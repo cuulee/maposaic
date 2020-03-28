@@ -3,7 +3,7 @@ import './App.css'
 import Mapozaic from './Mapozaic/Mapozaic'
 
 function App() {
-    return <Mapozaic />
+  return <Mapozaic />
 }
 
 export default App
