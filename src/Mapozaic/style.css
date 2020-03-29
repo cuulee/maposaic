@@ -7,4 +7,7 @@
 .loading {
   position: absolute;
   color: white;
+  font-size: medium;
+  top: 16px;
+  left: 16px;
 }

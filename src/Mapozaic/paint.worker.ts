@@ -1,7 +1,7 @@
 import { imagePoint, RGBColor } from './Mapozaic'
 
 const THRESHOLD = 50
-const TOLERANCE = 5
+const TOLERANCE = 3
 
 const getPointFromPixelIndex = (pixelIndex: number, W: number): imagePoint => {
   return { x: (pixelIndex / 4) % W, y: Math.floor(pixelIndex / 4 / W) }
@@ -84,8 +84,8 @@ const paintAdjacentPointsInData = (
 
     Object.values(adjacentPoints).forEach((adjacentPoint) => {
       if (
-        !adjacentPoint ||
-        !isColorSimilar(
+        !!adjacentPoint &&
+        isColorSimilar(
           createRGB(
             data[getPixelIndexFromPoint(adjacentPoint, W)],
             data[getPixelIndexFromPoint(adjacentPoint, W) + 1],
@@ -94,9 +94,8 @@ const paintAdjacentPointsInData = (
           initialColor,
         )
       ) {
-        return
+        toVisitPointStack.push(adjacentPoint)
       }
-      toVisitPointStack.push(adjacentPoint)
     })
   }
 }
