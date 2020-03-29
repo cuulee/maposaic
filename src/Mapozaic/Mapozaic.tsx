@@ -3,6 +3,7 @@ import mapboxgl from 'mapbox-gl'
 
 import './style.css'
 
+// eslint-disable-next-line
 const token: string = process.env['REACT_APP_MAPBOX_TOKEN'] || ''
 
 const styles = {
@@ -13,17 +14,17 @@ const styles = {
 
 const flipPixels = (
   data: Uint8ClampedArray,
-  pixels: Uint8Array,
+  mapboxPixels: Uint8Array,
   W: number,
   H: number,
   colors: Record<string, number>,
 ): void => {
   for (let y = 0; y < H; y++) {
     for (let x = 0; x < W; x++) {
-      data[(y * W + x) * 4] = pixels[((H - y - 1) * W + x) * 4]
-      data[(y * W + x) * 4 + 1] = pixels[((H - y - 1) * W + x) * 4 + 1]
-      data[(y * W + x) * 4 + 2] = pixels[((H - y - 1) * W + x) * 4 + 2]
-      data[(y * W + x) * 4 + 3] = pixels[((H - y - 1) * W + x) * 4 + 3]
+      data[(y * W + x) * 4] = mapboxPixels[((H - y - 1) * W + x) * 4]
+      data[(y * W + x) * 4 + 1] = mapboxPixels[((H - y - 1) * W + x) * 4 + 1]
+      data[(y * W + x) * 4 + 2] = mapboxPixels[((H - y - 1) * W + x) * 4 + 2]
+      data[(y * W + x) * 4 + 3] = mapboxPixels[((H - y - 1) * W + x) * 4 + 3]
       const color = `${data[(y * W + x) * 4]},${data[(y * W + x) * 4 + 1]},${data[(y * W + x) * 4 + 2]}`
       if (colors[color]) {
         colors[color] = colors[color] + 1
@@ -121,14 +122,65 @@ const paint = (data: Uint8ClampedArray, point: imagePoint, W: number) => {
   data[pixelIndex + 1] = 0
   data[pixelIndex + 2] = 0
 }
+let processId = 0
+const paintMozaic = async (map: mapboxgl.Map): Promise<void> => {
+  const currentProcess = processId
+  console.log('currentProcess', processId)
+  const canvas = map.getCanvas()
+  const gl = canvas.getContext('webgl')
+  if (!gl) {
+    console.log('pas de gl')
+    return
+  }
+  const mapboxPixels = new Uint8Array(gl.drawingBufferWidth * gl.drawingBufferHeight * 4)
+  gl.readPixels(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight, gl.RGBA, gl.UNSIGNED_BYTE, mapboxPixels)
+  const cvs = document.getElementById('mapozaic-cvs') as HTMLCanvasElement
+  const W = gl.drawingBufferWidth
+  const H = gl.drawingBufferHeight
+  cvs.setAttribute('width', W.toString())
+  cvs.setAttribute('height', H.toString())
+  const ctx = cvs.getContext('2d')
+  if (!ctx) {
+    return
+  }
+  const imageData = ctx.getImageData(0, 0, cvs.width, cvs.height)
+  const data = imageData.data
+  const colors = {}
+  flipPixels(data, mapboxPixels, W, H, colors)
+  const visitedPixelSet = new Set<number>()
+
+  for (let pixelIndex = 0; pixelIndex < data.length; pixelIndex += 4) {
+    if (visitedPixelSet.has(pixelIndex)) {
+      continue
+    }
+
+    const initialColor = createRGB(data[pixelIndex], data[pixelIndex + 1], data[pixelIndex + 2])
+    const targetColor: RGBColor =
+      data[pixelIndex] < THRESHOLD
+        ? createRGB(Math.floor(Math.random() * 256), Math.floor(Math.random() * 256), Math.floor(Math.random() * 256))
+        : createRGB(255, 255, 255)
+
+    const currentPoint = getPointFromPixelIndex(pixelIndex, W)
+    if (currentPoint.x < 100 || currentPoint.y < 100) paint(data, currentPoint, W)
+    paintAdjacentPointsInData(data, currentPoint, initialColor, targetColor, visitedPixelSet, W, H)
+  }
+
+  ctx.putImageData(imageData, 0, 0)
+  const mapboxCanvas = document.getElementById('mapbox-cvs') as HTMLCanvasElement
+  mapboxCanvas.style.opacity = '0'
+  cvs.style.opacity = '1'
+}
 
 const MapboxGLMap = (): JSX.Element => {
   const [map, setMap] = useState<mapboxgl.Map | null>(null)
   const mapContainer = useRef<HTMLDivElement | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
 
   useEffect(() => {
     mapboxgl.accessToken = token
     const initializeMap = (mapContainer: MutableRefObject<HTMLDivElement | null>): void => {
+      setIsLoading(true)
       const map = new mapboxgl.Map({
         container: mapContainer.current ? mapContainer.current : '',
         style: 'mapbox://styles/cartapuce/ck831v1pi187r1inxwf7np531', // stylesheet location
@@ -143,72 +195,50 @@ const MapboxGLMap = (): JSX.Element => {
       map.on('load', () => {
         setMap(map)
         map.resize()
-        const canvas = map.getCanvas()
-        const gl = canvas.getContext('webgl')
-        if (!gl) {
-          console.log('pas de gl')
-          return
+        processId += 1
+        paintMozaic(map)
+        console.log('finish paint')
+        setIsLoading(false)
+        const paintWorker = new Worker('paintWorker.ts')
+        console.log('loaaaad posting to worker')
+        paintWorker.onmessage = function (e) {
+          console.log(e.data)
         }
-        console.log('size', gl.drawingBufferWidth, gl.drawingBufferHeight)
-        const pixels = new Uint8Array(gl.drawingBufferWidth * gl.drawingBufferHeight * 4)
-        gl.readPixels(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight, gl.RGBA, gl.UNSIGNED_BYTE, pixels)
-        console.log('pixels', pixels)
-
-        const cvs = document.getElementById('cvs') as HTMLCanvasElement
-        if (!cvs) {
-          console.log('coucou')
-          return
-        }
-        const W = gl.drawingBufferWidth
-        const H = gl.drawingBufferHeight
-        cvs.setAttribute('width', W.toString())
-        cvs.setAttribute('height', H.toString())
-        const ctx = cvs.getContext('2d')
-        if (!ctx) {
-          return
-        }
-        const imageData = ctx.getImageData(0, 0, cvs.width, cvs.height)
-        const data = imageData.data
-        console.log('length', data.length, pixels.length)
-
-        const colors = {}
-        flipPixels(data, pixels, W, H, colors)
-        console.log('colors', colors)
-        const visitedPixelSet = new Set<number>()
-
-        for (let pixelIndex = 0; pixelIndex < data.length; pixelIndex += 4) {
-          if (visitedPixelSet.has(pixelIndex)) {
-            continue
-          }
-
-          const initialColor = createRGB(data[pixelIndex], data[pixelIndex + 1], data[pixelIndex + 2])
-          const targetColor: RGBColor =
-            data[pixelIndex] < THRESHOLD
-              ? createRGB(
-                  Math.floor(Math.random() * 256),
-                  Math.floor(Math.random() * 256),
-                  Math.floor(Math.random() * 256),
-                )
-              : createRGB(255, 255, 255)
-
-          const currentPoint = getPointFromPixelIndex(pixelIndex, W)
-          if (currentPoint.x < 100 || currentPoint.y < 100) paint(data, currentPoint, W)
-          paintAdjacentPointsInData(data, currentPoint, initialColor, targetColor, visitedPixelSet, W, H)
-        }
-        console.log('visited', visitedPixelSet.size)
-        // ctx.translate(W, 0)
-        // ctx.scale(10, -1)
-        ctx.putImageData(imageData, 0, 0)
+        paintWorker.postMessage('coucou worker')
+      })
+      map.on('dragstart', () => {
+        console.log('dragstart')
+        setIsDragging(true)
+        const mapboxCanvas = document.getElementById('mapbox-cvs') as HTMLCanvasElement
+        const cvs = document.getElementById('mapozaic-cvs') as HTMLCanvasElement
+        mapboxCanvas.style.opacity = '1'
+        cvs.style.opacity = '0'
+      })
+      map.on('dragend', () => setIsDragging(false))
+      map.on('render', () => {
+        // if (!map.loaded() || map.isMoving() || map.isZooming()) {
+        //   return
+        // }
+        // console.log('isLoafing, isdragging', isLoading, isDragging)
+        // console.log('gopaint')
+        // processId += 1
+        // setIsLoading(true)
+        // paintMozaic(map)
+        // setIsLoading(false)
+        // setIsLoading(false)
       })
     }
 
-    if (!map && mapContainer) initializeMap(mapContainer)
+    if (!map && mapContainer) {
+      initializeMap(mapContainer)
+    }
   }, [map])
 
   return (
-    <div>
-      <div ref={(el) => (mapContainer.current = el)} style={styles} />
-      <canvas className="mozaic" width="300" height="300" id="cvs" />
+    <div className="container">
+      <canvas className="mozaic" width="300" height="300" id="mapozaic-cvs" />
+      <div id="mapbox-cvs" ref={(el) => (mapContainer.current = el)} style={styles} />
+      {isLoading && <div className="loading">Loading</div>}
     </div>
   )
 }
