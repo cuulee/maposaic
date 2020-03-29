@@ -2,6 +2,7 @@
   "name": "maposaic",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://viconnex.github.io/mapozaic",
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
@@ -21,7 +22,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "lint:fix": "eslint './src/**/*.{ts,tsx}'"
+    "lint:fix": "eslint './src/**/*.{ts,tsx}'",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": "react-app"
