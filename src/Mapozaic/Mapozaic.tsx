@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, MutableRefObject } from 'react'
 import mapboxgl from 'mapbox-gl'
+import PaintWorker from './paint.worker.js'
 
 import './style.css'
 
@@ -199,7 +200,7 @@ const MapboxGLMap = (): JSX.Element => {
         paintMozaic(map)
         console.log('finish paint')
         setIsLoading(false)
-        const paintWorker = new Worker('paintWorker.ts')
+        const paintWorker = new PaintWorker() as Worker
         console.log('loaaaad posting to worker')
         paintWorker.onmessage = function (e) {
           console.log(e.data)
