@@ -17,6 +17,8 @@ const styles = {
 export type RGBColor = { r: number; g: number; b: number }
 export type imagePoint = { x: number; y: number }
 
+let paintWorker = new PaintWorker()
+
 const paintMozaic = async (map: mapboxgl.Map): Promise<void> => {
   const mapboxCanvas = map.getCanvas()
   const gl = mapboxCanvas.getContext('webgl')
@@ -24,9 +26,10 @@ const paintMozaic = async (map: mapboxgl.Map): Promise<void> => {
     console.log('pas de gl')
     return
   }
-  const mapozaicCanvas = document.getElementById('mapozaic-cvs') as HTMLCanvasElement
   const W = gl.drawingBufferWidth
   const H = gl.drawingBufferHeight
+
+  const mapozaicCanvas = document.getElementById('mapozaic-cvs') as HTMLCanvasElement
   mapozaicCanvas.setAttribute('width', W.toString())
   mapozaicCanvas.setAttribute('height', H.toString())
   const mapozaicContext = mapozaicCanvas.getContext('2d')
@@ -38,10 +41,7 @@ const paintMozaic = async (map: mapboxgl.Map): Promise<void> => {
   const mapboxPixels = new Uint8Array(gl.drawingBufferWidth * gl.drawingBufferHeight * 4)
   gl.readPixels(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight, gl.RGBA, gl.UNSIGNED_BYTE, mapboxPixels)
 
-  const paintWorker = new PaintWorker()
   paintWorker.onmessage = function (e) {
-    // console.log('new pixel', e.data)
-    // imageData.data = e.data
     imageData.data.set(e.data)
     mapozaicContext.putImageData(imageData, 0, 0)
     const mapboxElement = document.getElementById('mapbox-cvs') as HTMLCanvasElement
@@ -55,7 +55,6 @@ const MapboxGLMap = (): JSX.Element => {
   const [map, setMap] = useState<mapboxgl.Map | null>(null)
   const mapContainer = useRef<HTMLDivElement | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const [isDragging, setIsDragging] = useState(false)
 
   useEffect(() => {
     mapboxgl.accessToken = token
@@ -75,23 +74,26 @@ const MapboxGLMap = (): JSX.Element => {
       map.on('load', () => {
         setMap(map)
         map.resize()
+        paintWorker.terminate()
+        paintWorker = new PaintWorker()
         paintMozaic(map)
         console.log('finish paint')
         setIsLoading(false)
       })
       map.on('dragstart', () => {
         console.log('dragstart')
-        setIsDragging(true)
         const mapboxCanvas = document.getElementById('mapbox-cvs') as HTMLCanvasElement
         const cvs = document.getElementById('mapozaic-cvs') as HTMLCanvasElement
         mapboxCanvas.style.opacity = '1'
         cvs.style.opacity = '0'
       })
-      map.on('dragend', () => setIsDragging(false))
       map.on('render', () => {
-        // if (!map.loaded() || map.isMoving() || map.isZooming()) {
-        //   return
-        // }
+        if (!map.loaded() || map.isMoving() || map.isZooming()) {
+          return
+        }
+        paintWorker.terminate()
+        paintWorker = new PaintWorker()
+        paintMozaic(map)
         // console.log('isLoafing, isdragging', isLoading, isDragging)
         // console.log('gopaint')
         // processId += 1

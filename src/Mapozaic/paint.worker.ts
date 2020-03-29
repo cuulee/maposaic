@@ -100,7 +100,7 @@ const paintAdjacentPointsInData = (
     })
   }
 }
-
+// eslint-disable-next-line
 onmessage = ({
   data: { mapboxPixels, mapozaicData, W, H },
 }: {
