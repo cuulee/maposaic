@@ -1,0 +1,24 @@
+{
+  "files": {
+    "main.css": "/mapozaic/static/css/main.f578ac12.chunk.css",
+    "main.js": "/mapozaic/static/js/main.46261fda.chunk.js",
+    "main.js.map": "/mapozaic/static/js/main.46261fda.chunk.js.map",
+    "runtime-main.js": "/mapozaic/static/js/runtime-main.b4a5f797.js",
+    "runtime-main.js.map": "/mapozaic/static/js/runtime-main.b4a5f797.js.map",
+    "static/js/2.f38c4c18.chunk.js": "/mapozaic/static/js/2.f38c4c18.chunk.js",
+    "static/js/2.f38c4c18.chunk.js.map": "/mapozaic/static/js/2.f38c4c18.chunk.js.map",
+    "aeca35238c9d9de90d29.worker.js": "/mapozaic/aeca35238c9d9de90d29.worker.js",
+    "aeca35238c9d9de90d29.worker.js.map": "/mapozaic/aeca35238c9d9de90d29.worker.js.map",
+    "index.html": "/mapozaic/index.html",
+    "precache-manifest.ebd933bfabf427b231d00b48f67d6f91.js": "/mapozaic/precache-manifest.ebd933bfabf427b231d00b48f67d6f91.js",
+    "service-worker.js": "/mapozaic/service-worker.js",
+    "static/css/main.f578ac12.chunk.css.map": "/mapozaic/static/css/main.f578ac12.chunk.css.map",
+    "static/js/2.f38c4c18.chunk.js.LICENSE.txt": "/mapozaic/static/js/2.f38c4c18.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.b4a5f797.js",
+    "static/js/2.f38c4c18.chunk.js",
+    "static/css/main.f578ac12.chunk.css",
+    "static/js/main.46261fda.chunk.js"
+  ]
+}
