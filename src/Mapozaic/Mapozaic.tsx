@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, MutableRefObject } from 'react'
 import mapboxgl from 'mapbox-gl'
-import PaintWorker from './paint.worker.js'
+// eslint-disable-next-line
+import PaintWorker from 'worker-loader!./paint.worker'
 
 import './style.css'
 
@@ -200,7 +201,8 @@ const MapboxGLMap = (): JSX.Element => {
         paintMozaic(map)
         console.log('finish paint')
         setIsLoading(false)
-        const paintWorker = new PaintWorker() as Worker
+
+        const paintWorker = new PaintWorker()
         console.log('loaaaad posting to worker')
         paintWorker.onmessage = function (e) {
           console.log(e.data)
