@@ -1,6 +1,6 @@
 import { imagePoint, RGBColor } from './Mapozaic'
 
-const THRESHOLD = 50
+const WHITE_THRESHOLD = 50
 const TOLERANCE = 3
 
 const getPointFromPixelIndex = (pixelIndex: number, W: number): imagePoint => {
@@ -8,6 +8,9 @@ const getPointFromPixelIndex = (pixelIndex: number, W: number): imagePoint => {
 }
 const getPixelIndexFromPoint = (point: imagePoint, W: number): number => {
   return (point.y * W + point.x) * 4
+}
+const getPixelIndexFromOppositePoint = (point: imagePoint, W: number, H: number): number => {
+  return ((H - point.y - 1) * W + point.x) * 4
 }
 
 const isColorSimilar = (color1: RGBColor, color2: RGBColor): boolean => {
@@ -18,25 +21,13 @@ const isColorSimilar = (color1: RGBColor, color2: RGBColor): boolean => {
   )
 }
 
-const flipPixels = (
-  data: Uint8ClampedArray,
-  mapboxPixels: Uint8Array,
-  W: number,
-  H: number,
-  colors: Record<string, number>,
-): void => {
+const flipPixels = (data: Uint8ClampedArray, mapboxPixels: Uint8Array, W: number, H: number): void => {
   for (let y = 0; y < H; y++) {
     for (let x = 0; x < W; x++) {
       data[(y * W + x) * 4] = mapboxPixels[((H - y - 1) * W + x) * 4]
       data[(y * W + x) * 4 + 1] = mapboxPixels[((H - y - 1) * W + x) * 4 + 1]
       data[(y * W + x) * 4 + 2] = mapboxPixels[((H - y - 1) * W + x) * 4 + 2]
       data[(y * W + x) * 4 + 3] = mapboxPixels[((H - y - 1) * W + x) * 4 + 3]
-      const color = `${data[(y * W + x) * 4]},${data[(y * W + x) * 4 + 1]},${data[(y * W + x) * 4 + 2]}`
-      if (colors[color]) {
-        colors[color] = colors[color] + 1
-      } else {
-        colors[color] = 1
-      }
     }
   }
 }
@@ -46,7 +37,8 @@ const createRGB = (r: number, g: number, b: number): RGBColor => {
 }
 
 const paintAdjacentPointsInData = (
-  data: Uint8ClampedArray,
+  mapozaicData: Uint8ClampedArray,
+  mapboxPixels: Uint8Array,
   initialPoint: imagePoint,
   initialColor: RGBColor,
   targetColor: RGBColor,
@@ -65,11 +57,12 @@ const paintAdjacentPointsInData = (
     if (visitedPixelSet.has(pixelIndex)) {
       continue
     }
-
     visitedPixelSet.add(pixelIndex)
-    data[pixelIndex] = targetColor.r
-    data[pixelIndex + 1] = targetColor.g
-    data[pixelIndex + 2] = targetColor.b
+    const oppositePixel = getPixelIndexFromOppositePoint(point, W, H)
+    mapozaicData[oppositePixel] = targetColor.r
+    mapozaicData[oppositePixel + 1] = targetColor.g
+    mapozaicData[oppositePixel + 2] = targetColor.b
+    mapozaicData[oppositePixel + 3] = 255
 
     const adjacentPoints = {
       S: point.y < W - 1 ? { x: point.x, y: point.y + 1 } : null,
@@ -84,9 +77,9 @@ const paintAdjacentPointsInData = (
         !visitedPixelSet.has(getPixelIndexFromPoint(adjacentPoint, W)) &&
         isColorSimilar(
           createRGB(
-            data[getPixelIndexFromPoint(adjacentPoint, W)],
-            data[getPixelIndexFromPoint(adjacentPoint, W) + 1],
-            data[getPixelIndexFromPoint(adjacentPoint, W) + 2],
+            mapboxPixels[getPixelIndexFromPoint(adjacentPoint, W)],
+            mapboxPixels[getPixelIndexFromPoint(adjacentPoint, W) + 1],
+            mapboxPixels[getPixelIndexFromPoint(adjacentPoint, W) + 2],
           ),
           initialColor,
         )
@@ -102,25 +95,32 @@ onmessage = ({
 }: {
   data: { mapboxPixels: Uint8Array; mapozaicData: Uint8ClampedArray; W: number; H: number }
 }): void => {
-  const colors = {}
-  flipPixels(mapozaicData, mapboxPixels, W, H, colors)
+  // flipPixels(mapozaicData, mapboxPixels, W, H)
   const visitedPixelSet = new Set<number>()
-
-  for (let pixelIndex = 0; pixelIndex < mapozaicData.length; pixelIndex += 4) {
+  for (let pixelIndex = 0; pixelIndex < mapboxPixels.length; pixelIndex += 4) {
     if (visitedPixelSet.has(pixelIndex)) {
       continue
     }
 
-    const initialColor = createRGB(mapozaicData[pixelIndex], mapozaicData[pixelIndex + 1], mapozaicData[pixelIndex + 2])
+    const initialColor = createRGB(mapboxPixels[pixelIndex], mapboxPixels[pixelIndex + 1], mapboxPixels[pixelIndex + 2])
     const targetColor: RGBColor =
-      mapozaicData[pixelIndex] < THRESHOLD
+      mapboxPixels[pixelIndex] < WHITE_THRESHOLD
         ? createRGB(Math.floor(Math.random() * 256), Math.floor(Math.random() * 256), Math.floor(Math.random() * 256))
         : createRGB(255, 255, 255)
 
     const currentPoint = getPointFromPixelIndex(pixelIndex, W)
-    paintAdjacentPointsInData(mapozaicData, currentPoint, initialColor, targetColor, visitedPixelSet, W, H)
+    paintAdjacentPointsInData(
+      mapozaicData,
+      mapboxPixels,
+      currentPoint,
+      initialColor,
+      targetColor,
+      visitedPixelSet,
+      W,
+      H,
+    )
   }
-
+  console.log('end data', mapozaicData)
   // eslint-disable-next-line
   // @ts-ignore
   postMessage(mapozaicData)
