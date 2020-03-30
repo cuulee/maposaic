@@ -1,3 +1,3 @@
-Transform maps into mozaics
+Transform maps into mosaics
 
-![paris](mapozaic_paris.png)
+![paris](maposaic_paris.png)
