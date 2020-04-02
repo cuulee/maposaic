@@ -1,5 +1,5 @@
 Transform maps into mosaics.
 
-![paris](maposaic_paris.png)
+![paris](./screenshots/maposaic_paris.png)
 
-![monde](maposaic_monde.png)
+![monde](./screenshots/maposaic_monde.png)
