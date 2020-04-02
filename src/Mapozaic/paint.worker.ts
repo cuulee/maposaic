@@ -59,11 +59,11 @@ const paintAdjacentPointsInData = (
   while (toVisitPointStack.length > 0) {
     const point = toVisitPointStack.pop()
     if (!point) {
-      break
+      continue
     }
     const pixelIndex = getPixelIndexFromPoint(point, W)
     if (visitedPixelSet.has(pixelIndex)) {
-      break
+      continue
     }
 
     visitedPixelSet.add(pixelIndex)
@@ -72,19 +72,16 @@ const paintAdjacentPointsInData = (
     data[pixelIndex + 2] = targetColor.b
 
     const adjacentPoints = {
-      NO: point.x > 0 && point.y > 0 ? { x: point.x - 1, y: point.y - 1 } : null,
-      N: point.y > 0 ? { x: point.x, y: point.y - 1 } : null,
-      NE: point.x < W - 1 && point.y > 0 ? { x: point.x + 1, y: point.y - 1 } : null,
-      O: point.x > 0 ? { x: point.x - 1, y: point.y } : null,
-      E: point.x < W - 1 ? { x: point.x + 1, y: point.y } : null,
-      SO: point.x > 0 && point.y < H - 1 ? { x: point.x - 1, y: point.y + 1 } : null,
       S: point.y < W - 1 ? { x: point.x, y: point.y + 1 } : null,
-      SE: point.x < W - 1 && point.y < H - 1 ? { x: point.x + 1, y: point.y + 1 } : null,
+      E: point.x < W - 1 ? { x: point.x + 1, y: point.y } : null,
+      O: point.x > 0 ? { x: point.x - 1, y: point.y } : null,
+      N: point.y > 0 ? { x: point.x, y: point.y - 1 } : null,
     }
 
     Object.values(adjacentPoints).forEach((adjacentPoint) => {
       if (
         !!adjacentPoint &&
+        !visitedPixelSet.has(getPixelIndexFromPoint(adjacentPoint, W)) &&
         isColorSimilar(
           createRGB(
             data[getPixelIndexFromPoint(adjacentPoint, W)],
