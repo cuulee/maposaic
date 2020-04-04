@@ -4,7 +4,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/maposaic/57e96b48d5855b781de5.worker.js"
   },
   {
-    "revision": "0f8b03dda71b8ab3ec6d3ce4cf742187",
+    "revision": "357ef1639d60d2e69be81fbf4855b3b5",
     "url": "/maposaic/index.html"
   },
   {
