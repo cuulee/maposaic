@@ -40,20 +40,24 @@ const MapboxGLMap = (): JSX.Element => {
       console.log('pas de gl')
       return
     }
-    const W = gl.drawingBufferWidth
-    const H = gl.drawingBufferHeight
+    const webglWidth = gl.drawingBufferWidth
+    const webglHeight = gl.drawingBufferHeight
+    const viewportWidth = webglWidth
+    const viewportHeight = webglHeight
 
     const mapozaicCanvas = document.getElementById('mapozaic-cvs') as HTMLCanvasElement
-    mapozaicCanvas.setAttribute('width', W.toString())
-    mapozaicCanvas.setAttribute('height', H.toString())
+    mapozaicCanvas.setAttribute('width', viewportWidth.toString())
+    mapozaicCanvas.setAttribute('height', viewportHeight.toString())
     const mapozaicContext = mapozaicCanvas.getContext('2d')
     if (!mapozaicContext) {
       return
     }
     const imageData = mapozaicContext.getImageData(0, 0, mapozaicCanvas.width, mapozaicCanvas.height)
     const mapozaicData = imageData.data
+
     const mapboxPixels = new Uint8Array(gl.drawingBufferWidth * gl.drawingBufferHeight * 4)
     gl.readPixels(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight, gl.RGBA, gl.UNSIGNED_BYTE, mapboxPixels)
+
     paintWorker.onmessage = function (e): void {
       imageData.data.set(e.data)
       mapozaicContext.putImageData(imageData, 0, 0)
@@ -62,7 +66,7 @@ const MapboxGLMap = (): JSX.Element => {
       mapozaicCanvas.style.opacity = '1'
       setIsLoading(false)
     }
-    paintWorker.postMessage({ mapboxPixels, mapozaicData, W, H })
+    paintWorker.postMessage({ mapboxPixels, mapozaicData, webglWidth, webglHeight, viewportHeight, viewportWidth })
   }
 
   useEffect(() => {
@@ -103,7 +107,7 @@ const MapboxGLMap = (): JSX.Element => {
   return (
     <div className="container">
       <canvas className="mozaic" width="300" height="300" id="mapozaic-cvs" />
-      <div id="mapbox-cvs" ref={(el) => (mapContainer.current = el)} style={styles} />
+      <div id="mapbox-cvs" className="mapbox-cvs" ref={(el) => (mapContainer.current = el)} style={styles} />
       {isLoading && <div className="loading">Loading...</div>}
     </div>
   )
