@@ -26,7 +26,7 @@ const createRGB = (r: number, g: number, b: number): RGBColor => {
 }
 
 const paintAdjacentPointsInData = ({
-  mapozaicData,
+  maposaicData,
   mapboxPixels,
   initialPoint,
   initialColor,
@@ -36,7 +36,7 @@ const paintAdjacentPointsInData = ({
   viewportHeight,
   viewportWidth,
 }: {
-  mapozaicData: Uint8ClampedArray
+  maposaicData: Uint8ClampedArray
   mapboxPixels: Uint8Array
   initialPoint: imagePoint
   initialColor: RGBColor
@@ -60,10 +60,10 @@ const paintAdjacentPointsInData = ({
     }
     visitedPixelSet.add(pixelIndex)
     const mosaicPixel = getMosaicPixelIndexFromPoint(point, viewportWidth, viewportHeight)
-    mapozaicData[mosaicPixel] = targetColor.r
-    mapozaicData[mosaicPixel + 1] = targetColor.g
-    mapozaicData[mosaicPixel + 2] = targetColor.b
-    mapozaicData[mosaicPixel + 3] = 255
+    maposaicData[mosaicPixel] = targetColor.r
+    maposaicData[mosaicPixel + 1] = targetColor.g
+    maposaicData[mosaicPixel + 2] = targetColor.b
+    maposaicData[mosaicPixel + 3] = 255
 
     const adjacentPoints = {
       S: point.y < viewportHeight - 1 ? { x: point.x, y: point.y + 1 } : null,
@@ -92,11 +92,11 @@ const paintAdjacentPointsInData = ({
 }
 // eslint-disable-next-line
 onmessage = ({
-  data: { mapboxPixels, mapozaicData, webglWidth, webglHeight, viewportWidth, viewportHeight },
+  data: { mapboxPixels, maposaicData, webglWidth, webglHeight, viewportWidth, viewportHeight },
 }: {
   data: {
     mapboxPixels: Uint8Array
-    mapozaicData: Uint8ClampedArray
+    maposaicData: Uint8ClampedArray
     webglWidth: number
     webglHeight: number
     viewportWidth: number
@@ -130,7 +130,7 @@ onmessage = ({
 
       const initialPoint = getPointFromPixelIndex(pixelIndex, webglWidth)
       paintAdjacentPointsInData({
-        mapozaicData,
+        maposaicData,
         mapboxPixels,
         initialPoint,
         initialColor,
@@ -146,5 +146,5 @@ onmessage = ({
 
   // eslint-disable-next-line
   // @ts-ignore
-  postMessage(mapozaicData)
+  postMessage(maposaicData)
 }

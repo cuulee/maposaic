@@ -21,7 +21,7 @@ let paintWorker = new PaintWorker()
 
 const showMapboxCanvas = (isMapbox: boolean): void => {
   const mapboxElement = document.getElementById('mapbox-cvs') as HTMLCanvasElement
-  const mosaicElement = document.getElementById('mapozaic-cvs') as HTMLCanvasElement
+  const mosaicElement = document.getElementById('maposaic-cvs') as HTMLCanvasElement
   mapboxElement.style.opacity = isMapbox ? '1' : '0'
   mosaicElement.style.opacity = isMapbox ? '0' : '1'
 }
@@ -31,7 +31,7 @@ const MapboxGLMap = (): JSX.Element => {
   const mapContainer = useRef<HTMLDivElement | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
-  const paintMozaic = async (map: mapboxgl.Map): Promise<void> => {
+  const paintMosaic = async (map: mapboxgl.Map): Promise<void> => {
     setIsLoading(true)
     showMapboxCanvas(true)
     const mapboxCanvas = map.getCanvas()
@@ -45,26 +45,26 @@ const MapboxGLMap = (): JSX.Element => {
     const viewportWidth = webglWidth
     const viewportHeight = webglHeight
 
-    const mapozaicCanvas = document.getElementById('mapozaic-cvs') as HTMLCanvasElement
-    mapozaicCanvas.setAttribute('width', viewportWidth.toString())
-    mapozaicCanvas.setAttribute('height', viewportHeight.toString())
-    const mapozaicContext = mapozaicCanvas.getContext('2d')
-    if (!mapozaicContext) {
+    const maposaicCanvas = document.getElementById('maposaic-cvs') as HTMLCanvasElement
+    maposaicCanvas.setAttribute('width', viewportWidth.toString())
+    maposaicCanvas.setAttribute('height', viewportHeight.toString())
+    const maposaicContext = maposaicCanvas.getContext('2d')
+    if (!maposaicContext) {
       return
     }
-    const imageData = mapozaicContext.getImageData(0, 0, mapozaicCanvas.width, mapozaicCanvas.height)
-    const mapozaicData = imageData.data
+    const imageData = maposaicContext.getImageData(0, 0, maposaicCanvas.width, maposaicCanvas.height)
+    const maposaicData = imageData.data
 
     const mapboxPixels = new Uint8Array(gl.drawingBufferWidth * gl.drawingBufferHeight * 4)
     gl.readPixels(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight, gl.RGBA, gl.UNSIGNED_BYTE, mapboxPixels)
 
     paintWorker.onmessage = function (e): void {
       imageData.data.set(e.data)
-      mapozaicContext.putImageData(imageData, 0, 0)
+      maposaicContext.putImageData(imageData, 0, 0)
       showMapboxCanvas(false)
       setIsLoading(false)
     }
-    paintWorker.postMessage({ mapboxPixels, mapozaicData, webglWidth, webglHeight, viewportHeight, viewportWidth })
+    paintWorker.postMessage({ mapboxPixels, maposaicData, webglWidth, webglHeight, viewportHeight, viewportWidth })
   }
 
   useEffect(() => {
@@ -93,7 +93,7 @@ const MapboxGLMap = (): JSX.Element => {
         }
         paintWorker.terminate()
         paintWorker = new PaintWorker()
-        paintMozaic(map)
+        paintMosaic(map)
       })
     }
 
@@ -104,7 +104,7 @@ const MapboxGLMap = (): JSX.Element => {
 
   return (
     <div className="container">
-      <canvas className="mozaic" width="300" height="300" id="mapozaic-cvs" />
+      <canvas className="mozaic" width="300" height="300" id="maposaic-cvs" />
       <div id="mapbox-cvs" className="mapbox-cvs" ref={(el) => (mapContainer.current = el)} style={styles} />
       {isLoading && <div className="loading">Loading...</div>}
     </div>
