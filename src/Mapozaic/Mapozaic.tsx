@@ -19,11 +19,11 @@ export type imagePoint = { x: number; y: number }
 
 let paintWorker = new PaintWorker()
 
-const showMapboxCanvas = (): void => {
-  const mapboxCanvas = document.getElementById('mapbox-cvs') as HTMLCanvasElement
-  const cvs = document.getElementById('mapozaic-cvs') as HTMLCanvasElement
-  mapboxCanvas.style.opacity = '1'
-  cvs.style.opacity = '0'
+const showMapboxCanvas = (isMapbox: boolean): void => {
+  const mapboxElement = document.getElementById('mapbox-cvs') as HTMLCanvasElement
+  const mosaicElement = document.getElementById('mapozaic-cvs') as HTMLCanvasElement
+  mapboxElement.style.opacity = isMapbox ? '1' : '0'
+  mosaicElement.style.opacity = isMapbox ? '0' : '1'
 }
 
 const MapboxGLMap = (): JSX.Element => {
@@ -33,7 +33,7 @@ const MapboxGLMap = (): JSX.Element => {
 
   const paintMozaic = async (map: mapboxgl.Map): Promise<void> => {
     setIsLoading(true)
-    showMapboxCanvas()
+    showMapboxCanvas(true)
     const mapboxCanvas = map.getCanvas()
     const gl = mapboxCanvas.getContext('webgl')
     if (!gl) {
@@ -61,9 +61,7 @@ const MapboxGLMap = (): JSX.Element => {
     paintWorker.onmessage = function (e): void {
       imageData.data.set(e.data)
       mapozaicContext.putImageData(imageData, 0, 0)
-      const mapboxElement = document.getElementById('mapbox-cvs') as HTMLCanvasElement
-      mapboxElement.style.opacity = '0'
-      mapozaicCanvas.style.opacity = '1'
+      showMapboxCanvas(false)
       setIsLoading(false)
     }
     paintWorker.postMessage({ mapboxPixels, mapozaicData, webglWidth, webglHeight, viewportHeight, viewportWidth })
