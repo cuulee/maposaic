@@ -14,7 +14,8 @@
     "es6": true
   },
   "rules": {
-    "prettier/prettier": ["error"]
+    "prettier/prettier": ["error"],
+    "@typescript-eslint/explicit-function-return-type": "off"
   },
   "settings": {
     "react": {

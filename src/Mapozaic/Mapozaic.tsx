@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, MutableRefObject } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import mapboxgl from 'mapbox-gl'
 // eslint-disable-next-line
 import PaintWorker from 'worker-loader!./paint.worker'
@@ -69,38 +69,34 @@ const MapboxGLMap = (): JSX.Element => {
 
   useEffect(() => {
     mapboxgl.accessToken = token
-    const initializeMap = (mapContainer: MutableRefObject<HTMLDivElement | null>): void => {
-      const map = new mapboxgl.Map({
-        container: mapContainer.current ? mapContainer.current : '',
-        style: 'mapbox://styles/cartapuce/ck831v1pi187r1inxwf7np531', // stylesheet location
-        // style: 'mapbox://styles/mapbox/streets-v11',
-        zoom: 12,
-        center: {
-          lng: 2.338272,
-          lat: 48.858796,
-        },
-      })
 
-      map.on('load', () => {
-        setMap(map)
-        map.resize()
-      })
-      map.on('dragstart', showMapboxCanvas)
-      map.on('zoomstart', showMapboxCanvas)
-      map.on('render', () => {
-        if (!map.loaded() || map.isMoving() || map.isZooming()) {
-          return
-        }
-        paintWorker.terminate()
-        paintWorker = new PaintWorker()
-        paintMosaic(map)
-      })
-    }
+    const newMap = new mapboxgl.Map({
+      container: mapContainer.current ? mapContainer.current : '',
+      style: 'mapbox://styles/cartapuce/ck8vkvxjt27z71ila3b3jecka', // administrative
+      // style: 'mapbox://styles/cartapuce/ck8vk01zo2e5w1ipmytroxgf4', // road
+      // style: 'mapbox://styles/mapbox/streets-v11',
+      zoom: 12,
+      center: {
+        lng: 2.338272,
+        lat: 48.858796,
+      },
+    })
 
-    if (!map && mapContainer) {
-      initializeMap(mapContainer)
-    }
-  }, [map])
+    newMap.on('load', () => {
+      setMap(newMap)
+      newMap.resize()
+    })
+    newMap.on('dragstart', showMapboxCanvas)
+    newMap.on('zoomstart', showMapboxCanvas)
+    newMap.on('render', () => {
+      if (!newMap.loaded() || newMap.isMoving() || newMap.isZooming()) {
+        return
+      }
+      paintWorker.terminate()
+      paintWorker = new PaintWorker()
+      paintMosaic(newMap)
+    })
+  }, [])
 
   return (
     <div className="container">
