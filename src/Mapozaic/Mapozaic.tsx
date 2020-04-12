@@ -3,6 +3,8 @@ import mapboxgl from 'mapbox-gl'
 import { Button } from 'antd'
 import { RightCircleFilled } from '@ant-design/icons'
 import Drawer from './Drawer'
+import { Spin } from 'antd'
+import { LoadingOutlined } from '@ant-design/icons'
 // eslint-disable-next-line
 import PaintWorker from 'worker-loader!./paint.worker'
 
@@ -12,7 +14,7 @@ import './style.css'
 const token: string = process.env['REACT_APP_MAPBOX_TOKEN'] || ''
 mapboxgl.accessToken = token
 
-const MapboxStyleURL = {
+export const MAPBOX_STYLE_URL = {
   administrative: 'mapbox://styles/cartapuce/ck8vkvxjt27z71ila3b3jecka',
   road: 'mapbox://styles/cartapuce/ck8vk01zo2e5w1ipmytroxgf4',
   // regular: 'mapbox://styles/mapbox/streets-v11',
@@ -39,7 +41,7 @@ const showMapboxCanvas = (isMapbox: boolean): void => {
 const MapboxGLMap = (): JSX.Element => {
   const [map, setMap] = useState<mapboxgl.Map | null>(null)
   const mapContainer = useRef<HTMLDivElement | null>(null)
-  const [mapboxStyleURL, setMapboxStyleURL] = useState(MapboxStyleURL.road)
+  const [mapboxStyleURL, setMapboxStyleURL] = useState(MAPBOX_STYLE_URL.road)
   const [isLoading, setIsLoading] = useState(false)
 
   const paintMosaic = async (map: mapboxgl.Map): Promise<void> => {
@@ -114,13 +116,10 @@ const MapboxGLMap = (): JSX.Element => {
     }
   }, [mapboxStyleURL, map, hasChangedStyle])
 
-  const changeMapStyle = () => {
-    if (mapboxStyleURL === MapboxStyleURL.administrative) {
-      setMapboxStyleURL(MapboxStyleURL.road)
-      setHasChangedStyle(true)
-    }
-    if (mapboxStyleURL === MapboxStyleURL.road) {
-      setMapboxStyleURL(MapboxStyleURL.administrative)
+  const changeMapStyle = (newStyle: string) => {
+    if (mapboxStyleURL !== newStyle) {
+      setIsLoading(true)
+      setMapboxStyleURL(newStyle)
       setHasChangedStyle(true)
     }
   }
@@ -129,8 +128,14 @@ const MapboxGLMap = (): JSX.Element => {
     <div className="container">
       <canvas className="mosaic-canvas" width="300" height="300" id="maposaic-cvs" />
       <div id="mapbox-cvs" className="mapbox-canvas" ref={(el) => (mapContainer.current = el)} style={styles} />
+      <Spin spinning={isLoading} indicator={<LoadingOutlined />} />
       <div className="overmap">
-        <Drawer visible={drawerVisible} setDrawerVisible={setDrawerVisible} />
+        <Drawer
+          visible={drawerVisible}
+          setDrawerVisible={setDrawerVisible}
+          changeMapStyle={changeMapStyle}
+          mapboxStyleURL={mapboxStyleURL}
+        />
         <Button
           type="primary"
           shape="circle"
@@ -139,7 +144,6 @@ const MapboxGLMap = (): JSX.Element => {
           }}
           icon={<RightCircleFilled />}
         />
-        {isLoading && <div className="loading">Loading...</div>}
       </div>
     </div>
   )
