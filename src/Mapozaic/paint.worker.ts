@@ -1,8 +1,5 @@
 import { imagePoint, RGBColor } from './Mapozaic'
 
-const WHITE_THRESHOLD = 50
-const TOLERANCE = 3
-
 const getPointFromPixelIndex = (pixelIndex: number, webglWidth: number): imagePoint => {
   return { x: (pixelIndex / 4) % webglWidth, y: Math.floor(pixelIndex / 4 / webglWidth) }
 }
@@ -13,11 +10,11 @@ const getMosaicPixelIndexFromPoint = (point: imagePoint, viewportWidth: number, 
   return ((viewportHeight - point.y - 1) * viewportWidth + point.x) * 4
 }
 
-const isColorSimilar = (color1: RGBColor, color2: RGBColor): boolean => {
+const isColorSimilar = (color1: RGBColor, color2: RGBColor, similarColorTolerance: number): boolean => {
   return (
-    Math.abs(color1.r - color2.r) < TOLERANCE &&
-    Math.abs(color1.g - color2.g) < TOLERANCE &&
-    Math.abs(color1.b - color2.b) < TOLERANCE
+    Math.abs(color1.r - color2.r) < similarColorTolerance &&
+    Math.abs(color1.g - color2.g) < similarColorTolerance &&
+    Math.abs(color1.b - color2.b) < similarColorTolerance
   )
 }
 
@@ -35,6 +32,7 @@ const paintAdjacentPointsInData = ({
   webglWidth,
   viewportHeight,
   viewportWidth,
+  similarColorTolerance,
 }: {
   maposaicData: Uint8ClampedArray
   mapboxPixels: Uint8Array
@@ -46,6 +44,7 @@ const paintAdjacentPointsInData = ({
   webglHeight: number
   viewportHeight: number
   viewportWidth: number
+  similarColorTolerance: number
 }): void => {
   const toVisitPointStack: imagePoint[] = [initialPoint]
 
@@ -83,6 +82,7 @@ const paintAdjacentPointsInData = ({
             mapboxPixels[getMapboxPixelIndexFromPoint(adjacentPoint, webglWidth) + 2],
           ),
           initialColor,
+          similarColorTolerance,
         )
       ) {
         toVisitPointStack.push(adjacentPoint)
@@ -92,7 +92,16 @@ const paintAdjacentPointsInData = ({
 }
 // eslint-disable-next-line
 onmessage = ({
-  data: { mapboxPixels, maposaicData, webglWidth, webglHeight, viewportWidth, viewportHeight, roadColorThreshold },
+  data: {
+    mapboxPixels,
+    maposaicData,
+    webglWidth,
+    webglHeight,
+    viewportWidth,
+    viewportHeight,
+    roadColorThreshold,
+    similarColorTolerance,
+  },
 }: {
   data: {
     mapboxPixels: Uint8Array
@@ -102,6 +111,7 @@ onmessage = ({
     viewportWidth: number
     viewportHeight: number
     roadColorThreshold: number
+    similarColorTolerance: number
   }
 }): void => {
   const visitedPixelSet = new Set<number>()
@@ -141,6 +151,7 @@ onmessage = ({
         webglHeight,
         viewportHeight,
         viewportWidth,
+        similarColorTolerance,
       })
     }
   }

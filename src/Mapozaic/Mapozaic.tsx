@@ -21,6 +21,7 @@ export const MAPBOX_STYLE_URL = {
 }
 
 export const INITIAL_ROAD_COLOR_THRESHOLD = 50
+export const INITIAL_SIMILAR_COLOR_TOLERANCE = 3
 
 const styles = {
   width: '100vw',
@@ -48,6 +49,7 @@ const MapboxGLMap = (): JSX.Element => {
   const [mapboxStyleURL, setMapboxStyleURL] = useState(MAPBOX_STYLE_URL.road)
   const [isLoading, setIsLoading] = useState(false)
   const [roadColorThreshold, setRoadColorThreshold] = useState(INITIAL_ROAD_COLOR_THRESHOLD)
+  const [similarColorTolerance, setSimilarColorTolerance] = useState(INITIAL_SIMILAR_COLOR_TOLERANCE)
 
   const paintMosaic = async (map: mapboxgl.Map): Promise<void> => {
     setIsLoading(true)
@@ -90,6 +92,7 @@ const MapboxGLMap = (): JSX.Element => {
       viewportHeight,
       viewportWidth,
       roadColorThreshold,
+      similarColorTolerance,
     })
   }
 
@@ -116,7 +119,7 @@ const MapboxGLMap = (): JSX.Element => {
       paintWorker = new PaintWorker()
       paintMosaic(newMap)
     })
-  }, [roadColorThreshold])
+  }, [roadColorThreshold, similarColorTolerance])
 
   const [hasChangedStyle, setHasChangedStyle] = useState(false)
   const [drawerVisible, setDrawerVisible] = useState(false)
@@ -140,6 +143,10 @@ const MapboxGLMap = (): JSX.Element => {
     setRoadColorThreshold(threshold)
     setIsLoading(true)
   }
+  const setNewSimilarColorTolerance = (tolerance: number) => {
+    setSimilarColorTolerance(tolerance)
+    setIsLoading(true)
+  }
 
   return (
     <div className="container">
@@ -153,6 +160,7 @@ const MapboxGLMap = (): JSX.Element => {
           changeMapStyle={changeMapStyle}
           mapboxStyleURL={mapboxStyleURL}
           setNewRoadColorThreshold={setNewRoadColorThreshold}
+          setNewSimilarColorTolerance={setNewSimilarColorTolerance}
         />
         <Button
           type="primary"

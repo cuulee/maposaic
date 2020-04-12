@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Drawer as AntDrawer, Radio, Divider, Slider } from 'antd'
 import { RadioChangeEvent } from 'antd/lib/radio'
-import { MAPBOX_STYLE_URL, INITIAL_ROAD_COLOR_THRESHOLD } from './Mapozaic'
+import { MAPBOX_STYLE_URL, INITIAL_ROAD_COLOR_THRESHOLD, INITIAL_SIMILAR_COLOR_TOLERANCE } from './Mapozaic'
 import { SliderValue } from 'antd/lib/slider'
 
 type PropsType = {
@@ -10,18 +10,28 @@ type PropsType = {
   mapboxStyleURL: string
   changeMapStyle: (style: string) => void
   setNewRoadColorThreshold: (threshold: number) => void
+  setNewSimilarColorTolerance: (tolerance: number) => void
 }
 
-const Drawer = ({ visible, setDrawerVisible, mapboxStyleURL, changeMapStyle, setNewRoadColorThreshold }: PropsType) => {
+const Drawer = ({
+  visible,
+  setDrawerVisible,
+  mapboxStyleURL,
+  changeMapStyle,
+  setNewRoadColorThreshold,
+  setNewSimilarColorTolerance,
+}: PropsType) => {
   const onStyleUrlChange = (event: RadioChangeEvent) => {
     changeMapStyle(event.target.value)
   }
   const [localRoadColorThreshold, setLocalRoadColorThreshold] = useState(INITIAL_ROAD_COLOR_THRESHOLD)
-  const onSliderChange = (value: SliderValue) => {
+  const [localSimilarColorTolerance, setLocalSimilarColorTolerance] = useState(INITIAL_SIMILAR_COLOR_TOLERANCE)
+
+  const onSliderChange = (value: SliderValue, changeCallback: (n: number) => void) => {
     if (typeof value === 'number') {
-      setLocalRoadColorThreshold(value)
+      changeCallback(value)
     } else {
-      setLocalRoadColorThreshold(value[0])
+      changeCallback(value[0])
     }
   }
 
@@ -39,7 +49,16 @@ const Drawer = ({ visible, setDrawerVisible, mapboxStyleURL, changeMapStyle, set
         range={false}
         value={localRoadColorThreshold}
         onAfterChange={() => setNewRoadColorThreshold(localRoadColorThreshold)}
-        onChange={onSliderChange}
+        onChange={(value) => onSliderChange(value, setLocalRoadColorThreshold)}
+      />
+      <p>Fill Color Tolerance</p>
+      <Slider
+        min={0}
+        max={20}
+        range={false}
+        value={localSimilarColorTolerance}
+        onAfterChange={() => setNewSimilarColorTolerance(localSimilarColorTolerance)}
+        onChange={(value) => onSliderChange(value, setLocalSimilarColorTolerance)}
       />
     </AntDrawer>
   )
