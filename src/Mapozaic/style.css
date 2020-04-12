@@ -11,6 +11,13 @@
   top: 16px;
   left: 16px;
 }
+.change {
+  position: absolute;
+  color: white;
+  font-size: medium;
+  top: 32px;
+  left: 16px;
+}
 .mapbox-cvs {
   width: 100vw;
   height: 100vh;

@@ -7,6 +7,13 @@ import './style.css'
 
 // eslint-disable-next-line
 const token: string = process.env['REACT_APP_MAPBOX_TOKEN'] || ''
+mapboxgl.accessToken = token
+
+const MapboxStyleURL = {
+  administrative: 'mapbox://styles/cartapuce/ck8vkvxjt27z71ila3b3jecka',
+  road: 'mapbox://styles/cartapuce/ck8vk01zo2e5w1ipmytroxgf4',
+  // regular: 'mapbox://styles/mapbox/streets-v11',
+}
 
 const styles = {
   width: '100vw',
@@ -29,6 +36,7 @@ const showMapboxCanvas = (isMapbox: boolean): void => {
 const MapboxGLMap = (): JSX.Element => {
   const [map, setMap] = useState<mapboxgl.Map | null>(null)
   const mapContainer = useRef<HTMLDivElement | null>(null)
+  const [mapboxStyleURL, setMapboxStyleURL] = useState(MapboxStyleURL.road)
   const [isLoading, setIsLoading] = useState(false)
 
   const paintMosaic = async (map: mapboxgl.Map): Promise<void> => {
@@ -68,20 +76,15 @@ const MapboxGLMap = (): JSX.Element => {
   }
 
   useEffect(() => {
-    mapboxgl.accessToken = token
-
     const newMap = new mapboxgl.Map({
       container: mapContainer.current ? mapContainer.current : '',
-      style: 'mapbox://styles/cartapuce/ck8vkvxjt27z71ila3b3jecka', // administrative
-      // style: 'mapbox://styles/cartapuce/ck8vk01zo2e5w1ipmytroxgf4', // road
-      // style: 'mapbox://styles/mapbox/streets-v11',
+      style: mapboxStyleURL,
       zoom: 12,
       center: {
         lng: 2.338272,
         lat: 48.858796,
       },
     })
-
     newMap.on('load', () => {
       setMap(newMap)
       newMap.resize()
@@ -98,11 +101,34 @@ const MapboxGLMap = (): JSX.Element => {
     })
   }, [])
 
+  const [hasChangedStyle, setHasChangedStyle] = useState(false)
+
+  useEffect(() => {
+    if (map && hasChangedStyle) {
+      map.setStyle(mapboxStyleURL)
+      setHasChangedStyle(false)
+    }
+  }, [mapboxStyleURL, map, hasChangedStyle])
+
+  const changeMapStyle = () => {
+    if (mapboxStyleURL === MapboxStyleURL.administrative) {
+      setMapboxStyleURL(MapboxStyleURL.road)
+      setHasChangedStyle(true)
+    }
+    if (mapboxStyleURL === MapboxStyleURL.road) {
+      setMapboxStyleURL(MapboxStyleURL.administrative)
+      setHasChangedStyle(true)
+    }
+  }
+
   return (
     <div className="container">
       <canvas className="mozaic" width="300" height="300" id="maposaic-cvs" />
       <div id="mapbox-cvs" className="mapbox-cvs" ref={(el) => (mapContainer.current = el)} style={styles} />
       {isLoading && <div className="loading">Loading...</div>}
+      <button className="change" onClick={changeMapStyle}>
+        Change
+      </button>
     </div>
   )
 }
