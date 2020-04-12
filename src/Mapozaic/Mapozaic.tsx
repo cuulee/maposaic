@@ -1,5 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react'
 import mapboxgl from 'mapbox-gl'
+import { Button } from 'antd'
+import { RightCircleFilled } from '@ant-design/icons'
+import Drawer from './Drawer'
 // eslint-disable-next-line
 import PaintWorker from 'worker-loader!./paint.worker'
 
@@ -102,6 +105,7 @@ const MapboxGLMap = (): JSX.Element => {
   }, [])
 
   const [hasChangedStyle, setHasChangedStyle] = useState(false)
+  const [drawerVisible, setDrawerVisible] = useState(false)
 
   useEffect(() => {
     if (map && hasChangedStyle) {
@@ -123,12 +127,20 @@ const MapboxGLMap = (): JSX.Element => {
 
   return (
     <div className="container">
-      <canvas className="mozaic" width="300" height="300" id="maposaic-cvs" />
-      <div id="mapbox-cvs" className="mapbox-cvs" ref={(el) => (mapContainer.current = el)} style={styles} />
-      {isLoading && <div className="loading">Loading...</div>}
-      <button className="change" onClick={changeMapStyle}>
-        Change
-      </button>
+      <canvas className="mosaic-canvas" width="300" height="300" id="maposaic-cvs" />
+      <div id="mapbox-cvs" className="mapbox-canvas" ref={(el) => (mapContainer.current = el)} style={styles} />
+      <div className="overmap">
+        <Drawer visible={drawerVisible} setDrawerVisible={setDrawerVisible} />
+        <Button
+          type="primary"
+          shape="circle"
+          onClick={() => {
+            setDrawerVisible(true)
+          }}
+          icon={<RightCircleFilled />}
+        />
+        {isLoading && <div className="loading">Loading...</div>}
+      </div>
     </div>
   )
 }

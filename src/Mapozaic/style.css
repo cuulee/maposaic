@@ -1,24 +1,26 @@
-.mozaic {
+.container {
+  background-color: #242424;
+  width: 100vw;
+  height: 100vh;
+}
+
+.mapbox-canvas {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+}
+
+.mosaic-canvas {
   position: absolute;
   width: 100vw;
   height: 100vh;
   opacity: 1;
 }
+.overmap {
+  padding: 16px;
+  position: relative;
+}
 .loading {
-  position: absolute;
   color: white;
   font-size: medium;
-  top: 16px;
-  left: 16px;
-}
-.change {
-  position: absolute;
-  color: white;
-  font-size: medium;
-  top: 32px;
-  left: 16px;
-}
-.mapbox-cvs {
-  width: 100vw;
-  height: 100vh;
 }
