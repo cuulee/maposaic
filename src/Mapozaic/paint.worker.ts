@@ -92,7 +92,7 @@ const paintAdjacentPointsInData = ({
 }
 // eslint-disable-next-line
 onmessage = ({
-  data: { mapboxPixels, maposaicData, webglWidth, webglHeight, viewportWidth, viewportHeight },
+  data: { mapboxPixels, maposaicData, webglWidth, webglHeight, viewportWidth, viewportHeight, roadColorThreshold },
 }: {
   data: {
     mapboxPixels: Uint8Array
@@ -101,6 +101,7 @@ onmessage = ({
     webglHeight: number
     viewportWidth: number
     viewportHeight: number
+    roadColorThreshold: number
   }
 }): void => {
   const visitedPixelSet = new Set<number>()
@@ -124,7 +125,7 @@ onmessage = ({
         mapboxPixels[pixelIndex + 2],
       )
       const targetColor: RGBColor =
-        mapboxPixels[pixelIndex] < WHITE_THRESHOLD
+        mapboxPixels[pixelIndex] < roadColorThreshold
           ? createRGB(Math.floor(Math.random() * 256), Math.floor(Math.random() * 256), Math.floor(Math.random() * 256))
           : createRGB(255, 255, 255)
 

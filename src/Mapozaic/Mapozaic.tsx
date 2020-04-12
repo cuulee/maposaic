@@ -20,6 +20,8 @@ export const MAPBOX_STYLE_URL = {
   // regular: 'mapbox://styles/mapbox/streets-v11',
 }
 
+export const INITIAL_ROAD_COLOR_THRESHOLD = 50
+
 const styles = {
   width: '100vw',
   height: 'calc(100vh)',
@@ -40,9 +42,12 @@ const showMapboxCanvas = (isMapbox: boolean): void => {
 
 const MapboxGLMap = (): JSX.Element => {
   const [map, setMap] = useState<mapboxgl.Map | null>(null)
+  const [center, setCenter] = useState(new mapboxgl.LngLat(2.338272, 48.858796))
+  const [zoom, setZoom] = useState(12)
   const mapContainer = useRef<HTMLDivElement | null>(null)
   const [mapboxStyleURL, setMapboxStyleURL] = useState(MAPBOX_STYLE_URL.road)
   const [isLoading, setIsLoading] = useState(false)
+  const [roadColorThreshold, setRoadColorThreshold] = useState(INITIAL_ROAD_COLOR_THRESHOLD)
 
   const paintMosaic = async (map: mapboxgl.Map): Promise<void> => {
     setIsLoading(true)
@@ -77,18 +82,23 @@ const MapboxGLMap = (): JSX.Element => {
       showMapboxCanvas(false)
       setIsLoading(false)
     }
-    paintWorker.postMessage({ mapboxPixels, maposaicData, webglWidth, webglHeight, viewportHeight, viewportWidth })
+    paintWorker.postMessage({
+      mapboxPixels,
+      maposaicData,
+      webglWidth,
+      webglHeight,
+      viewportHeight,
+      viewportWidth,
+      roadColorThreshold,
+    })
   }
 
   useEffect(() => {
     const newMap = new mapboxgl.Map({
       container: mapContainer.current ? mapContainer.current : '',
       style: mapboxStyleURL,
-      zoom: 12,
-      center: {
-        lng: 2.338272,
-        lat: 48.858796,
-      },
+      zoom,
+      center,
     })
     newMap.on('load', () => {
       setMap(newMap)
@@ -100,11 +110,13 @@ const MapboxGLMap = (): JSX.Element => {
       if (!newMap.loaded() || newMap.isMoving() || newMap.isZooming()) {
         return
       }
+      setCenter(newMap.getCenter())
+      setZoom(newMap.getZoom())
       paintWorker.terminate()
       paintWorker = new PaintWorker()
       paintMosaic(newMap)
     })
-  }, [])
+  }, [roadColorThreshold])
 
   const [hasChangedStyle, setHasChangedStyle] = useState(false)
   const [drawerVisible, setDrawerVisible] = useState(false)
@@ -124,6 +136,11 @@ const MapboxGLMap = (): JSX.Element => {
     }
   }
 
+  const setNewRoadColorThreshold = (threshold: number) => {
+    setRoadColorThreshold(threshold)
+    setIsLoading(true)
+  }
+
   return (
     <div className="container">
       <canvas className="mosaic-canvas" width="300" height="300" id="maposaic-cvs" />
@@ -135,6 +152,7 @@ const MapboxGLMap = (): JSX.Element => {
           setDrawerVisible={setDrawerVisible}
           changeMapStyle={changeMapStyle}
           mapboxStyleURL={mapboxStyleURL}
+          setNewRoadColorThreshold={setNewRoadColorThreshold}
         />
         <Button
           type="primary"
