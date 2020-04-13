@@ -14,8 +14,8 @@ import PaintWorker from 'worker-loader!./paint.worker'
 import './style.css'
 
 // eslint-disable-next-line
-const token: string = process.env['REACT_APP_MAPBOX_TOKEN'] || ''
-mapboxgl.accessToken = token
+export const MAPBOX_TOKEN: string = process.env['REACT_APP_MAPBOX_TOKEN'] || ''
+mapboxgl.accessToken = MAPBOX_TOKEN
 
 export const MAPBOX_STYLE_URL = {
   road: 'mapbox://styles/cartapuce/ck8vk01zo2e5w1ipmytroxgf4',
@@ -53,6 +53,7 @@ const MapboxGLMap = (): JSX.Element => {
   const [isLoading, setIsLoading] = useState(false)
   const [roadColorThreshold, setRoadColorThreshold] = useState(INITIAL_ROAD_COLOR_THRESHOLD)
   const [similarColorTolerance, setSimilarColorTolerance] = useState(INITIAL_SIMILAR_COLOR_TOLERANCE)
+  const [currentCenter, setCurrentCenter] = useState<[number, number]>([0, 0])
 
   useEffect(() => {
     const paintMosaic = async (newMap: mapboxgl.Map): Promise<void> => {
@@ -125,6 +126,7 @@ const MapboxGLMap = (): JSX.Element => {
       paintWorker.terminate()
       paintWorker = new PaintWorker()
       paintMosaic(newMap)
+      setCurrentCenter([newMap.getCenter().lng, newMap.getCenter().lat])
     })
     // eslint-disable-next-line
   }, [roadColorThreshold, similarColorTolerance, mapboxStyleURL])
@@ -146,6 +148,15 @@ const MapboxGLMap = (): JSX.Element => {
     setIsLoading(true)
   }
 
+  const flyTo = (center: [number, number]) => {
+    if (!map) {
+      return
+    }
+    showMapboxCanvas(true)
+    setIsLoading(true)
+    map.setCenter(center)
+  }
+
   return (
     <div className="container">
       <canvas className="mosaic-canvas" width="300" height="300" id="maposaic-cvs" />
@@ -159,6 +170,8 @@ const MapboxGLMap = (): JSX.Element => {
           mapboxStyleURL={mapboxStyleURL}
           setNewRoadColorThreshold={setNewRoadColorThreshold}
           setNewSimilarColorTolerance={setNewSimilarColorTolerance}
+          flyTo={flyTo}
+          currentCenter={currentCenter}
         />
         <Button
           type="primary"
