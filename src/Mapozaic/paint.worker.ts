@@ -35,6 +35,10 @@ const getAdjacentPoints = ({
   E: point.x < viewportWidth - 1 ? { x: point.x + 1, y: point.y } : null,
   O: point.x > 0 ? { x: point.x - 1, y: point.y } : null,
   N: point.y > 0 ? { x: point.x, y: point.y - 1 } : null,
+  // NE: point.y > 0 && point.x < viewportWidth - 1 ? { x: point.x + 1, y: point.y - 1 } : null,
+  // NO: point.y > 0 && point.x > 0 ? { x: point.x - 1, y: point.y - 1 } : null,
+  // SE: point.y < viewportHeight - 1 && point.x < viewportWidth - 1 ? { x: point.x + 1, y: point.y + 1 } : null,
+  // SO: point.y < viewportHeight - 1 && point.x > 0 ? { x: point.x - 1, y: point.y + 1 } : null,
 })
 
 const paintAdjacentPointsInData = ({
@@ -72,15 +76,16 @@ const paintAdjacentPointsInData = ({
     if (visitedPixelSet.has(pixelIndex)) {
       continue
     }
-    const pointColor = createRGB(mapboxPixels[pixelIndex], mapboxPixels[pixelIndex + 1], mapboxPixels[pixelIndex + 2])
-    const paintPoint = () => {
+    const paintPoint = (color: RGBColor) => {
       visitedPixelSet.add(pixelIndex)
       const mosaicPixel = getMosaicPixelIndexFromPoint(point, viewportWidth, viewportHeight)
-      maposaicData[mosaicPixel] = targetColor.r
-      maposaicData[mosaicPixel + 1] = targetColor.g
-      maposaicData[mosaicPixel + 2] = targetColor.b
+      maposaicData[mosaicPixel] = color.r
+      maposaicData[mosaicPixel + 1] = color.g
+      maposaicData[mosaicPixel + 2] = color.b
       maposaicData[mosaicPixel + 3] = 255
     }
+
+    const pointColor = createRGB(mapboxPixels[pixelIndex], mapboxPixels[pixelIndex + 1], mapboxPixels[pixelIndex + 2])
 
     const adjacentPoints = getAdjacentPoints({ point, viewportHeight, viewportWidth })
     if (!isColorSimilar(pointColor, initialColor, similarColorTolerance)) {
@@ -100,16 +105,22 @@ const paintAdjacentPointsInData = ({
         )
       }).length
 
-      if (similarPointCount < 3) {
-        paintPoint()
+      if (similarPointCount < 2) {
+        const colorRatio = initialColor.r ? pointColor.r / initialColor.r : 1
+        const antiAliasingColor = createRGB(
+          targetColor.r * colorRatio,
+          targetColor.g * colorRatio,
+          targetColor.b * colorRatio,
+        )
+        paintPoint(antiAliasingColor)
       }
       continue
     }
 
-    paintPoint()
+    paintPoint(targetColor)
 
     Object.values(adjacentPoints).forEach((adjacentPoint) => {
-      if (!!adjacentPoint && !visitedPixelSet.has(getMapboxPixelIndexFromPoint(adjacentPoint, webglWidth))) {
+      if (adjacentPoint && !visitedPixelSet.has(getMapboxPixelIndexFromPoint(adjacentPoint, webglWidth))) {
         toVisitPointStack.push(adjacentPoint)
       }
     })
