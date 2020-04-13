@@ -38,7 +38,8 @@ const Drawer = ({
   return (
     <AntDrawer visible={visible} placement="left" onClose={() => setDrawerVisible(false)}>
       <Radio.Group onChange={onStyleUrlChange} value={mapboxStyleURL}>
-        <Radio value={MAPBOX_STYLE_URL.road}>Roads</Radio>
+        <Radio value={MAPBOX_STYLE_URL.road}>Road boundaries</Radio>
+        <Radio value={MAPBOX_STYLE_URL.water}>Water boundaries</Radio>
         <Radio value={MAPBOX_STYLE_URL.administrative}>Administrative boundaries</Radio>
       </Radio.Group>
       <Divider />
