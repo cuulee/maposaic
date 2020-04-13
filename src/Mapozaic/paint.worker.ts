@@ -73,38 +73,40 @@ const paintAdjacentPointsInData = ({
       continue
     }
     const pointColor = createRGB(mapboxPixels[pixelIndex], mapboxPixels[pixelIndex + 1], mapboxPixels[pixelIndex + 2])
-    if (!isColorSimilar(pointColor, initialColor, similarColorTolerance)) {
-      const adjacentPoints = getAdjacentPoints({ point, viewportHeight, viewportWidth })
-
-      if (
-        Object.values(adjacentPoints).some((adjacentPoint) => {
-          return (
-            !!adjacentPoint &&
-            !visitedPixelSet.has(getMapboxPixelIndexFromPoint(adjacentPoint, webglWidth)) &&
-            !isColorSimilar(
-              createRGB(
-                mapboxPixels[getMapboxPixelIndexFromPoint(adjacentPoint, webglWidth)],
-                mapboxPixels[getMapboxPixelIndexFromPoint(adjacentPoint, webglWidth) + 1],
-                mapboxPixels[getMapboxPixelIndexFromPoint(adjacentPoint, webglWidth) + 2],
-              ),
-              pointColor,
-              similarColorTolerance,
-            )
-          )
-        })
-      ) {
-        continue
-      }
+    const paintPoint = () => {
+      visitedPixelSet.add(pixelIndex)
+      const mosaicPixel = getMosaicPixelIndexFromPoint(point, viewportWidth, viewportHeight)
+      maposaicData[mosaicPixel] = targetColor.r
+      maposaicData[mosaicPixel + 1] = targetColor.g
+      maposaicData[mosaicPixel + 2] = targetColor.b
+      maposaicData[mosaicPixel + 3] = 255
     }
 
-    visitedPixelSet.add(pixelIndex)
-    const mosaicPixel = getMosaicPixelIndexFromPoint(point, viewportWidth, viewportHeight)
-    maposaicData[mosaicPixel] = targetColor.r
-    maposaicData[mosaicPixel + 1] = targetColor.g
-    maposaicData[mosaicPixel + 2] = targetColor.b
-    maposaicData[mosaicPixel + 3] = 255
+    const adjacentPoints = getAdjacentPoints({ point, viewportHeight, viewportWidth })
+    if (!isColorSimilar(pointColor, initialColor, similarColorTolerance)) {
+      const similarPointCount = Object.values(adjacentPoints).filter((adjacentPoint) => {
+        return (
+          !!adjacentPoint &&
+          !visitedPixelSet.has(getMapboxPixelIndexFromPoint(adjacentPoint, webglWidth)) &&
+          isColorSimilar(
+            createRGB(
+              mapboxPixels[getMapboxPixelIndexFromPoint(adjacentPoint, webglWidth)],
+              mapboxPixels[getMapboxPixelIndexFromPoint(adjacentPoint, webglWidth) + 1],
+              mapboxPixels[getMapboxPixelIndexFromPoint(adjacentPoint, webglWidth) + 2],
+            ),
+            pointColor,
+            similarColorTolerance,
+          )
+        )
+      }).length
 
-    const adjacentPoints = getAdjacentPoints({ point, viewportWidth, viewportHeight })
+      if (similarPointCount < 3) {
+        paintPoint()
+      }
+      continue
+    }
+
+    paintPoint()
 
     Object.values(adjacentPoints).forEach((adjacentPoint) => {
       if (!!adjacentPoint && !visitedPixelSet.has(getMapboxPixelIndexFromPoint(adjacentPoint, webglWidth))) {
