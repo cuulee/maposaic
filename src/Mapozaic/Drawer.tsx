@@ -27,6 +27,7 @@ const Drawer = ({
   currentCenter,
 }: DrawerPropsType) => {
   const onStyleUrlChange = (event: RadioChangeEvent) => {
+    setDrawerVisible(false)
     changeMapStyle(event.target.value)
   }
   const [localRoadColorThreshold, setLocalRoadColorThreshold] = useState(INITIAL_ROAD_COLOR_THRESHOLD)
@@ -40,9 +41,18 @@ const Drawer = ({
     }
   }
 
+  const handleRoadThresholdAfterChange = () => {
+    setNewRoadColorThreshold(localRoadColorThreshold)
+    setDrawerVisible(false)
+  }
+  const handleSimilarColorToleranceAfterChange = () => {
+    setNewSimilarColorTolerance(localSimilarColorTolerance)
+    setDrawerVisible(false)
+  }
+
   return (
     <AntDrawer visible={visible} placement="left" onClose={() => setDrawerVisible(false)} closable={false}>
-      <GeoSearch flyTo={flyTo} currentCenter={currentCenter} />
+      <GeoSearch flyTo={flyTo} currentCenter={currentCenter} setDrawerVisible={setDrawerVisible} />
       <Divider />
       <Radio.Group onChange={onStyleUrlChange} value={mapboxStyleURL}>
         <Radio value={MAPBOX_STYLE_URL.road}>Road boundaries</Radio>
@@ -56,7 +66,7 @@ const Drawer = ({
         max={255}
         range={false}
         value={localRoadColorThreshold}
-        onAfterChange={() => setNewRoadColorThreshold(localRoadColorThreshold)}
+        onAfterChange={handleRoadThresholdAfterChange}
         onChange={(value) => onSliderChange(value, setLocalRoadColorThreshold)}
       />
       <p>Fill Color Tolerance</p>
@@ -65,7 +75,7 @@ const Drawer = ({
         max={20}
         range={false}
         value={localSimilarColorTolerance}
-        onAfterChange={() => setNewSimilarColorTolerance(localSimilarColorTolerance)}
+        onAfterChange={handleSimilarColorToleranceAfterChange}
         onChange={(value) => onSliderChange(value, setLocalSimilarColorTolerance)}
       />
     </AntDrawer>
