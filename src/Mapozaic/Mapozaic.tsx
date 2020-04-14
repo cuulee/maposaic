@@ -2,8 +2,9 @@ import React, { useState, useRef, useEffect } from 'react'
 import mapboxgl from 'mapbox-gl'
 // import 'mapbox-gl/dist/mapbox-gl.css'
 import { Button } from 'antd'
-import { RightCircleFilled, LoadingOutlined } from '@ant-design/icons'
+import { RightCircleFilled } from '@ant-design/icons'
 import { Spin } from 'antd'
+import spinner from '../assets/spinner.png'
 
 import Drawer from './Drawer'
 
@@ -160,7 +161,7 @@ const MapboxGLMap = (): JSX.Element => {
     <div className="container">
       <canvas className="mosaic-canvas" width="300" height="300" id="maposaic-cvs" />
       <div id="mapbox-cvs" className="mapbox-canvas" ref={(el) => (mapContainer.current = el)} style={styles} />
-      <Spin spinning={isLoading} indicator={<LoadingOutlined />} />
+      <Spin spinning={isLoading} indicator={<img className="spinner" src={spinner} alt="spin" />} />
       <div className="overmap">
         <Drawer
           visible={drawerVisible}
