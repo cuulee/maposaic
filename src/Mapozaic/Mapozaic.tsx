@@ -151,6 +151,10 @@ const MapboxGLMap = (): JSX.Element => {
     setSimilarColorTolerance(tolerance)
     setIsLoading(true)
   }
+  const setNewMaosaicColor = (colorName: ColorName) => {
+    setMaposaicColor(colorName)
+    setIsLoading(true)
+  }
 
   const flyTo = (center: [number, number]) => {
     if (!map) {
@@ -177,7 +181,7 @@ const MapboxGLMap = (): JSX.Element => {
           flyTo={flyTo}
           currentCenter={currentCenter}
           maposaicColor={maposaicColor}
-          setMaposaicColor={setMaposaicColor}
+          setNewMaosaicColor={setNewMaosaicColor}
         />
         <Button
           type="primary"

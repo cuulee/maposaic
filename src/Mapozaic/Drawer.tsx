@@ -16,7 +16,7 @@ export type DrawerPropsType = {
   flyTo: (center: [number, number]) => void
   currentCenter: [number, number]
   maposaicColor: ColorName
-  setMaposaicColor: (color: ColorName) => void
+  setNewMaosaicColor: (color: ColorName) => void
 }
 
 const Drawer = ({
@@ -29,7 +29,7 @@ const Drawer = ({
   flyTo,
   currentCenter,
   maposaicColor,
-  setMaposaicColor,
+  setNewMaosaicColor,
 }: DrawerPropsType) => {
   const onStyleUrlChange = (event: RadioChangeEvent) => {
     setDrawerVisible(false)
@@ -47,7 +47,7 @@ const Drawer = ({
   }
 
   const handleColorChange = (e: RadioChangeEvent) => {
-    setMaposaicColor(e.target.value)
+    setNewMaosaicColor(e.target.value)
     setDrawerVisible(false)
   }
   const handleRoadThresholdAfterChange = () => {
