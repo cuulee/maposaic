@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/maposaic/precache-manifest.74dc50eafd62336d9797a80d21c8f7bc.js"
+  "/maposaic/precache-manifest.5c064395025c201162b1c38f24a21470.js"
 );
 
 self.addEventListener('message', (event) => {
