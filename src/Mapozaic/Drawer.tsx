@@ -4,6 +4,7 @@ import { RadioChangeEvent } from 'antd/lib/radio'
 import { MAPBOX_STYLE_URL, INITIAL_ROAD_COLOR_THRESHOLD, INITIAL_SIMILAR_COLOR_TOLERANCE } from './Mapozaic'
 import { SliderValue } from 'antd/lib/slider'
 import GeoSearch from './GeoSearchInput'
+import { ColorName } from './colors'
 
 export type DrawerPropsType = {
   visible: boolean
@@ -14,6 +15,8 @@ export type DrawerPropsType = {
   setNewSimilarColorTolerance: (tolerance: number) => void
   flyTo: (center: [number, number]) => void
   currentCenter: [number, number]
+  maposaicColor: ColorName
+  setMaposaicColor: (color: ColorName) => void
 }
 
 const Drawer = ({
@@ -25,6 +28,8 @@ const Drawer = ({
   setNewSimilarColorTolerance,
   flyTo,
   currentCenter,
+  maposaicColor,
+  setMaposaicColor,
 }: DrawerPropsType) => {
   const onStyleUrlChange = (event: RadioChangeEvent) => {
     setDrawerVisible(false)
@@ -53,6 +58,16 @@ const Drawer = ({
   return (
     <AntDrawer visible={visible} placement="left" onClose={() => setDrawerVisible(false)} closable={false}>
       <GeoSearch flyTo={flyTo} currentCenter={currentCenter} setDrawerVisible={setDrawerVisible} />
+      <Divider />
+      <Radio.Group onChange={(e) => setMaposaicColor(e.target.value)} value={maposaicColor}>
+        {Object.values(ColorName).map((color: ColorName) => {
+          return (
+            <Radio key={color} value={color}>
+              {color}
+            </Radio>
+          )
+        })}
+      </Radio.Group>
       <Divider />
       <Radio.Group onChange={onStyleUrlChange} value={mapboxStyleURL}>
         <Radio value={MAPBOX_STYLE_URL.road}>Road boundaries</Radio>

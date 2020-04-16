@@ -40,6 +40,25 @@ const getAdjacentPoints = ({
   // SE: point.y < viewportHeight - 1 && point.x < viewportWidth - 1 ? { x: point.x + 1, y: point.y + 1 } : null,
   // SO: point.y < viewportHeight - 1 && point.x > 0 ? { x: point.x - 1, y: point.y + 1 } : null,
 })
+const blues = [
+  '#E6F7FF',
+  '#BAE7FF',
+  '#91D5FF',
+  '#69C0FF',
+  '#40A9FF',
+  '#1890FF',
+  '#096DD9',
+  '#0050B3',
+  '#003A8C',
+  '#002766',
+]
+const hexToRgb = (hex: string) => {
+  return createRGB(
+    parseInt(hex.slice(1, 2), 16) * 16 + parseInt(hex.slice(2, 3), 16),
+    parseInt(hex.slice(3, 4), 16) * 16 + parseInt(hex.slice(4, 5), 16),
+    parseInt(hex.slice(5, 6), 16) * 16 + parseInt(hex.slice(6, 7), 16),
+  )
+}
 
 const paintAdjacentPointsInData = ({
   maposaicData,
@@ -172,7 +191,8 @@ onmessage = ({
       )
       const targetColor: RGBColor =
         mapboxPixels[pixelIndex] < roadColorThreshold
-          ? createRGB(Math.floor(Math.random() * 256), Math.floor(Math.random() * 256), Math.floor(Math.random() * 256))
+          ? // ? createRGB(Math.floor(Math.random() * 256), Math.floor(Math.random() * 256), Math.floor(Math.random() * 256))
+            hexToRgb(blues[Math.floor(Math.random() * blues.length)])
           : createRGB(255, 255, 255)
 
       const initialPoint = getPointFromPixelIndex(pixelIndex, webglWidth)

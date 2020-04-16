@@ -1,0 +1,45 @@
+import {
+  red,
+  volcano,
+  gold,
+  yellow,
+  lime,
+  green,
+  cyan,
+  blue,
+  geekblue,
+  purple,
+  magenta,
+  grey,
+} from '@ant-design/colors'
+
+export enum ColorName {
+  Random = 'random',
+  Red = 'red',
+  Volcano = 'volcano',
+  Gold = 'gold',
+  Yellow = 'yellow',
+  Lime = 'lime',
+  Green = 'green',
+  Cyan = 'cyan',
+  Blue = 'blue',
+  Geekblue = 'geekblue',
+  Purple = 'purple',
+  Magenta = 'magenta',
+  Grey = 'grey',
+}
+
+export const AntColors = {
+  [ColorName.Red]: red,
+  [ColorName.Volcano]: volcano,
+  [ColorName.Gold]: gold,
+  [ColorName.Yellow]: yellow,
+  [ColorName.Lime]: lime,
+  [ColorName.Green]: green,
+  [ColorName.Cyan]: cyan,
+  [ColorName.Blue]: blue,
+  [ColorName.Geekblue]: geekblue,
+  [ColorName.Purple]: purple,
+  [ColorName.Magenta]: magenta,
+  [ColorName.Grey]: grey,
+}

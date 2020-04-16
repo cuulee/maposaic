@@ -12,6 +12,7 @@ import Drawer from './Drawer'
 import PaintWorker from 'worker-loader!./paint.worker'
 
 import './style.css'
+import { ColorName } from './colors'
 
 // eslint-disable-next-line
 export const MAPBOX_TOKEN: string = process.env['REACT_APP_MAPBOX_TOKEN'] || ''
@@ -50,6 +51,8 @@ const MapboxGLMap = (): JSX.Element => {
   const mapContainer = useRef<HTMLDivElement | null>(null)
 
   const [mapboxStyleURL, setMapboxStyleURL] = useState(MAPBOX_STYLE_URL.road)
+  const [maposaicColor, setMaposaicColor] = useState<ColorName>(ColorName.Random)
+
   const [isLoading, setIsLoading] = useState(false)
   const [roadColorThreshold, setRoadColorThreshold] = useState(INITIAL_ROAD_COLOR_THRESHOLD)
   const [similarColorTolerance, setSimilarColorTolerance] = useState(INITIAL_SIMILAR_COLOR_TOLERANCE)
@@ -156,7 +159,7 @@ const MapboxGLMap = (): JSX.Element => {
     setIsLoading(true)
     map.setCenter(center)
   }
-
+  console.log('render', maposaicColor)
   return (
     <div className="container">
       <canvas className="mosaic-canvas" width="300" height="300" id="maposaic-cvs" />
@@ -172,6 +175,8 @@ const MapboxGLMap = (): JSX.Element => {
           setNewSimilarColorTolerance={setNewSimilarColorTolerance}
           flyTo={flyTo}
           currentCenter={currentCenter}
+          maposaicColor={maposaicColor}
+          setMaposaicColor={setMaposaicColor}
         />
         <Button
           type="primary"
