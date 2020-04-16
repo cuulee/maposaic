@@ -99,6 +99,7 @@ const MapboxGLMap = (): JSX.Element => {
         webglHeight,
         viewportHeight,
         viewportWidth,
+        maposaicColor,
         roadColorThreshold,
         similarColorTolerance,
       })
@@ -132,7 +133,7 @@ const MapboxGLMap = (): JSX.Element => {
       setCurrentCenter([newMap.getCenter().lng, newMap.getCenter().lat])
     })
     // eslint-disable-next-line
-  }, [roadColorThreshold, similarColorTolerance, mapboxStyleURL])
+  }, [roadColorThreshold, similarColorTolerance, mapboxStyleURL, maposaicColor])
 
   const [drawerVisible, setDrawerVisible] = useState(false)
 
@@ -159,7 +160,7 @@ const MapboxGLMap = (): JSX.Element => {
     setIsLoading(true)
     map.setCenter(center)
   }
-  console.log('render', maposaicColor)
+
   return (
     <div className="container">
       <canvas className="mosaic-canvas" width="300" height="300" id="maposaic-cvs" />

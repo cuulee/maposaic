@@ -46,6 +46,10 @@ const Drawer = ({
     }
   }
 
+  const handleColorChange = (e: RadioChangeEvent) => {
+    setMaposaicColor(e.target.value)
+    setDrawerVisible(false)
+  }
   const handleRoadThresholdAfterChange = () => {
     setNewRoadColorThreshold(localRoadColorThreshold)
     setDrawerVisible(false)
@@ -59,11 +63,11 @@ const Drawer = ({
     <AntDrawer visible={visible} placement="left" onClose={() => setDrawerVisible(false)} closable={false}>
       <GeoSearch flyTo={flyTo} currentCenter={currentCenter} setDrawerVisible={setDrawerVisible} />
       <Divider />
-      <Radio.Group onChange={(e) => setMaposaicColor(e.target.value)} value={maposaicColor}>
-        {Object.values(ColorName).map((color: ColorName) => {
+      <Radio.Group onChange={handleColorChange} value={maposaicColor}>
+        {Object.entries(ColorName).map(([name, color]) => {
           return (
             <Radio key={color} value={color}>
-              {color}
+              {name}
             </Radio>
           )
         })}
