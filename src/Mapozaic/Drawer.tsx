@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useRef } from 'react'
 import { Drawer as AntDrawer, Radio, Divider, Slider, Popover, Button } from 'antd'
 import { RadioChangeEvent } from 'antd/lib/radio'
 import { MAPBOX_STYLE_URL, INITIAL_ROAD_COLOR_THRESHOLD, INITIAL_SIMILAR_COLOR_TOLERANCE } from './Mapozaic'
