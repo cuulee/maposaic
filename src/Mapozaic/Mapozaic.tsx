@@ -12,7 +12,7 @@ import Drawer from './Drawer'
 import PaintWorker from 'worker-loader!./paint.worker'
 
 import './style.css'
-import { ColorName } from './colors'
+import { MaposaicColors, PresetColorName } from './colors'
 
 // eslint-disable-next-line
 export const MAPBOX_TOKEN: string = process.env['REACT_APP_MAPBOX_TOKEN'] || ''
@@ -51,7 +51,7 @@ const MapboxGLMap = (): JSX.Element => {
   const mapContainer = useRef<HTMLDivElement | null>(null)
 
   const [mapboxStyleURL, setMapboxStyleURL] = useState(MAPBOX_STYLE_URL.road)
-  const [maposaicColor, setMaposaicColor] = useState<ColorName>(ColorName.Random)
+  const [maposaicColors, setMaposaicColors] = useState<MaposaicColors>(PresetColorName.Random)
 
   const [isLoading, setIsLoading] = useState(false)
   const [roadColorThreshold, setRoadColorThreshold] = useState(INITIAL_ROAD_COLOR_THRESHOLD)
@@ -99,7 +99,7 @@ const MapboxGLMap = (): JSX.Element => {
         webglHeight,
         viewportHeight,
         viewportWidth,
-        maposaicColor,
+        maposaicColors,
         roadColorThreshold,
         similarColorTolerance,
       })
@@ -133,7 +133,7 @@ const MapboxGLMap = (): JSX.Element => {
       setCurrentCenter([newMap.getCenter().lng, newMap.getCenter().lat])
     })
     // eslint-disable-next-line
-  }, [roadColorThreshold, similarColorTolerance, mapboxStyleURL, maposaicColor])
+  }, [roadColorThreshold, similarColorTolerance, mapboxStyleURL, maposaicColors])
 
   const [drawerVisible, setDrawerVisible] = useState(false)
 
@@ -151,8 +151,8 @@ const MapboxGLMap = (): JSX.Element => {
     setSimilarColorTolerance(tolerance)
     setIsLoading(true)
   }
-  const setNewMaosaicColor = (colorName: ColorName) => {
-    setMaposaicColor(colorName)
+  const setNewMaposaicColors = (colors: MaposaicColors) => {
+    setMaposaicColors(colors)
     setIsLoading(true)
   }
 
@@ -180,8 +180,7 @@ const MapboxGLMap = (): JSX.Element => {
           setNewSimilarColorTolerance={setNewSimilarColorTolerance}
           flyTo={flyTo}
           currentCenter={currentCenter}
-          maposaicColor={maposaicColor}
-          setNewMaosaicColor={setNewMaosaicColor}
+          setNewMaposaicColors={setNewMaposaicColors}
         />
         <Button
           type="primary"

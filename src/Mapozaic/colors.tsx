@@ -13,7 +13,7 @@ import {
   grey,
 } from '@ant-design/colors'
 
-export enum ColorName {
+export enum PresetColorName {
   Random = 'random',
   Red = 'red',
   Volcano = 'volcano',
@@ -30,16 +30,21 @@ export enum ColorName {
 }
 
 export const AntColors = {
-  [ColorName.Red]: red,
-  [ColorName.Volcano]: volcano,
-  [ColorName.Gold]: gold,
-  [ColorName.Yellow]: yellow,
-  [ColorName.Lime]: lime,
-  [ColorName.Green]: green,
-  [ColorName.Cyan]: cyan,
-  [ColorName.Blue]: blue,
-  [ColorName.Geekblue]: geekblue,
-  [ColorName.Purple]: purple,
-  [ColorName.Magenta]: magenta,
-  [ColorName.Grey]: grey,
+  [PresetColorName.Red]: red,
+  [PresetColorName.Volcano]: volcano,
+  [PresetColorName.Gold]: gold,
+  [PresetColorName.Yellow]: yellow,
+  [PresetColorName.Lime]: lime,
+  [PresetColorName.Green]: green,
+  [PresetColorName.Cyan]: cyan,
+  [PresetColorName.Blue]: blue,
+  [PresetColorName.Geekblue]: geekblue,
+  [PresetColorName.Purple]: purple,
+  [PresetColorName.Magenta]: magenta,
+  [PresetColorName.Grey]: grey,
 }
+
+export type CustomColor = 'custom'
+
+export type ChosenColor = PresetColorName | CustomColor
+export type MaposaicColors = PresetColorName.Random | string[]

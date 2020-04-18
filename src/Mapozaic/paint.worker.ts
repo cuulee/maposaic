@@ -1,5 +1,5 @@
 import { imagePoint, RGBColor } from './Mapozaic'
-import { ColorName, AntColors } from './colors'
+import { AntColors, MaposaicColors, PresetColorName } from './colors'
 
 const getPointFromPixelIndex = (pixelIndex: number, webglWidth: number): imagePoint => {
   return { x: (pixelIndex / 4) % webglWidth, y: Math.floor(pixelIndex / 4 / webglWidth) }
@@ -147,11 +147,11 @@ const paintAdjacentPointsInData = ({
   }
 }
 
-const createColor = (colorName: ColorName) => {
-  if (colorName === ColorName.Random) {
+const createColor = (colors: MaposaicColors) => {
+  if (colors === PresetColorName.Random) {
     return createRGB(Math.floor(Math.random() * 256), Math.floor(Math.random() * 256), Math.floor(Math.random() * 256))
   }
-  return hexToRgb(AntColors[colorName][Math.floor(Math.random() * AntColors[colorName].length)])
+  return hexToRgb(colors[Math.floor(Math.random() * colors.length)])
 }
 
 // eslint-disable-next-line
@@ -163,7 +163,7 @@ onmessage = ({
     webglHeight,
     viewportWidth,
     viewportHeight,
-    maposaicColor,
+    maposaicColors,
     roadColorThreshold,
     similarColorTolerance,
   },
@@ -175,7 +175,7 @@ onmessage = ({
     webglHeight: number
     viewportWidth: number
     viewportHeight: number
-    maposaicColor: ColorName
+    maposaicColors: MaposaicColors
     roadColorThreshold: number
     similarColorTolerance: number
   }
@@ -203,7 +203,7 @@ onmessage = ({
       const targetColor: RGBColor =
         mapboxPixels[pixelIndex] < roadColorThreshold
           ? // ? createRGB(Math.floor(Math.random() * 256), Math.floor(Math.random() * 256), Math.floor(Math.random() * 256))
-            createColor(maposaicColor)
+            createColor(maposaicColors)
           : createRGB(255, 255, 255)
 
       const initialPoint = getPointFromPixelIndex(pixelIndex, webglWidth)

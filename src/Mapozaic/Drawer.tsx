@@ -1,10 +1,12 @@
-import React, { useState } from 'react'
-import { Drawer as AntDrawer, Radio, Divider, Slider, Button } from 'antd'
+import React, { useState, useEffect, useRef } from 'react'
+import { Drawer as AntDrawer, Radio, Divider, Slider, Popover, Button } from 'antd'
 import { RadioChangeEvent } from 'antd/lib/radio'
 import { MAPBOX_STYLE_URL, INITIAL_ROAD_COLOR_THRESHOLD, INITIAL_SIMILAR_COLOR_TOLERANCE } from './Mapozaic'
 import { SliderValue } from 'antd/lib/slider'
 import GeoSearch from './GeoSearchInput'
-import { ColorName } from './colors'
+import { MaposaicColors, ChosenColor, PresetColorName, AntColors } from './colors'
+import { ChromePicker, ColorResult as ReactColorResult } from 'react-color'
+import { generate } from '@ant-design/colors'
 
 export type DrawerPropsType = {
   visible: boolean
@@ -15,8 +17,7 @@ export type DrawerPropsType = {
   setNewSimilarColorTolerance: (tolerance: number) => void
   flyTo: (center: [number, number]) => void
   currentCenter: [number, number]
-  maposaicColor: ColorName
-  setNewMaosaicColor: (color: ColorName) => void
+  setNewMaposaicColors: (colors: MaposaicColors) => void
 }
 
 const Drawer = ({
@@ -28,8 +29,7 @@ const Drawer = ({
   setNewSimilarColorTolerance,
   flyTo,
   currentCenter,
-  maposaicColor,
-  setNewMaosaicColor,
+  setNewMaposaicColors,
 }: DrawerPropsType) => {
   const onStyleUrlChange = (event: RadioChangeEvent) => {
     setDrawerVisible(false)
@@ -46,9 +46,12 @@ const Drawer = ({
     }
   }
 
-  const handleColorChange = (e: RadioChangeEvent) => {
-    setNewMaosaicColor(e.target.value)
-    setDrawerVisible(false)
+  const [chosenColor, setChosenColor] = useState<ChosenColor>(PresetColorName.Random)
+
+  const handlePresetColorChange = (e: RadioChangeEvent) => {
+    const color = e.target.value as PresetColorName
+    setChosenColor(color)
+    setNewMaposaicColors(color === PresetColorName.Random ? PresetColorName.Random : AntColors[color])
   }
   const handleRoadThresholdAfterChange = () => {
     setNewRoadColorThreshold(localRoadColorThreshold)
@@ -59,12 +62,26 @@ const Drawer = ({
     setDrawerVisible(false)
   }
 
+  const [pickerVisible, setPickerVisible] = useState(false)
+  const [customColor, setCustomColor] = useState('#aaaaaa')
+
+  const customButton = useRef<Button>(null)
+
+  const handleCustomColorChangeComplete = (color: ReactColorResult) => {
+    setCustomColor(color.hex)
+    if (customButton.current) {
+      // customButton.current
+    }
+    setChosenColor('custom')
+    setNewMaposaicColors(generate(color.hex))
+  }
+
   return (
     <AntDrawer visible={visible} placement="left" onClose={() => setDrawerVisible(false)} closable={false}>
       <GeoSearch flyTo={flyTo} currentCenter={currentCenter} setDrawerVisible={setDrawerVisible} />
       <Divider />
-      <Radio.Group onChange={handleColorChange} value={maposaicColor}>
-        {Object.entries(ColorName).map(([name, color]) => {
+      <Radio.Group onChange={handlePresetColorChange} value={chosenColor}>
+        {Object.entries(PresetColorName).map(([name, color]) => {
           return (
             <Radio.Button style={{ width: ' 100px' }} key={color} value={color}>
               {name}
@@ -72,6 +89,22 @@ const Drawer = ({
           )
         })}
       </Radio.Group>
+      <Popover
+        content={
+          <ChromePicker
+            color={customColor}
+            onChange={(c) => setCustomColor(c.hex)}
+            onChangeComplete={handleCustomColorChangeComplete}
+          />
+        }
+        title="Chose a color"
+        visible={pickerVisible}
+        onVisibleChange={setPickerVisible}
+      >
+        <Button style={{ marginTop: '16px' }} id="goulo" ref={customButton}>
+          Custom color
+        </Button>
+      </Popover>
       <Divider />
       <Radio.Group onChange={onStyleUrlChange} value={mapboxStyleURL}>
         <Radio value={MAPBOX_STYLE_URL.road}>Road boundaries</Radio>
