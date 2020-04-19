@@ -1,27 +1,27 @@
 {
   "files": {
-    "main.css": "/maposaic/static/css/main.d6350a1f.chunk.css",
-    "main.js": "/maposaic/static/js/main.46d7b8f7.chunk.js",
-    "main.js.map": "/maposaic/static/js/main.46d7b8f7.chunk.js.map",
+    "main.css": "/maposaic/static/css/main.1bbc27ff.chunk.css",
+    "main.js": "/maposaic/static/js/main.f9bc938c.chunk.js",
+    "main.js.map": "/maposaic/static/js/main.f9bc938c.chunk.js.map",
     "runtime-main.js": "/maposaic/static/js/runtime-main.4e4b2e59.js",
     "runtime-main.js.map": "/maposaic/static/js/runtime-main.4e4b2e59.js.map",
-    "static/css/2.b3cd9262.chunk.css": "/maposaic/static/css/2.b3cd9262.chunk.css",
-    "static/js/2.772a2f9e.chunk.js": "/maposaic/static/js/2.772a2f9e.chunk.js",
-    "static/js/2.772a2f9e.chunk.js.map": "/maposaic/static/js/2.772a2f9e.chunk.js.map",
+    "static/css/2.53c0b46f.chunk.css": "/maposaic/static/css/2.53c0b46f.chunk.css",
+    "static/js/2.f237c04c.chunk.js": "/maposaic/static/js/2.f237c04c.chunk.js",
+    "static/js/2.f237c04c.chunk.js.map": "/maposaic/static/js/2.f237c04c.chunk.js.map",
     "955d2a58bdde9342cca9.worker.js": "/maposaic/955d2a58bdde9342cca9.worker.js",
     "955d2a58bdde9342cca9.worker.js.map": "/maposaic/955d2a58bdde9342cca9.worker.js.map",
     "index.html": "/maposaic/index.html",
-    "precache-manifest.4df3ffa0489fff5ad15bbeed356fbfa3.js": "/maposaic/precache-manifest.4df3ffa0489fff5ad15bbeed356fbfa3.js",
+    "precache-manifest.f228778af4e3251a393b6687b9db7b14.js": "/maposaic/precache-manifest.f228778af4e3251a393b6687b9db7b14.js",
     "service-worker.js": "/maposaic/service-worker.js",
-    "static/css/2.b3cd9262.chunk.css.map": "/maposaic/static/css/2.b3cd9262.chunk.css.map",
-    "static/css/main.d6350a1f.chunk.css.map": "/maposaic/static/css/main.d6350a1f.chunk.css.map",
-    "static/js/2.772a2f9e.chunk.js.LICENSE.txt": "/maposaic/static/js/2.772a2f9e.chunk.js.LICENSE.txt"
+    "static/css/2.53c0b46f.chunk.css.map": "/maposaic/static/css/2.53c0b46f.chunk.css.map",
+    "static/css/main.1bbc27ff.chunk.css.map": "/maposaic/static/css/main.1bbc27ff.chunk.css.map",
+    "static/js/2.f237c04c.chunk.js.LICENSE.txt": "/maposaic/static/js/2.f237c04c.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.4e4b2e59.js",
-    "static/css/2.b3cd9262.chunk.css",
-    "static/js/2.772a2f9e.chunk.js",
-    "static/css/main.d6350a1f.chunk.css",
-    "static/js/main.46d7b8f7.chunk.js"
+    "static/css/2.53c0b46f.chunk.css",
+    "static/js/2.f237c04c.chunk.js",
+    "static/css/main.1bbc27ff.chunk.css",
+    "static/js/main.f9bc938c.chunk.js"
   ]
 }
