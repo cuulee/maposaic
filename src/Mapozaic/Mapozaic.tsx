@@ -44,6 +44,11 @@ const showMapboxCanvas = (isMapbox: boolean): void => {
   const mosaicElement = document.getElementById('maposaic-cvs') as HTMLCanvasElement
   mapboxElement.style.opacity = isMapbox ? '1' : '0'
   mosaicElement.style.opacity = isMapbox ? '0' : '1'
+
+  const viewportmeta = document.querySelector('meta[name=viewport]')
+  if (viewportmeta) {
+    viewportmeta.setAttribute('content', 'width=device-width, initial-scale=0')
+  }
 }
 
 const MapboxGLMap = (): JSX.Element => {
@@ -53,7 +58,7 @@ const MapboxGLMap = (): JSX.Element => {
   const [mapboxStyleURL, setMapboxStyleURL] = useState(MAPBOX_STYLE_URL.road)
   const [maposaicColors, setMaposaicColors] = useState<MaposaicColors>(PresetColorName.Random)
 
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const [roadColorThreshold, setRoadColorThreshold] = useState(INITIAL_ROAD_COLOR_THRESHOLD)
   const [similarColorTolerance, setSimilarColorTolerance] = useState(INITIAL_SIMILAR_COLOR_TOLERANCE)
   const [currentCenter, setCurrentCenter] = useState<[number, number]>([0, 0])
