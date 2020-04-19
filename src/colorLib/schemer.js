@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { colorMe } from './colored'
 
 export const getScheme = function (mode, count, seed) {

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import named from './colorNames.json'
 import { schemer } from './schemer.js'
 
