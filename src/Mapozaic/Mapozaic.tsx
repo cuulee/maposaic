@@ -46,11 +46,6 @@ const showMapboxCanvas = (isMapbox: boolean): void => {
   mosaicElement.style.opacity = isMapbox ? '0' : '1'
 }
 
-const viewportmeta = document.querySelector('meta[name=viewport]')
-if (viewportmeta) {
-  viewportmeta.setAttribute('content', 'width=device-width, initial-scale=1, user-scalable=no')
-}
-
 const MapboxGLMap = (): JSX.Element => {
   const [map, setMap] = useState<mapboxgl.Map | null>(null)
   const mapContainer = useRef<HTMLDivElement | null>(null)
