@@ -8,8 +8,8 @@ import { MaposaicColors, ChosenColor, PresetColorName, AntColors } from './color
 import { ChromePicker, ColorResult as ReactColorResult } from 'react-color'
 import { generate } from '@ant-design/colors'
 
-import { colorMe } from '../colorLib/colored'
-import { getScheme } from '../colorLib/schemer'
+import { colorMe } from 'colorLib/colored'
+import { getScheme } from 'colorLib/schemer'
 
 export type DrawerPropsType = {
   visible: boolean
@@ -22,8 +22,6 @@ export type DrawerPropsType = {
   currentCenter: [number, number]
   setNewMaposaicColors: (colors: MaposaicColors) => void
 }
-
-const THE_COLOR_API_URL = 'http://thecolorapi.com/scheme'
 
 const ColorTabs = ({ setNewMaposaicColors }: { setNewMaposaicColors: DrawerPropsType['setNewMaposaicColors'] }) => {
   const [chosenColor, setChosenColor] = useState<ChosenColor>(PresetColorName.Random)
@@ -44,9 +42,9 @@ const ColorTabs = ({ setNewMaposaicColors }: { setNewMaposaicColors: DrawerProps
   }
 
   const handleCustomPaletteColorChangeComplete = async (color: ReactColorResult) => {
-    const colorapi = colorMe({ hex: 'FBCED6' })
-    const scheme = getScheme('triad', 5, colorapi)
-    console.log('color', colorapi)
+    const seed = colorMe(color)
+    const scheme = getScheme('triad', 5, seed)
+    console.log('color', seed)
     console.log('scheme', scheme)
   }
 

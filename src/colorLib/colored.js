@@ -1,5 +1,5 @@
 /* eslint-disable */
-import named from './colorNames.json'
+import { colors as named } from './colorNames.json'
 import { schemer } from './schemer.js'
 
 export const colorMe = function (arg) {
@@ -266,6 +266,8 @@ export const nearestNamedHex = function (color) {
   let ndf = 0
   let cl = -1,
     df = -1
+    console.log('nearest', color,named[0]);
+
   for (let i = 0; i < named.length; i++) {
     if (color == '#' + named[i].hex) return ['#' + named[i].hex, named[i].name, true, 0]
     ndf1 = Math.pow(r - named[i].r, 2) + Math.pow(g - named[i].g, 2) + Math.pow(b - named[i].b, 2)
