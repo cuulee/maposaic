@@ -44,7 +44,7 @@ export const AntColors = {
   [PresetColorName.Grey]: grey,
 }
 
-export type CustomColor = 'custom'
+export type CustomShadingColor = 'customShading'
+export type CustomPalette = 'palette'
 
-export type ChosenColor = PresetColorName | CustomColor
 export type MaposaicColors = PresetColorName.Random | string[]

@@ -1,0 +1,25 @@
+.tab-span {
+  font-size: 13px;
+}
+
+.palette-container {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-evenly;
+  margin-top: 16px;
+  width: 100%;
+}
+
+.palette-number {
+  margin-right: 32px;
+}
+.palette-colors {
+  display: flex;
+  justify-content: flex-start;
+  width: 50%;
+}
+.palette-color {
+  width: 12px;
+  height: 12px;
+  margin-right: 16px;
+}
