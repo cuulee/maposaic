@@ -4,7 +4,7 @@
 
 .palette-container {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-evenly;
   margin-top: 16px;
   width: 100%;
@@ -22,4 +22,5 @@
   width: 12px;
   height: 12px;
   margin-right: 16px;
+  cursor: pointer;
 }
