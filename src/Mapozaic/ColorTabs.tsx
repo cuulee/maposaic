@@ -136,7 +136,11 @@ const ColorTabs = ({ setNewMaposaicColors }: { setNewMaposaicColors: (colors: Ma
         <div className="palette-container">
           <Select value={paletteColorSize} onChange={onPaletteColorSizeChange}>
             {Array.from({ length: 4 }, (_, i) => {
-              return <Select.Option value={i + 1}>{i + 1}</Select.Option>
+              return (
+                <Select.Option key={i} value={i + 1}>
+                  {i + 1}
+                </Select.Option>
+              )
             })}
           </Select>
           <div className="palette-colors">

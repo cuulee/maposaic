@@ -44,11 +44,6 @@ const showMapboxCanvas = (isMapbox: boolean): void => {
   const mosaicElement = document.getElementById('maposaic-cvs') as HTMLCanvasElement
   mapboxElement.style.opacity = isMapbox ? '1' : '0'
   mosaicElement.style.opacity = isMapbox ? '0' : '1'
-
-  const viewportmeta = document.querySelector('meta[name=viewport]')
-  if (viewportmeta) {
-    viewportmeta.setAttribute('content', 'width=device-width, initial-scale=0')
-  }
 }
 
 const MapboxGLMap = (): JSX.Element => {
