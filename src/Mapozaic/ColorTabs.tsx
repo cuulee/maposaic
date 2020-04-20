@@ -24,6 +24,8 @@ type ColorScheme = {
 }
 
 const COLOR_API_MODES = ['monochrome', 'complement', 'triad', 'quad']
+const INITIAL_PALETTE_SEED = '#E8D50D'
+const INITIAL_PALETTE_SIZE = 3
 
 const getModeFromCount = (count: number) => {
   if (count > COLOR_API_MODES.length) {
@@ -49,9 +51,11 @@ const ColorTabs = ({ setNewMaposaicColors }: { setNewMaposaicColors: (colors: Ma
 
   const [customShadingColor, setCustomShadingColor] = useState('#3C22C3')
 
-  const [paletteSeed, setPaletteSeed] = useState('#CB2476')
-  const [paletteColors, setPaletteColors] = useState(getPalette({ seed: { hex: '#CB2476' }, count: 4 }))
-  const [paletteColorSize, setPaletteColorSize] = useState(4)
+  const [paletteSeed, setPaletteSeed] = useState(INITIAL_PALETTE_SEED)
+  const [paletteColors, setPaletteColors] = useState(
+    getPalette({ seed: { hex: INITIAL_PALETTE_SEED }, count: INITIAL_PALETTE_SIZE }),
+  )
+  const [paletteColorSize, setPaletteColorSize] = useState(INITIAL_PALETTE_SIZE)
 
   const handleCustomColorChangeComplete = (color: ReactColorResult) => {
     setCustomShadingColor(color.hex)
@@ -134,10 +138,10 @@ const ColorTabs = ({ setNewMaposaicColors }: { setNewMaposaicColors: (colors: Ma
           disableAlpha
         />
         <div className="palette-container">
-          <Select value={paletteColorSize} onChange={onPaletteColorSizeChange}>
-            {Array.from({ length: 4 }, (_, i) => {
+          <Select value={paletteColorSize} onChange={onPaletteColorSizeChange} style={{ fontSize: '16px' }}>
+            {Array.from({ length: 5 }, (_, i) => {
               return (
-                <Select.Option key={i} value={i + 1}>
+                <Select.Option key={i} value={i + 1} style={{ fontSize: '16px' }}>
                   {i + 1}
                 </Select.Option>
               )
