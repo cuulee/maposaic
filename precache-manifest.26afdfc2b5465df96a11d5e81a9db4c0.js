@@ -1,10 +1,10 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "d352aacf2e5d3d72be49d81ce8846326",
-    "url": "/maposaic/89b1dcb654eb9c5e1224.worker.js"
+    "revision": "a1a6b8ee87e15db5130bf27242fe491d",
+    "url": "/maposaic/9db125b268759e336e80.worker.js"
   },
   {
-    "revision": "c4d34754999b1315781138bb795ccc2a",
+    "revision": "4b0bab31258c6b53f2c76c3dff024fa7",
     "url": "/maposaic/index.html"
   },
   {
@@ -12,7 +12,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/maposaic/static/css/2.491dbdf2.chunk.css"
   },
   {
-    "revision": "311c99b5491daf51ccd3",
+    "revision": "a8a02c91cdfac707f6dd",
     "url": "/maposaic/static/css/main.6467f581.chunk.css"
   },
   {
@@ -24,8 +24,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/maposaic/static/js/2.c32d56c6.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "311c99b5491daf51ccd3",
-    "url": "/maposaic/static/js/main.f7a62c1e.chunk.js"
+    "revision": "a8a02c91cdfac707f6dd",
+    "url": "/maposaic/static/js/main.78efcb8b.chunk.js"
   },
   {
     "revision": "8e7da0133f14ecb129bc",
