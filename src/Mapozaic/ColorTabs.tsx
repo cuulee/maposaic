@@ -1,27 +1,28 @@
 import React, { useState } from 'react'
 import { Radio, Tabs, Popover, Select, Button } from 'antd'
 import { RadioChangeEvent } from 'antd/lib/radio'
-import { MaposaicColors, PresetColorName, AntColors, ShadingColor } from './colors'
 import { ChromePicker, ColorResult as ReactColorResult, ColorResult } from 'react-color'
 import { generate } from '@ant-design/colors'
 
-import './colorTabs.style.css'
-import { coloors } from 'palettes/coloors'
 import { THEME_COLOR_PURPLE } from 'constants/colors'
+import { MaposaicColors, PresetColorName, AntColors, ShadingColor, PaletteOrigin, PRESET_PALETTES } from './colors'
+import './colorTabs.style.css'
 
 const ColorTabs = ({ setNewMaposaicColors }: { setNewMaposaicColors: (colors: MaposaicColors) => void }) => {
   const [shadingColor, setShadingColor] = useState<ShadingColor>(PresetColorName.Random)
+  const [customShadingColor, setCustomShadingColor] = useState('#3C22C3')
+  const [presetPaletteIndex, setPresetPaletteIndex] = useState({
+    [PaletteOrigin.Coolors]: 0,
+    [PaletteOrigin.ColorHunt]: 0,
+  })
+  const [customPaletteColors, setCustomPaletteColors] = useState<string[]>(['#F3D2A6', '#13DFF6'])
+  const [paletteOrigin, setPaletteOrigin] = useState<PaletteOrigin>(PaletteOrigin.Coolors)
 
   const handlePresetColorChange = (e: RadioChangeEvent) => {
     const color = e.target.value as PresetColorName
     setShadingColor(color)
     setNewMaposaicColors(color === PresetColorName.Random ? PresetColorName.Random : AntColors[color])
   }
-
-  const [customShadingColor, setCustomShadingColor] = useState('#3C22C3')
-  const [presetPaletteIndex, setPresetPaletteIndex] = useState(0)
-  const [presetPaletteColors, setPresetPaletteColors] = useState<string[]>(coloors[0])
-  const [customPaletteColors, setCustomPaletteColors] = useState<string[]>(['#F3D2A6', '#13DFF6'])
 
   const handleCustomShadingClick = () => {
     setShadingColor('customShading')
@@ -32,6 +33,12 @@ const ColorTabs = ({ setNewMaposaicColors }: { setNewMaposaicColors: (colors: Ma
     setCustomShadingColor(color.hex)
     setShadingColor('customShading')
     setNewMaposaicColors(generate(color.hex))
+  }
+
+  const handlePaletteOriginChange = (e: RadioChangeEvent) => {
+    const origin = e.target.value as PaletteOrigin
+    setPaletteOrigin(origin)
+    setNewMaposaicColors(PRESET_PALETTES[origin].palettes[presetPaletteIndex[origin]])
   }
 
   const onPaletteSizeChange = (value: number | undefined) => {
@@ -58,7 +65,7 @@ const ColorTabs = ({ setNewMaposaicColors }: { setNewMaposaicColors: (colors: Ma
       }
       setNewMaposaicColors(shadingColor === PresetColorName.Random ? PresetColorName.Random : AntColors[shadingColor])
     } else if (activeKey === '2') {
-      setNewMaposaicColors(presetPaletteColors)
+      setNewMaposaicColors(PRESET_PALETTES[paletteOrigin].palettes[presetPaletteIndex[paletteOrigin]])
     } else if (activeKey === '3') {
       setNewMaposaicColors(customPaletteColors)
     }
@@ -78,15 +85,16 @@ const ColorTabs = ({ setNewMaposaicColors }: { setNewMaposaicColors: (colors: Ma
   }
 
   const onPresetPaletteChange = (index: number) => {
-    setPresetPaletteIndex(index)
-    setPresetPaletteColors(coloors[index])
-    setNewMaposaicColors(coloors[index])
+    const paletteIndex = { ...presetPaletteIndex }
+    paletteIndex[paletteOrigin] = index
+    setPresetPaletteIndex(paletteIndex)
+    setNewMaposaicColors(PRESET_PALETTES[paletteOrigin].palettes[index])
   }
 
   return (
     <Tabs defaultActiveKey="1" onChange={onTabChange}>
       <Tabs.TabPane key="1" tab={<span className="tab-span">Shading</span>}>
-        <Radio.Group onChange={handlePresetColorChange} value={shadingColor} style={{ padding: '1px' }}>
+        <Radio.Group name="preset" onChange={handlePresetColorChange} value={shadingColor} style={{ padding: '1px' }}>
           {Object.entries(PresetColorName).map(([name, color]) => {
             return (
               <Radio.Button style={{ width: ' 100px' }} key={color} value={color}>
@@ -124,8 +132,21 @@ const ColorTabs = ({ setNewMaposaicColors }: { setNewMaposaicColors: (colors: Ma
         tab={<span className="tab-span">Palette</span>}
         style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}
       >
-        <Select value={presetPaletteIndex} onChange={onPresetPaletteChange}>
-          {coloors.map((palette, index) => {
+        <Radio.Group name="paletteOrigin" value={paletteOrigin} onChange={handlePaletteOriginChange}>
+          {Object.entries(PRESET_PALETTES).map(([origin, { name }]) => {
+            return (
+              <Radio key={origin} value={origin}>
+                {name}
+              </Radio>
+            )
+          })}
+        </Radio.Group>
+        <Select
+          className="preset-palette-select"
+          value={presetPaletteIndex[paletteOrigin]}
+          onChange={onPresetPaletteChange}
+        >
+          {PRESET_PALETTES[paletteOrigin].palettes.map((palette, index) => {
             return (
               <Select.Option value={index} key={index} dropdownStyle={{ display: 'flex', alignItems: 'center' }}>
                 <div className="custom-palette-colors">

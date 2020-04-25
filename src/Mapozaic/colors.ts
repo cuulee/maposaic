@@ -13,6 +13,9 @@ import {
   grey,
 } from '@ant-design/colors'
 
+import { coloors } from 'palettes/coloors'
+import { colorHunt } from 'palettes/colorHunt'
+
 export enum PresetColorName {
   Random = 'random',
   Red = 'red',
@@ -49,3 +52,13 @@ export type CustomShadingColor = 'customShading'
 export type ShadingColor = PresetColorName | CustomShadingColor
 
 export type MaposaicColors = PresetColorName.Random | string[]
+
+export enum PaletteOrigin {
+  Coolors = 'coolors',
+  ColorHunt = 'colorHunt',
+}
+
+export const PRESET_PALETTES: { [key in PaletteOrigin]: { name: string; palettes: string[][] } } = {
+  [PaletteOrigin.Coolors]: { name: 'Coloors', palettes: coloors },
+  [PaletteOrigin.ColorHunt]: { name: 'Color Hunt', palettes: colorHunt },
+}

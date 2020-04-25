@@ -1,6 +1,6 @@
-export const palettes = [
-  ['#eeeeee', '#00adb5', '#393e46', '#222831'],
+export const colorHunt = [
   ['#6a2c70', '#b83b5e', '#f08a5d', '#f9ed69'],
+  ['#eeeeee', '#00adb5', '#393e46', '#222831'],
   ['#95e1d3', '#eaffd0', '#fce38a', '#f38181'],
   ['#eaeaea', '#ff2e63', '#252a34', '#08d9d6'],
   ['#fc5185', '#f5f5f5', '#3fc1c9', '#364f6b'],

@@ -5,6 +5,10 @@
   margin-top: 16px;
 }
 
+.preset-palette-select {
+  margin-top: 8px;
+}
+
 .custom-palette-container {
   display: flex;
   align-items: center;
@@ -21,6 +25,7 @@
   justify-content: flex-start;
   align-items: center;
   width: 100%;
+  height: 100%;
   flex-wrap: wrap;
 }
 .custom-palette-color-container {
