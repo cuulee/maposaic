@@ -1,110 +1,87 @@
 import React, { useState } from 'react'
-import { Radio, Tabs, Popover, Select } from 'antd'
+import { Radio, Tabs, Popover, Select, Button } from 'antd'
 import { RadioChangeEvent } from 'antd/lib/radio'
-import { MaposaicColors, PresetColorName, AntColors } from './colors'
+import { MaposaicColors, PresetColorName, AntColors, ShadingColor } from './colors'
 import { ChromePicker, ColorResult as ReactColorResult, ColorResult } from 'react-color'
 import { generate } from '@ant-design/colors'
 
-import { colorMe } from 'colorLib/colored'
-import { getScheme } from 'colorLib/schemer'
-
 import './colorTabs.style.css'
+import { coloors } from 'palettes/coloors'
 
-type ApiColor = {
-  hex: {
-    value: string
-  }
-  name: {
-    value: string
-  }
-}
-
-type ColorScheme = {
-  colors: ApiColor[]
-}
-
-const COLOR_API_MODES = ['monochrome', 'complement', 'triad', 'quad']
-const INITIAL_PALETTE_SEED = '#E8D50D'
-const INITIAL_PALETTE_SIZE = 3
-
-const getModeFromCount = (count: number) => {
-  if (count > COLOR_API_MODES.length) {
-    return 'quad'
-  }
-  return COLOR_API_MODES[count - 1]
-}
-
-const getPalette = ({ seed, count }: { seed: { hex: string }; count: number }): string[] => {
-  const seedColor = colorMe(seed)
-  const scheme: ColorScheme = getScheme(getModeFromCount(count), count, seedColor)
-
-  return scheme.colors.map((color) => color.hex.value)
-}
 const ColorTabs = ({ setNewMaposaicColors }: { setNewMaposaicColors: (colors: MaposaicColors) => void }) => {
-  const [chosenColor, setChosenColor] = useState<PresetColorName>(PresetColorName.Random)
+  const [shadingColor, setShadingColor] = useState<ShadingColor>(PresetColorName.Random)
 
   const handlePresetColorChange = (e: RadioChangeEvent) => {
     const color = e.target.value as PresetColorName
-    setChosenColor(color)
+    setShadingColor(color)
     setNewMaposaicColors(color === PresetColorName.Random ? PresetColorName.Random : AntColors[color])
   }
 
   const [customShadingColor, setCustomShadingColor] = useState('#3C22C3')
 
-  const [paletteSeed, setPaletteSeed] = useState(INITIAL_PALETTE_SEED)
-  const [paletteColors, setPaletteColors] = useState(
-    getPalette({ seed: { hex: INITIAL_PALETTE_SEED }, count: INITIAL_PALETTE_SIZE }),
-  )
-  const [paletteColorSize, setPaletteColorSize] = useState(INITIAL_PALETTE_SIZE)
+  const [presetPaletteIndex, setPresetPaletteIndex] = useState(0)
+  const [presetPaletteColors, setPresetPaletteColors] = useState<string[]>(coloors[0])
+  const [customPaletteColors, setCustomPaletteColors] = useState<string[]>(['#F3D2A6', '#13DFF6'])
 
   const handleCustomColorChangeComplete = (color: ReactColorResult) => {
     setCustomShadingColor(color.hex)
+    setShadingColor('customShading')
     setNewMaposaicColors(generate(color.hex))
   }
 
-  const handleCustomPaletteColorChangeComplete = async (color: ReactColorResult) => {
-    const palette = getPalette({ seed: color, count: paletteColorSize })
-    setPaletteColors(palette)
-    setNewMaposaicColors(palette)
-  }
-
-  const onPaletteColorSizeChange = (value: number | undefined) => {
+  const onPaletteSizeChange = (value: number | undefined) => {
     if (!value) {
       return
     }
-    setPaletteColorSize(value)
-    const palette = getPalette({ seed: { hex: paletteSeed }, count: value })
-    setPaletteColors(palette)
-    setNewMaposaicColors(palette)
+    const newPalette = [
+      ...customPaletteColors.slice(0, value),
+      ...Array.from(
+        { length: value - customPaletteColors.length },
+        () => customPaletteColors[customPaletteColors.length - 1] || '#AAAAAA',
+      ),
+    ]
+
+    setCustomPaletteColors(newPalette)
+    setNewMaposaicColors(newPalette)
   }
 
   const onTabChange = (activeKey: string) => {
     if (activeKey === '1') {
-      setNewMaposaicColors(chosenColor === PresetColorName.Random ? PresetColorName.Random : AntColors[chosenColor])
+      if (shadingColor === 'customShading') {
+        setNewMaposaicColors(generate(customShadingColor))
+        return
+      }
+      setNewMaposaicColors(shadingColor === PresetColorName.Random ? PresetColorName.Random : AntColors[shadingColor])
     } else if (activeKey === '2') {
-      setNewMaposaicColors(generate(customShadingColor))
+      setNewMaposaicColors(presetPaletteColors)
     } else if (activeKey === '3') {
-      setNewMaposaicColors(paletteColors)
+      setNewMaposaicColors(customPaletteColors)
     }
   }
 
-  const onPaletteIndexChange = (color: ColorResult, index: number) => {
-    const newPalette = [...paletteColors]
+  const onCustomPalettePickerChange = (color: ColorResult, index: number) => {
+    const newPalette = [...customPaletteColors]
     newPalette[index] = color.hex
-    setPaletteColors(newPalette)
+    setCustomPaletteColors(newPalette)
   }
 
-  const onPaletteIndexChangeComplete = (color: ColorResult, index: number) => {
-    const newPalette = [...paletteColors]
+  const onCustomPalettePickerChangeComplete = (color: ColorResult, index: number) => {
+    const newPalette = [...customPaletteColors]
     newPalette[index] = color.hex
-    setPaletteColors(newPalette)
-    setNewMaposaicColors(paletteColors)
+    setCustomPaletteColors(newPalette)
+    setNewMaposaicColors(customPaletteColors)
+  }
+
+  const onPresetPaletteChange = (index: number) => {
+    setPresetPaletteIndex(index)
+    setPresetPaletteColors(coloors[index])
+    setNewMaposaicColors(coloors[index])
   }
 
   return (
     <Tabs defaultActiveKey="1" onChange={onTabChange}>
-      <Tabs.TabPane key="1" tab={<span className="tab-span">Preset</span>}>
-        <Radio.Group onChange={handlePresetColorChange} value={chosenColor} style={{ padding: '1px' }}>
+      <Tabs.TabPane key="1" tab={<span className="tab-span">Shading</span>}>
+        <Radio.Group onChange={handlePresetColorChange} value={shadingColor} style={{ padding: '1px' }}>
           {Object.entries(PresetColorName).map(([name, color]) => {
             return (
               <Radio.Button style={{ width: ' 100px' }} key={color} value={color}>
@@ -113,33 +90,56 @@ const ColorTabs = ({ setNewMaposaicColors }: { setNewMaposaicColors: (colors: Ma
             )
           })}
         </Radio.Group>
+        <Popover
+          content={
+            <ChromePicker
+              color={customShadingColor}
+              onChange={(c) => setCustomShadingColor(c.hex)}
+              onChangeComplete={handleCustomColorChangeComplete}
+              disableAlpha
+            />
+          }
+          placement="bottom"
+        >
+          <Button>Custom seed</Button>
+        </Popover>
       </Tabs.TabPane>
       <Tabs.TabPane
         key="2"
-        tab={<span className="tab-span">Shading</span>}
-        style={{ padding: '1px 1px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+        tab={<span className="tab-span">Palette</span>}
+        style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}
       >
-        <ChromePicker
-          color={customShadingColor}
-          onChange={(c) => setCustomShadingColor(c.hex)}
-          onChangeComplete={handleCustomColorChangeComplete}
-          disableAlpha
-        />
+        <Select value={presetPaletteIndex} onChange={onPresetPaletteChange}>
+          {coloors.map((palette, index) => {
+            return (
+              <Select.Option value={index} key={index} dropdownStyle={{ display: 'flex', alignItems: 'center' }}>
+                <div className="custom-palette-colors">
+                  {palette.map((hexColor) => {
+                    return (
+                      <div key="hexColor" className="custom-palette-color-container">
+                        <div className="custom-palette-color" style={{ backgroundColor: hexColor }} />
+                      </div>
+                    )
+                  })}
+                </div>
+              </Select.Option>
+            )
+          })}
+        </Select>
       </Tabs.TabPane>
       <Tabs.TabPane
         key="3"
-        tab={<span className="tab-span">Palette</span>}
+        tab={<span className="tab-span">Custom</span>}
         style={{ padding: '1px 1px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
       >
-        <ChromePicker
-          color={paletteSeed}
-          onChange={(c) => setPaletteSeed(c.hex)}
-          onChangeComplete={handleCustomPaletteColorChangeComplete}
-          disableAlpha
-        />
-        <div className="palette-container">
-          <Select value={paletteColorSize} onChange={onPaletteColorSizeChange} style={{ fontSize: '16px' }}>
-            {Array.from({ length: 5 }, (_, i) => {
+        <div className="custom-palette-container">
+          <Select
+            className="custom-palette-number"
+            value={customPaletteColors.length}
+            onChange={onPaletteSizeChange}
+            style={{ fontSize: '16px' }}
+          >
+            {Array.from({ length: 10 }, (_, i) => {
               return (
                 <Select.Option key={i} value={i + 1} style={{ fontSize: '16px' }}>
                   {i + 1}
@@ -147,17 +147,17 @@ const ColorTabs = ({ setNewMaposaicColors }: { setNewMaposaicColors: (colors: Ma
               )
             })}
           </Select>
-          <div className="palette-colors">
-            {paletteColors.map((color, paletteIndex) => (
+          <div className="custom-palette-colors">
+            {customPaletteColors.map((color, paletteIndex) => (
               <Popover
                 content={
                   <ChromePicker
                     color={color}
                     onChange={(c) => {
-                      onPaletteIndexChange(c, paletteIndex)
+                      onCustomPalettePickerChange(c, paletteIndex)
                     }}
                     onChangeComplete={(c) => {
-                      onPaletteIndexChangeComplete(c, paletteIndex)
+                      onCustomPalettePickerChangeComplete(c, paletteIndex)
                     }}
                     disableAlpha
                   />
@@ -165,7 +165,9 @@ const ColorTabs = ({ setNewMaposaicColors }: { setNewMaposaicColors: (colors: Ma
                 key={paletteIndex}
                 placement="bottom"
               >
-                <div className="palette-color" style={{ backgroundColor: color }} />
+                <div className="custom-palette-color-container">
+                  <div className="custom-palette-color" style={{ backgroundColor: color }} />
+                </div>
               </Popover>
             ))}
           </div>

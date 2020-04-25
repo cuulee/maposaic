@@ -45,6 +45,7 @@ export const AntColors = {
 }
 
 export type CustomShadingColor = 'customShading'
-export type CustomPalette = 'palette'
+
+export type ShadingColor = PresetColorName | CustomShadingColor
 
 export type MaposaicColors = PresetColorName.Random | string[]

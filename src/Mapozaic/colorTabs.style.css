@@ -2,25 +2,35 @@
   font-size: 13px;
 }
 
-.palette-container {
+.custom-palette-container {
   display: flex;
   align-items: center;
-  justify-content: space-evenly;
+  justify-content: flex-start;
   margin-top: 16px;
   width: 100%;
 }
 
-.palette-number {
-  margin-right: 32px;
+.custom-palette-number {
+  margin-right: 16px;
 }
-.palette-colors {
+.custom-palette-colors {
   display: flex;
   justify-content: flex-start;
-  width: 50%;
+  align-items: center;
+  width: 100%;
+  flex-wrap: wrap;
 }
-.palette-color {
-  width: 12px;
-  height: 12px;
-  margin-right: 16px;
+.custom-palette-color-container {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.custom-palette-color {
+  width: 18px;
+  height: 18px;
   cursor: pointer;
+  border: 1px solid darkgrey;
 }
