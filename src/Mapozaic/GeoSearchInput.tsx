@@ -35,7 +35,7 @@ const GeoSearch = ({
       return
     }
     setIsSearching(true)
-    const request = `${baseurl}/${value}.json?limit=5&language=fr-FR&access_token=${MAPBOX_TOKEN}&proximity=${currentCenter[0]}%2C${currentCenter[1]}`
+    const request = `${baseurl}/${value}.json?limit=10&language=fr-FR&access_token=${MAPBOX_TOKEN}&proximity=${currentCenter[0]}%2C${currentCenter[1]}`
     const res = await fetch(request)
     const body: GeocoderResult = await res.json()
     setIsSearching(false)

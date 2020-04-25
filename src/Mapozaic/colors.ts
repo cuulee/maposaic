@@ -13,7 +13,7 @@ import {
   grey,
 } from '@ant-design/colors'
 
-import { coloors } from 'palettes/coloors'
+import { coolors } from 'palettes/coolors'
 import { colorHunt } from 'palettes/colorHunt'
 
 export enum PresetColorName {
@@ -59,6 +59,6 @@ export enum PaletteOrigin {
 }
 
 export const PRESET_PALETTES: { [key in PaletteOrigin]: { name: string; palettes: string[][] } } = {
-  [PaletteOrigin.Coolors]: { name: 'Coloors', palettes: coloors },
+  [PaletteOrigin.Coolors]: { name: 'Coolors', palettes: coolors },
   [PaletteOrigin.ColorHunt]: { name: 'Color Hunt', palettes: colorHunt },
 }

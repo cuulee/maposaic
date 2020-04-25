@@ -1,4 +1,4 @@
-export const coloors = [
+export const coolors = [
   ['#247ba0', '#70c1b3', '#b2dbbf', '#f3ffbd', '#ff1654'],
   ['#05668d', '#028090', '#00a896', '#02c39a', '#f0f3bd'],
   ['#ffcdb2', '#ffb4a2', '#e5989b', '#b5838d', '#6d6875'],
