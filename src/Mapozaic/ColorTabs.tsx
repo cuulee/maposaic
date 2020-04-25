@@ -7,6 +7,7 @@ import { generate } from '@ant-design/colors'
 
 import './colorTabs.style.css'
 import { coloors } from 'palettes/coloors'
+import { THEME_COLOR_PURPLE } from 'constants/colors'
 
 const ColorTabs = ({ setNewMaposaicColors }: { setNewMaposaicColors: (colors: MaposaicColors) => void }) => {
   const [shadingColor, setShadingColor] = useState<ShadingColor>(PresetColorName.Random)
@@ -18,12 +19,16 @@ const ColorTabs = ({ setNewMaposaicColors }: { setNewMaposaicColors: (colors: Ma
   }
 
   const [customShadingColor, setCustomShadingColor] = useState('#3C22C3')
-
   const [presetPaletteIndex, setPresetPaletteIndex] = useState(0)
   const [presetPaletteColors, setPresetPaletteColors] = useState<string[]>(coloors[0])
   const [customPaletteColors, setCustomPaletteColors] = useState<string[]>(['#F3D2A6', '#13DFF6'])
 
-  const handleCustomColorChangeComplete = (color: ReactColorResult) => {
+  const handleCustomShadingClick = () => {
+    setShadingColor('customShading')
+    setNewMaposaicColors(generate(customShadingColor))
+  }
+
+  const handleCustomShadingColorChangeComplete = (color: ReactColorResult) => {
     setCustomShadingColor(color.hex)
     setShadingColor('customShading')
     setNewMaposaicColors(generate(color.hex))
@@ -95,13 +100,23 @@ const ColorTabs = ({ setNewMaposaicColors }: { setNewMaposaicColors: (colors: Ma
             <ChromePicker
               color={customShadingColor}
               onChange={(c) => setCustomShadingColor(c.hex)}
-              onChangeComplete={handleCustomColorChangeComplete}
+              onChangeComplete={handleCustomShadingColorChangeComplete}
               disableAlpha
             />
           }
           placement="bottom"
         >
-          <Button>Custom seed</Button>
+          <Button
+            style={
+              shadingColor === 'customShading'
+                ? { borderColor: THEME_COLOR_PURPLE, color: THEME_COLOR_PURPLE }
+                : undefined
+            }
+            onClick={handleCustomShadingClick}
+            className="shading-custom-button"
+          >
+            Custom seed
+          </Button>
         </Popover>
       </Tabs.TabPane>
       <Tabs.TabPane
