@@ -1,7 +1,7 @@
-// eslint-disable-next-line
-const { override, fixBabelImports, addLessLoader } = require('customize-cra')
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { override, fixBabelImports, addLessLoader, addWebpackModuleRule } = require('customize-cra')
 
-// eslint-disable-next-line
+/* eslint-env commonjs */
 module.exports = override(
   fixBabelImports('import', {
     libraryName: 'antd',
@@ -12,4 +12,5 @@ module.exports = override(
     javascriptEnabled: true,
     modifyVars: { '@primary-color': '#e53f67' },
   }),
+  addWebpackModuleRule({ test: /\.worker\.js$/, use: { loader: 'worker-loader' } }),
 )

@@ -1,5 +1,5 @@
 import { imagePoint, RGBColor } from './Mapozaic'
-import { AntColors, MaposaicColors, PresetColorName } from './colors'
+import { MaposaicColors, PresetColorName } from './colors'
 
 const getPointFromPixelIndex = (pixelIndex: number, webglWidth: number): imagePoint => {
   return { x: (pixelIndex / 4) % webglWidth, y: Math.floor(pixelIndex / 4 / webglWidth) }
@@ -41,18 +41,7 @@ const getAdjacentPoints = ({
   // SE: point.y < viewportHeight - 1 && point.x < viewportWidth - 1 ? { x: point.x + 1, y: point.y + 1 } : null,
   // SO: point.y < viewportHeight - 1 && point.x > 0 ? { x: point.x - 1, y: point.y + 1 } : null,
 })
-const blues = [
-  '#E6F7FF',
-  '#BAE7FF',
-  '#91D5FF',
-  '#69C0FF',
-  '#40A9FF',
-  '#1890FF',
-  '#096DD9',
-  '#0050B3',
-  '#003A8C',
-  '#002766',
-]
+
 const hexToRgb = (hex: string) => {
   return createRGB(
     parseInt(hex.slice(1, 2), 16) * 16 + parseInt(hex.slice(2, 3), 16),
@@ -154,7 +143,6 @@ const createColor = (colors: MaposaicColors) => {
   return hexToRgb(colors[Math.floor(Math.random() * colors.length)])
 }
 
-// eslint-disable-next-line
 onmessage = ({
   data: {
     mapboxPixels,

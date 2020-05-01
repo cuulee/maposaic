@@ -6,7 +6,7 @@ import { generate } from '@ant-design/colors'
 
 import { THEME_COLOR_PURPLE } from 'constants/colors'
 import { MaposaicColors, PresetColorName, AntColors, ShadingColor, PaletteOrigin, PRESET_PALETTES } from './colors'
-import './colorTabs.style.css'
+import './colorTabs.style.less'
 
 const ColorTabs = ({ setNewMaposaicColors }: { setNewMaposaicColors: (colors: MaposaicColors) => void }) => {
   const [shadingColor, setShadingColor] = useState<ShadingColor>(PresetColorName.Random)
