@@ -1,107 +1,25 @@
 import React, { useEffect, useState } from 'react'
 import pixelArray from './pixelArray'
 
+import {
+  ImagePoint,
+  Adjacent,
+  BorderPoint,
+  Corner,
+  createRGB,
+  getPointFromPixelIndex,
+  MOVE_OFFSET,
+  ADJACENT_PROCESSING_ORDER,
+  ADJACENT_PROCESSING,
+  getPixelIndexFromPoint,
+  isColorSimilar,
+} from './svgUtils'
+
 import './svgtest.less'
 
 const canvasRatio = 1
 const pixelArrayWidth = 10
 const canvasWidth = canvasRatio * pixelArrayWidth
-
-type imagePoint = { x: number; y: number }
-export type RGBColor = { r: number; g: number; b: number }
-
-const getPointFromPixelIndex = (pixelIndex: number, width: number): imagePoint => {
-  return { x: (pixelIndex / 4) % width, y: Math.floor(pixelIndex / 4 / width) }
-}
-const getPixelIndexFromPoint = (point: imagePoint, width: number): number => {
-  return (point.y * width + point.x) * 4
-}
-
-enum Corner {
-  ONO = 'ONO',
-  NNO = 'NNO',
-  NNE = 'NNE',
-  ENE = 'ENE',
-  SSO = 'SSO',
-  OSO = 'OSO',
-  SSE = 'SSE',
-  ESE = 'ESE',
-}
-
-enum Adjacent {
-  N = 'N',
-  E = 'E',
-  O = 'O',
-  S = 'S',
-}
-
-enum Border {
-  NOtoNE,
-  NEtoNO,
-  SOtoSE,
-  SEtoSO,
-  NEtoSE,
-  SEtoNE,
-  SOtoNO,
-  NOtoSO,
-}
-
-enum Draw {
-  Right = 'h 1',
-  Left = 'h -1',
-  Up = 'v -1',
-  Down = 'v 1',
-}
-
-const ADJACENT_PROCESSING = {
-  [Border.NOtoNE]: { adjacent: Adjacent.N, separation: Draw.Right, adjDeptCorner: Corner.SSO, arv: Corner.NNE },
-  [Border.NEtoNO]: { adjacent: Adjacent.N, separation: Draw.Left, adjDeptCorner: Corner.SSE, arv: Corner.NNO },
-  [Border.SOtoSE]: { adjacent: Adjacent.S, separation: Draw.Right, adjDeptCorner: Corner.NNO, arv: Corner.SSE },
-  [Border.SEtoSO]: { adjacent: Adjacent.S, separation: Draw.Left, adjDeptCorner: Corner.NNE, arv: Corner.SSO },
-  [Border.NEtoSE]: { adjacent: Adjacent.E, separation: Draw.Down, adjDeptCorner: Corner.ONO, arv: Corner.ESE },
-  [Border.SEtoNE]: { adjacent: Adjacent.E, separation: Draw.Up, adjDeptCorner: Corner.OSO, arv: Corner.ESE },
-  [Border.SOtoNO]: { adjacent: Adjacent.O, separation: Draw.Up, adjDeptCorner: Corner.ESE, arv: Corner.ONO },
-  [Border.NOtoSO]: { adjacent: Adjacent.O, separation: Draw.Down, adjDeptCorner: Corner.ENE, arv: Corner.OSO },
-}
-
-const ADJACENT_PROCESSING_ORDER = {
-  [Corner.ONO]: [Border.NOtoNE, Border.NEtoSE, Border.SEtoSO, Border.SOtoNO],
-  [Corner.NNO]: [Border.NOtoSO, Border.SOtoSE, Border.SEtoNE, Border.NEtoNO],
-  [Corner.OSO]: [Border.SOtoSE, Border.SEtoNE, Border.NEtoNO, Border.NOtoSO],
-  [Corner.SSO]: [Border.SOtoNO, Border.NOtoNE, Border.NEtoSE, Border.SEtoSO],
-  [Corner.NNE]: [Border.NEtoSE, Border.SEtoSO, Border.SOtoNO, Border.NOtoNE],
-  [Corner.ENE]: [Border.NEtoNO, Border.NOtoSO, Border.SOtoSE, Border.SEtoNE],
-  [Corner.SSE]: [Border.SEtoNE, Border.NEtoNO, Border.NOtoSO, Border.SOtoSE],
-  [Corner.ESE]: [Border.SEtoSO, Border.SOtoNO, Border.NOtoNE, Border.NEtoSE],
-}
-
-const MOVE_OFFSET = {
-  [Corner.ONO]: { x: 0, y: 0 },
-  [Corner.NNO]: { x: 0, y: 0 },
-  [Corner.OSO]: { x: 0, y: 1 },
-  [Corner.SSO]: { x: 0, y: 1 },
-  [Corner.NNE]: { x: 1, y: 0 },
-  [Corner.ENE]: { x: 1, y: 0 },
-  [Corner.SSE]: { x: 1, y: 1 },
-  [Corner.ESE]: { x: 1, y: 1 },
-}
-
-type borderPoint = {
-  parentCorner: Corner
-  pixelIndex: number
-}
-
-const isColorSimilar = (color1: RGBColor, color2: RGBColor, similarColorTolerance?: number): boolean => {
-  return (
-    Math.abs(color1.r - color2.r) < (similarColorTolerance || 1) &&
-    Math.abs(color1.g - color2.g) < (similarColorTolerance || 1) &&
-    Math.abs(color1.b - color2.b) < (similarColorTolerance || 1)
-  )
-}
-
-const createRGB = (r: number, g: number, b: number): RGBColor => {
-  return { r, g, b }
-}
 
 const getAdjacentPoint = ({
   point,
@@ -109,7 +27,7 @@ const getAdjacentPoint = ({
   width,
   height,
 }: {
-  point: imagePoint
+  point: ImagePoint
   adjacent: Adjacent
   width: number
   height: number
@@ -134,35 +52,44 @@ const getAreaBorderPath = ({
   toVisitBorderMap,
   width,
   height,
-  visitedBorderSet,
+  visitedSet,
 }: {
-  origin: borderPoint
+  origin: BorderPoint
   data: Uint8ClampedArray
   toVisitBorderMap: Map<number, Corner>
   width: number
   height: number
-  visitedBorderSet: Set<number>
+  visitedSet: Set<number>
 }) => {
-  const originColor = createRGB(data[origin.pixelIndex], data[origin.pixelIndex + 1], data[origin.pixelIndex + 2])
-  const originPoint = getPointFromPixelIndex(origin.pixelIndex, width)
+  const addedInToVisitInArea = new Set<number>()
+  const toVisitAreaStack = []
 
-  const dx = originPoint.x + MOVE_OFFSET[origin.parentCorner].x
-  const dy = originPoint.y + MOVE_OFFSET[origin.parentCorner].y
+  const originColor = createRGB(data[origin.pixelIndex], data[origin.pixelIndex + 1], data[origin.pixelIndex + 2])
+
+  const dx = origin.point.x + MOVE_OFFSET[origin.parentCorner].x
+  const dy = origin.point.y + MOVE_OFFSET[origin.parentCorner].y
   let path = `M ${dx} ${dy}`
-  let currentBorder = origin
+
+  let nextBorder = origin
   let iter = 0
 
-  while (iter < width * height) {
+  pathLoop: while (iter < width * height) {
     iter++
-    const currentBorderPoint = getPointFromPixelIndex(currentBorder.pixelIndex, width)
-    visitedBorderSet.add(currentBorder.pixelIndex)
+    const currentBorder = nextBorder
+    visitedSet.add(currentBorder.pixelIndex)
     toVisitBorderMap.delete(currentBorder.pixelIndex)
 
+    let isAdjacentFound = false
+
     for (let adjacentIndex = 0; adjacentIndex < 4; adjacentIndex++) {
+      if (isAdjacentFound && adjacentIndex >= 3) {
+        break
+      }
+
       const borderName = ADJACENT_PROCESSING_ORDER[currentBorder.parentCorner][adjacentIndex]
       const borderCandidate = ADJACENT_PROCESSING[borderName]
       const borderCandidatePoint = getAdjacentPoint({
-        point: currentBorderPoint,
+        point: currentBorder.point,
         adjacent: borderCandidate.adjacent,
         width,
         height,
@@ -177,11 +104,23 @@ const getAreaBorderPath = ({
           createRGB(data[borderCandidatePixel], data[borderCandidatePixel + 1], data[borderCandidatePixel + 2]),
         )
       ) {
-        currentBorder = {
-          parentCorner: borderCandidate.adjDeptCorner,
-          pixelIndex: borderCandidatePixel,
+        if (isAdjacentFound) {
+          if (!addedInToVisitInArea.has(borderCandidatePixel) && !visitedSet.has(borderCandidatePixel)) {
+            toVisitAreaStack.push(borderCandidatePixel)
+            addedInToVisitInArea.add(borderCandidatePixel)
+          }
+        } else {
+          nextBorder = {
+            parentCorner: borderCandidate.adjDeptCorner,
+            pixelIndex: borderCandidatePixel,
+            point: borderCandidatePoint as ImagePoint,
+          }
+          isAdjacentFound = true
         }
-        break
+        continue
+      }
+      if (isAdjacentFound) {
+        continue
       }
 
       path += ` ${borderCandidate.separation}`
@@ -193,12 +132,13 @@ const getAreaBorderPath = ({
         if (origin.parentCorner !== borderCandidate.arv) {
           throw 'end anomalie'
         }
-        return path
+        break pathLoop
       }
-      if (borderCandidatePixel && !visitedBorderSet.has(borderCandidatePixel)) {
+      if (borderCandidatePixel && !visitedSet.has(borderCandidatePixel)) {
         toVisitBorderMap.set(borderCandidatePixel, borderCandidate.adjDeptCorner)
       }
       if (adjacentIndex === 3) {
+        console.log(path)
         throw 'no adjacent found'
       }
     }
@@ -207,7 +147,37 @@ const getAreaBorderPath = ({
     console.log(path)
     throw 'too many iterations'
   }
-  console.log('iter', iter, height * width)
+  while (toVisitAreaStack.length) {
+    const toVisitPixel = toVisitAreaStack.pop()
+    if (!toVisitPixel || visitedSet.has(toVisitPixel)) {
+      continue
+    }
+    visitedSet.add(toVisitPixel)
+    const currentPoint = getPointFromPixelIndex(toVisitPixel, width)
+    Object.values(Adjacent).forEach((adjacent) => {
+      const adjacentPoint = getAdjacentPoint({ point: currentPoint, adjacent, width, height })
+      const adjacentPixel = adjacentPoint ? getPixelIndexFromPoint(adjacentPoint, width) : null
+
+      if (adjacentPixel === null || visitedSet.has(adjacentPixel)) {
+        return
+      }
+
+      if (
+        !isColorSimilar(originColor, createRGB(data[adjacentPixel], data[adjacentPixel + 1], data[adjacentPixel + 2]))
+      ) {
+        if (toVisitBorderMap.has(adjacentPixel)) {
+          // throw `pixel id:${adjacentPixel} already in map`
+        }
+        toVisitBorderMap.set(adjacentPixel, Corner.NNO)
+        return
+      }
+      if (!addedInToVisitInArea.has(adjacentPixel)) {
+        toVisitAreaStack.push(adjacentPixel)
+        addedInToVisitInArea.add(adjacentPixel)
+      }
+    })
+  }
+
   return path
 }
 
@@ -219,19 +189,29 @@ type Path = {
 
 const getCanvasPaths = ({ data, width, height }: { data: Uint8ClampedArray; width: number; height: number }) => {
   const toVisitBorderMap = new Map<number, Corner>()
-  const visitedBorderSet = new Set<number>()
+  const visitedSet = new Set<number>()
   toVisitBorderMap.set(0, Corner.ONO)
+
   const paths = []
   let pathId = 0
+
   while (toVisitBorderMap.size > 0) {
     const originPixelIndex = toVisitBorderMap.keys().next().value
     const originParentCorner = toVisitBorderMap.get(originPixelIndex)
-    if (!originParentCorner || visitedBorderSet.has(originPixelIndex)) {
+
+    if (!originParentCorner || visitedSet.has(originPixelIndex)) {
       toVisitBorderMap.delete(originPixelIndex)
       continue
     }
-    const origin = { pixelIndex: originPixelIndex, parentCorner: originParentCorner }
-    const path = getAreaBorderPath({ data, width, height, origin, toVisitBorderMap, visitedBorderSet })
+
+    const origin = {
+      pixelIndex: originPixelIndex,
+      parentCorner: originParentCorner,
+      point: getPointFromPixelIndex(originPixelIndex, width),
+    }
+
+    const path = getAreaBorderPath({ data, width, height, origin, toVisitBorderMap, visitedSet })
+
     paths.push({
       d: path,
       id: pathId,
