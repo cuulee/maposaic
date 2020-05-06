@@ -77,10 +77,21 @@ export const MOVE_OFFSET = {
   [Corner.ESE]: { x: 1, y: 1 },
 }
 
+export type PointWithIndex = {
+  point: ImagePoint
+  pixelIndex: number
+}
+
 export type BorderPoint = {
   parentCorner: Corner
   pixelIndex: number
   point: ImagePoint
+}
+
+export type Path = {
+  d: string
+  id: number
+  color: string
 }
 
 export const isColorSimilar = (color1: RGBColor, color2: RGBColor, similarColorTolerance?: number): boolean => {
