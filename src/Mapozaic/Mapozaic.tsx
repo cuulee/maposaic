@@ -9,7 +9,7 @@ import spinner from '../assets/spinner.png'
 import Drawer from './Drawer'
 
 // eslint-disable-next-line
-import PaintWorker from 'worker-loader!./paint.worker'
+import PaintWorker from 'worker-loader!./svg.worker'
 
 import './style.css'
 import { MaposaicColors, PresetColorName } from './colors'
@@ -45,8 +45,14 @@ const showMapboxCanvas = (isMapbox: boolean): void => {
   mapboxElement.style.opacity = isMapbox ? '1' : '0'
   mosaicElement.style.opacity = isMapbox ? '0' : '1'
 }
-
+type Path = {
+  d: string
+  id: number
+  color: string
+}
 const MapboxGLMap = (): JSX.Element => {
+  const [paths, setPaths] = useState<Path[]>([])
+
   const [map, setMap] = useState<mapboxgl.Map | null>(null)
   const mapContainer = useRef<HTMLDivElement | null>(null)
 
@@ -83,25 +89,21 @@ const MapboxGLMap = (): JSX.Element => {
       const imageData = maposaicContext.getImageData(0, 0, maposaicCanvas.width, maposaicCanvas.height)
       const maposaicData = imageData.data
 
-      const mapboxPixels = new Uint8Array(gl.drawingBufferWidth * gl.drawingBufferHeight * 4)
+      const mapboxPixels = new Uint8Array(webglWidth * webglHeight * 4)
       gl.readPixels(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight, gl.RGBA, gl.UNSIGNED_BYTE, mapboxPixels)
 
-      paintWorker.onmessage = function (e: { data: number[] }): void {
-        imageData.data.set(e.data)
-        maposaicContext.putImageData(imageData, 0, 0)
-        showMapboxCanvas(false)
-        setIsLoading(false)
+      paintWorker.onmessage = function (e: { data: Path[] }): void {
+        setPaths(e.data)
+        console.log('finish')
+        // imageData.data.set(e.data)
+        // maposaicContext.putImageData(imageData, 0, 0)
+        // showMapboxCanvas(false)
+        // setIsLoading(false)
       }
       paintWorker.postMessage({
         mapboxPixels,
-        maposaicData,
         webglWidth,
         webglHeight,
-        viewportHeight,
-        viewportWidth,
-        maposaicColors,
-        roadColorThreshold,
-        similarColorTolerance,
       })
     }
 
@@ -119,7 +121,7 @@ const MapboxGLMap = (): JSX.Element => {
     })
     newMap.on('load', () => {
       setMap(newMap)
-      newMap.resize()
+      // newMap.resize()
     })
     newMap.on('dragstart', showMapboxCanvas)
     newMap.on('zoomstart', showMapboxCanvas)
@@ -168,7 +170,13 @@ const MapboxGLMap = (): JSX.Element => {
   return (
     <div className="container">
       <canvas className="mosaic-canvas" width="300" height="300" id="maposaic-cvs" />
-      <div id="mapbox-cvs" className="mapbox-canvas" ref={(el) => (mapContainer.current = el)} style={styles} />
+      <svg id="svg" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg">
+        {paths.map((path) => (
+          <path d={path.d} key={path.id} fill={path.color} strokeWidth="0" stroke="blue" />
+        ))}
+      </svg>
+
+      <div id="mapbox-cvs" className="mapbox-canvas" ref={(el) => (mapContainer.current = el)} />
       <Spin spinning={isLoading} indicator={<img className="spinner" src={spinner} alt="spin" />} />
       <div className="overmap">
         <Drawer

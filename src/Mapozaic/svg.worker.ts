@@ -1,23 +1,13 @@
-import React, { useEffect, useState } from 'react'
-import pixelArray from './pixelArray'
-
-import { ImagePoint, RGBColor, PointWithIndex, Path, Adjacent, BorderPoint, Corner } from 'utils/svgTypes'
-
+import { ImagePoint, Adjacent, BorderPoint, RGBColor, PointWithIndex, Corner } from 'utils/svgTypes'
 import {
-  getPointFromPixelIndex,
-  MOVE_OFFSET,
   ADJACENT_PROCESSING_ORDER,
   ADJACENT_PROCESSING,
   getPixelIndexFromPoint,
   isColorSimilar,
   createRGB,
+  MOVE_OFFSET,
+  getPointFromPixelIndex,
 } from 'utils/helpers'
-
-import './svgtest.less'
-
-const canvasRatio = 1
-const pixelArrayWidth = 10
-const canvasWidth = canvasRatio * pixelArrayWidth
 
 const getAdjacentPoint = ({
   point,
@@ -66,6 +56,7 @@ const getAdjacentFromBorder = ({
   const adjacentPixel = adjacentPoint ? getPixelIndexFromPoint(adjacentPoint, width) : null
   return { adjacent, adjacentPoint, adjacentPixel }
 }
+let overflow = 0
 
 const fillToVisitAreaStackFromBorder = ({
   currentBorder,
@@ -156,7 +147,7 @@ const getAreaBorderPath = ({
 
       if (
         adjacentPixel !== null &&
-        isColorSimilar(originColor, createRGB(data[adjacentPixel], data[adjacentPixel + 1], data[adjacentPixel + 2]))
+        isColorSimilar(originColor, createRGB(data[adjacentPixel], data[adjacentPixel + 1], data[adjacentPixel + 2]), 3)
       ) {
         fillToVisitAreaStackFromBorder({
           currentBorder,
@@ -187,7 +178,7 @@ const getAreaBorderPath = ({
         origin.parentCorner.slice(1, 3) === adjacent.arv.slice(1, 3)
       ) {
         if (origin.parentCorner !== adjacent.arv) {
-          throw 'end anomalie'
+          // throw 'end anomalie'
         }
         break pathLoop
       }
@@ -195,46 +186,46 @@ const getAreaBorderPath = ({
         toVisitBorderMap.set(adjacentPixel, adjacent.adjDeptCorner)
       }
       if (adjacentIndex === 3) {
-        console.log(path)
-        throw 'no adjacent found'
+        // console.log('no adj found', path)
+        // throw 'no adjacent found'
       }
     }
   }
   if (iter === height * width) {
-    console.log(path)
-    throw 'too many iterations'
+    overflow += 1
+    // throw 'too many iterations'
   }
 
-  while (toVisitAreaStack.length) {
-    const toVisitPoint = toVisitAreaStack.pop()
-    if (!toVisitPoint || visitedSet.has(toVisitPoint.pixelIndex)) {
-      continue
-    }
-    visitedSet.add(toVisitPoint.pixelIndex)
-    Object.values(Adjacent).forEach((adjacent) => {
-      const adjacentPoint = getAdjacentPoint({ point: toVisitPoint.point, adjacent, width, height })
-      const adjacentPixel = adjacentPoint ? getPixelIndexFromPoint(adjacentPoint, width) : null
+  // while (toVisitAreaStack.length) {
+  //   const toVisitPoint = toVisitAreaStack.pop()
+  //   if (!toVisitPoint || visitedSet.has(toVisitPoint.pixelIndex)) {
+  //     continue
+  //   }
+  //   visitedSet.add(toVisitPoint.pixelIndex)
+  //   Object.values(Adjacent).forEach((adjacent) => {
+  //     const adjacentPoint = getAdjacentPoint({ point: toVisitPoint.point, adjacent, width, height })
+  //     const adjacentPixel = adjacentPoint ? getPixelIndexFromPoint(adjacentPoint, width) : null
 
-      if (adjacentPixel === null || visitedSet.has(adjacentPixel)) {
-        return
-      }
+  //     if (adjacentPixel === null || visitedSet.has(adjacentPixel)) {
+  //       return
+  //     }
 
-      if (
-        !isColorSimilar(originColor, createRGB(data[adjacentPixel], data[adjacentPixel + 1], data[adjacentPixel + 2]))
-      ) {
-        if (toVisitBorderMap.has(adjacentPixel)) {
-          // throw `pixel id:${adjacentPixel} already in map`
-        }
-        toVisitBorderMap.set(adjacentPixel, Corner.NNO)
-        return
-      }
+  //     if (
+  //       !isColorSimilar(originColor, createRGB(data[adjacentPixel], data[adjacentPixel + 1], data[adjacentPixel + 2]))
+  //     ) {
+  //       if (toVisitBorderMap.has(adjacentPixel)) {
+  //         // throw `pixel id:${adjacentPixel} already in map`
+  //       }
+  //       toVisitBorderMap.set(adjacentPixel, Corner.NNO)
+  //       return
+  //     }
 
-      if (!addedInToVisitInArea.has(adjacentPixel)) {
-        toVisitAreaStack.push({ pixelIndex: adjacentPixel, point: getPointFromPixelIndex(adjacentPixel, width) })
-        addedInToVisitInArea.add(adjacentPixel)
-      }
-    })
-  }
+  //     if (!addedInToVisitInArea.has(adjacentPixel)) {
+  //       toVisitAreaStack.push({ pixelIndex: adjacentPixel, point: getPointFromPixelIndex(adjacentPixel, width) })
+  //       addedInToVisitInArea.add(adjacentPixel)
+  //     }
+  //   })
+  // }
 
   return path
 }
@@ -275,68 +266,23 @@ export const getCanvasPaths = ({ data, width, height }: { data: Uint8ClampedArra
   }
   return paths
 }
-
-const SvgTest = () => {
-  const [paths, setPaths] = useState<Path[]>([])
-  useEffect(() => {
-    const canvas = document.getElementById('cvs') as HTMLCanvasElement
-    const ctx = canvas.getContext('2d')
-    canvas.setAttribute('width', canvasWidth.toString())
-    canvas.setAttribute('height', canvasWidth.toString())
-    // svgElement?.setAttribute('width', canvasWidth.toString())
-    // svgElement?.setAttribute('height', canvasWidth.toString())
-    const imageData = ctx?.getImageData(0, 0, canvasWidth, canvasWidth)
-    if (!imageData) {
-      console.log('pas de ctx')
-      return
-    }
-    const data = imageData.data
-    const pixelSeenSet = new Set()
-    for (let index = 0; index < pixelArray.length; index++) {
-      const x = index % pixelArrayWidth
-      const y = Math.floor(index / pixelArrayWidth)
-      const originCanvasPixel = y * canvasRatio * canvasWidth * 4 + x * canvasRatio * 4
-
-      pixelSeenSet.add(originCanvasPixel)
-
-      for (let dy = 0; dy < canvasRatio; dy++) {
-        for (let dx = 0; dx < canvasRatio; dx++) {
-          data[originCanvasPixel + dy * canvasWidth * 4 + 4 * dx] = pixelArray[index] === 1 ? 0 : 255
-          data[originCanvasPixel + dy * canvasWidth * 4 + 4 * dx + 1] = pixelArray[index] === 1 ? 0 : 255
-          data[originCanvasPixel + dy * canvasWidth * 4 + 4 * dx + 2] = pixelArray[index] === 1 ? 0 : 255
-          data[originCanvasPixel + dy * canvasWidth * 4 + 4 * dx + 3] = 255
-        }
-      }
-    }
-    ctx?.putImageData(imageData, 0, 0)
-    const paths = getCanvasPaths({ data, width: canvasWidth, height: canvasWidth })
-    setPaths(paths)
-    console.log('paths', paths)
-  }, [])
-  return (
-    <div>
-      <canvas id="cvs" className="cvs" />
-      <svg id="svg" version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10" width="400">
-        {/* <rect width="100%" height="100%" fill="white" stroke="blue" /> */}
-
-        {paths.map((path) => {
-          return <path d={path.d} key={path.id} fill={path.color} strokeWidth="0" stroke="blue" />
-        })}
-      </svg>
-      <svg
-        width="100"
-        height="100"
-        viewBox="0 0 20 20"
-        version="1.1"
-        baseProfile="full"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <rect width="100%" height="100%" fill="red" />
-        <rect width="1" height="1" fill="black" />
-        <path d="M 1 1 h 1 v -1 h 1 v 1 h -1 v 1 h -1  Z" fill="blue" strokeWidth="1" stroke="blue" />
-      </svg>
-    </div>
-  )
+onmessage = ({
+  data: { mapboxPixels, webglWidth, webglHeight },
+}: {
+  data: {
+    mapboxPixels: Uint8ClampedArray
+    maposaicData: Uint8ClampedArray
+    webglWidth: number
+    webglHeight: number
+    viewportWidth: number
+    viewportHeight: number
+    roadColorThreshold: number
+    similarColorTolerance: number
+  }
+}): void => {
+  const paths = getCanvasPaths({ data: mapboxPixels, width: webglWidth, height: webglHeight })
+  console.log('finish overflow', overflow)
+  // eslint-disable-next-line
+  // @ts-ignore
+  postMessage(paths)
 }
-
-export default SvgTest

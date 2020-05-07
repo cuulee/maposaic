@@ -3,8 +3,8 @@ import Mapozaic from './Mapozaic/Mapozaic'
 import SvgTest from 'SvgTest/SvgTest'
 
 function App() {
-  // return <Mapozaic />
-  return <SvgTest />
+  return <Mapozaic />
+  // return <SvgTest />
 }
 
 export default App

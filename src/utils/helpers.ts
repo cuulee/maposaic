@@ -1,47 +1,10 @@
-export type ImagePoint = { x: number; y: number }
-export type RGBColor = { r: number; g: number; b: number }
+import { ImagePoint, Border, Adjacent, Draw, Corner, RGBColor } from './svgTypes'
 
 export const getPointFromPixelIndex = (pixelIndex: number, width: number): ImagePoint => {
   return { x: (pixelIndex / 4) % width, y: Math.floor(pixelIndex / 4 / width) }
 }
 export const getPixelIndexFromPoint = (point: ImagePoint, width: number): number => {
   return (point.y * width + point.x) * 4
-}
-
-export enum Corner {
-  ONO = 'ONO',
-  NNO = 'NNO',
-  NNE = 'NNE',
-  ENE = 'ENE',
-  SSO = 'SSO',
-  OSO = 'OSO',
-  SSE = 'SSE',
-  ESE = 'ESE',
-}
-
-export enum Adjacent {
-  N = 'N',
-  E = 'E',
-  O = 'O',
-  S = 'S',
-}
-
-export enum Border {
-  NOtoNE,
-  NEtoNO,
-  SOtoSE,
-  SEtoSO,
-  NEtoSE,
-  SEtoNE,
-  SOtoNO,
-  NOtoSO,
-}
-
-export enum Draw {
-  Right = 'h 1',
-  Left = 'h -1',
-  Up = 'v -1',
-  Down = 'v 1',
 }
 
 export const ADJACENT_PROCESSING = {
@@ -75,23 +38,6 @@ export const MOVE_OFFSET = {
   [Corner.ENE]: { x: 1, y: 0 },
   [Corner.SSE]: { x: 1, y: 1 },
   [Corner.ESE]: { x: 1, y: 1 },
-}
-
-export type PointWithIndex = {
-  point: ImagePoint
-  pixelIndex: number
-}
-
-export type BorderPoint = {
-  parentCorner: Corner
-  pixelIndex: number
-  point: ImagePoint
-}
-
-export type Path = {
-  d: string
-  id: number
-  color: string
 }
 
 export const isColorSimilar = (color1: RGBColor, color2: RGBColor, similarColorTolerance?: number): boolean => {
