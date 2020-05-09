@@ -28,12 +28,6 @@ export const MAPBOX_STYLE_URL = {
 export const INITIAL_ROAD_COLOR_THRESHOLD = 50
 export const INITIAL_SIMILAR_COLOR_TOLERANCE = 3
 
-const styles = {
-  width: '100vw',
-  height: 'calc(100vh)',
-  position: 'absolute',
-} as React.CSSProperties
-
 export type RGBColor = { r: number; g: number; b: number }
 export type imagePoint = { x: number; y: number }
 
@@ -74,6 +68,7 @@ const MapboxGLMap = (): JSX.Element => {
       const viewportHeight = webglHeight
 
       const maposaicCanvas = document.getElementById('maposaic-cvs') as HTMLCanvasElement
+
       maposaicCanvas.setAttribute('width', viewportWidth.toString())
       maposaicCanvas.setAttribute('height', viewportHeight.toString())
       const maposaicContext = maposaicCanvas.getContext('2d')
@@ -167,8 +162,8 @@ const MapboxGLMap = (): JSX.Element => {
 
   return (
     <div className="container">
-      <canvas className="mosaic-canvas" width="300" height="300" id="maposaic-cvs" />
-      <div id="mapbox-cvs" className="mapbox-canvas" ref={(el) => (mapContainer.current = el)} style={styles} />
+      <canvas className="mosaic-canvas" id="maposaic-cvs" />
+      <div id="mapbox-cvs" className="mapbox-canvas" ref={(el) => (mapContainer.current = el)} />
       <Spin spinning={isLoading} indicator={<img className="spinner" src={spinner} alt="spin" />} />
       <div className="overmap">
         <Drawer
