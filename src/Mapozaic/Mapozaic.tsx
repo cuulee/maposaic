@@ -64,13 +64,13 @@ const MapboxGLMap = (): JSX.Element => {
       }
       const webglWidth = gl.drawingBufferWidth
       const webglHeight = gl.drawingBufferHeight
-      const viewportWidth = webglWidth
-      const viewportHeight = webglHeight
+      const maposaicWidth = webglWidth
+      const maposaicHeight = webglHeight
 
       const maposaicCanvas = document.getElementById('maposaic-cvs') as HTMLCanvasElement
 
-      maposaicCanvas.setAttribute('width', viewportWidth.toString())
-      maposaicCanvas.setAttribute('height', viewportHeight.toString())
+      maposaicCanvas.setAttribute('width', maposaicWidth.toString())
+      maposaicCanvas.setAttribute('height', maposaicHeight.toString())
       const maposaicContext = maposaicCanvas.getContext('2d')
       if (!maposaicContext) {
         return
@@ -92,8 +92,8 @@ const MapboxGLMap = (): JSX.Element => {
         maposaicData,
         webglWidth,
         webglHeight,
-        viewportHeight,
-        viewportWidth,
+        maposaicHeight,
+        maposaicWidth,
         maposaicColors,
         roadColorThreshold,
         similarColorTolerance,

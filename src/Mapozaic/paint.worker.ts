@@ -1,14 +1,16 @@
 import { imagePoint, RGBColor } from './Mapozaic'
 import { MaposaicColors, PresetColorName } from './colors'
 
+const MAX_SET_SIZE = 16777216
+
 const getPointFromPixelIndex = (pixelIndex: number, webglWidth: number): imagePoint => {
   return { x: (pixelIndex / 4) % webglWidth, y: Math.floor(pixelIndex / 4 / webglWidth) }
 }
 const getMapboxPixelIndexFromPoint = (point: imagePoint, webglWidth: number): number => {
   return (point.y * webglWidth + point.x) * 4
 }
-const getMosaicPixelIndexFromPoint = (point: imagePoint, viewportWidth: number, viewportHeight: number): number => {
-  return ((viewportHeight - point.y - 1) * viewportWidth + point.x) * 4
+const getMosaicPixelIndexFromPoint = (point: imagePoint, maposaicWidth: number, maposaicHeight: number): number => {
+  return ((maposaicHeight - point.y - 1) * maposaicWidth + point.x) * 4
 }
 
 const isColorSimilar = (color1: RGBColor, color2: RGBColor, similarColorTolerance: number): boolean => {
@@ -25,21 +27,21 @@ const createRGB = (r: number, g: number, b: number): RGBColor => {
 
 const getAdjacentPoints = ({
   point,
-  viewportWidth,
-  viewportHeight,
+  maposaicWidth,
+  maposaicHeight,
 }: {
   point: imagePoint
-  viewportWidth: number
-  viewportHeight: number
+  maposaicWidth: number
+  maposaicHeight: number
 }) => ({
-  S: point.y < viewportHeight - 1 ? { x: point.x, y: point.y + 1 } : null,
-  E: point.x < viewportWidth - 1 ? { x: point.x + 1, y: point.y } : null,
+  S: point.y < maposaicHeight - 1 ? { x: point.x, y: point.y + 1 } : null,
+  E: point.x < maposaicWidth - 1 ? { x: point.x + 1, y: point.y } : null,
   O: point.x > 0 ? { x: point.x - 1, y: point.y } : null,
   N: point.y > 0 ? { x: point.x, y: point.y - 1 } : null,
-  // NE: point.y > 0 && point.x < viewportWidth - 1 ? { x: point.x + 1, y: point.y - 1 } : null,
+  // NE: point.y > 0 && point.x < maposaicWidth - 1 ? { x: point.x + 1, y: point.y - 1 } : null,
   // NO: point.y > 0 && point.x > 0 ? { x: point.x - 1, y: point.y - 1 } : null,
-  // SE: point.y < viewportHeight - 1 && point.x < viewportWidth - 1 ? { x: point.x + 1, y: point.y + 1 } : null,
-  // SO: point.y < viewportHeight - 1 && point.x > 0 ? { x: point.x - 1, y: point.y + 1 } : null,
+  // SE: point.y < maposaicHeight - 1 && point.x < maposaicWidth - 1 ? { x: point.x + 1, y: point.y + 1 } : null,
+  // SO: point.y < maposaicHeight - 1 && point.x > 0 ? { x: point.x - 1, y: point.y + 1 } : null,
 })
 
 const hexToRgb = (hex: string) => {
@@ -58,8 +60,8 @@ const paintAdjacentPointsInData = ({
   targetColor,
   visitedPixelSet,
   webglWidth,
-  viewportHeight,
-  viewportWidth,
+  maposaicHeight,
+  maposaicWidth,
   similarColorTolerance,
 }: {
   maposaicData: Uint8ClampedArray
@@ -70,8 +72,8 @@ const paintAdjacentPointsInData = ({
   visitedPixelSet: Set<number>
   webglWidth: number
   webglHeight: number
-  viewportHeight: number
-  viewportWidth: number
+  maposaicHeight: number
+  maposaicWidth: number
   similarColorTolerance: number
 }): void => {
   const toVisitPointStack: imagePoint[] = [initialPoint]
@@ -86,8 +88,13 @@ const paintAdjacentPointsInData = ({
       continue
     }
     const paintPoint = (color: RGBColor) => {
-      visitedPixelSet.add(pixelIndex)
-      const mosaicPixel = getMosaicPixelIndexFromPoint(point, viewportWidth, viewportHeight)
+      try {
+        visitedPixelSet.add(pixelIndex)
+      } catch (e) {
+        console.log('erreur', visitedPixelSet.size, pixelIndex)
+        throw e
+      }
+      const mosaicPixel = getMosaicPixelIndexFromPoint(point, maposaicWidth, maposaicHeight)
       maposaicData[mosaicPixel] = color.r
       maposaicData[mosaicPixel + 1] = color.g
       maposaicData[mosaicPixel + 2] = color.b
@@ -96,7 +103,7 @@ const paintAdjacentPointsInData = ({
 
     const pointColor = createRGB(mapboxPixels[pixelIndex], mapboxPixels[pixelIndex + 1], mapboxPixels[pixelIndex + 2])
 
-    const adjacentPoints = getAdjacentPoints({ point, viewportHeight, viewportWidth })
+    const adjacentPoints = getAdjacentPoints({ point, maposaicHeight, maposaicWidth })
     if (!isColorSimilar(pointColor, initialColor, similarColorTolerance)) {
       const similarPointCount = Object.values(adjacentPoints).filter((adjacentPoint) => {
         return (
@@ -149,8 +156,8 @@ onmessage = ({
     maposaicData,
     webglWidth,
     webglHeight,
-    viewportWidth,
-    viewportHeight,
+    maposaicWidth,
+    maposaicHeight,
     maposaicColors,
     roadColorThreshold,
     similarColorTolerance,
@@ -161,21 +168,23 @@ onmessage = ({
     maposaicData: Uint8ClampedArray
     webglWidth: number
     webglHeight: number
-    viewportWidth: number
-    viewportHeight: number
+    maposaicWidth: number
+    maposaicHeight: number
     maposaicColors: MaposaicColors
     roadColorThreshold: number
     similarColorTolerance: number
   }
 }): void => {
+  const visitedPixelSets = []
+
   const visitedPixelSet = new Set<number>()
 
   let pixelIndex = 0
 
-  for (let i = 0; i < viewportHeight; i += 1) {
+  for (let i = 0; i < maposaicHeight; i += 1) {
     pixelIndex = i * webglWidth * 4
 
-    for (let j = 0; j < viewportWidth; j += 1) {
+    for (let j = 0; j < maposaicWidth; j += 1) {
       if (j > 0) {
         pixelIndex += 4
       }
@@ -204,8 +213,8 @@ onmessage = ({
         visitedPixelSet,
         webglWidth,
         webglHeight,
-        viewportHeight,
-        viewportWidth,
+        maposaicHeight,
+        maposaicWidth,
         similarColorTolerance,
       })
     }
