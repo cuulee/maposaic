@@ -2,6 +2,7 @@ import { imagePoint, RGBColor } from './Mapozaic'
 import { MaposaicColors, PresetColorName } from './colors'
 
 const MAX_SET_SIZE = 16777216
+const MAX_SET_SIZE_4 = MAX_SET_SIZE * 4
 
 const getPointFromPixelIndex = (pixelIndex: number, webglWidth: number): imagePoint => {
   return { x: (pixelIndex / 4) % webglWidth, y: Math.floor(pixelIndex / 4 / webglWidth) }
@@ -58,7 +59,7 @@ const paintAdjacentPointsInData = ({
   initialPoint,
   initialColor,
   targetColor,
-  visitedPixelSet,
+  visitedPixelSets,
   webglWidth,
   maposaicHeight,
   maposaicWidth,
@@ -69,7 +70,7 @@ const paintAdjacentPointsInData = ({
   initialPoint: imagePoint
   initialColor: RGBColor
   targetColor: RGBColor
-  visitedPixelSet: Set<number>
+  visitedPixelSets: Set<number>[]
   webglWidth: number
   webglHeight: number
   maposaicHeight: number
@@ -84,14 +85,14 @@ const paintAdjacentPointsInData = ({
       continue
     }
     const pixelIndex = getMapboxPixelIndexFromPoint(point, webglWidth)
-    if (visitedPixelSet.has(pixelIndex)) {
+    if (visitedPixelSets[Math.floor(pixelIndex / MAX_SET_SIZE_4)].has(pixelIndex)) {
       continue
     }
     const paintPoint = (color: RGBColor) => {
       try {
-        visitedPixelSet.add(pixelIndex)
+        visitedPixelSets[Math.floor(pixelIndex / MAX_SET_SIZE_4)].add(pixelIndex)
       } catch (e) {
-        console.log('erreur', visitedPixelSet.size, pixelIndex)
+        console.log('erreur', visitedPixelSets[Math.floor(pixelIndex / MAX_SET_SIZE_4)].size, pixelIndex)
         throw e
       }
       const mosaicPixel = getMosaicPixelIndexFromPoint(point, maposaicWidth, maposaicHeight)
@@ -108,7 +109,9 @@ const paintAdjacentPointsInData = ({
       const similarPointCount = Object.values(adjacentPoints).filter((adjacentPoint) => {
         return (
           !!adjacentPoint &&
-          !visitedPixelSet.has(getMapboxPixelIndexFromPoint(adjacentPoint, webglWidth)) &&
+          !visitedPixelSets[Math.floor(pixelIndex / MAX_SET_SIZE_4)].has(
+            getMapboxPixelIndexFromPoint(adjacentPoint, webglWidth),
+          ) &&
           isColorSimilar(
             createRGB(
               mapboxPixels[getMapboxPixelIndexFromPoint(adjacentPoint, webglWidth)],
@@ -136,7 +139,12 @@ const paintAdjacentPointsInData = ({
     paintPoint(targetColor)
 
     Object.values(adjacentPoints).forEach((adjacentPoint) => {
-      if (adjacentPoint && !visitedPixelSet.has(getMapboxPixelIndexFromPoint(adjacentPoint, webglWidth))) {
+      if (
+        adjacentPoint &&
+        !visitedPixelSets[Math.floor(pixelIndex / MAX_SET_SIZE_4)].has(
+          getMapboxPixelIndexFromPoint(adjacentPoint, webglWidth),
+        )
+      ) {
         toVisitPointStack.push(adjacentPoint)
       }
     })
@@ -175,9 +183,13 @@ onmessage = ({
     similarColorTolerance: number
   }
 }): void => {
-  const visitedPixelSets = []
+  const t1 = new Date()
 
-  const visitedPixelSet = new Set<number>()
+  const visitedPixelSets = []
+  const numberOfSets = Math.floor((maposaicHeight * maposaicWidth) / MAX_SET_SIZE) + 1
+  for (let index = 0; index < numberOfSets; index++) {
+    visitedPixelSets.push(new Set<number>()) // because Set size cannot exceed 2^24
+  }
 
   let pixelIndex = 0
 
@@ -188,7 +200,7 @@ onmessage = ({
       if (j > 0) {
         pixelIndex += 4
       }
-      if (visitedPixelSet.has(pixelIndex)) {
+      if (visitedPixelSets[Math.floor(pixelIndex / MAX_SET_SIZE_4)].has(pixelIndex)) {
         continue
       }
 
@@ -210,7 +222,7 @@ onmessage = ({
         initialPoint,
         initialColor,
         targetColor,
-        visitedPixelSet,
+        visitedPixelSets,
         webglWidth,
         webglHeight,
         maposaicHeight,
@@ -219,6 +231,8 @@ onmessage = ({
       })
     }
   }
+  // @ts-ignore
+  console.log('fin', new Date() - t1)
 
   // eslint-disable-next-line
   // @ts-ignore
