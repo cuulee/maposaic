@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Drawer as AntDrawer, Radio, Divider, Slider } from 'antd'
+import { Drawer as AntDrawer, Radio, Divider, Slider, Button } from 'antd'
 import { RadioChangeEvent } from 'antd/lib/radio'
 import { MAPBOX_STYLE_URL, INITIAL_ROAD_COLOR_THRESHOLD, INITIAL_SIMILAR_COLOR_TOLERANCE } from './Mapozaic'
 import { SliderValue } from 'antd/lib/slider'
@@ -20,6 +20,7 @@ export type DrawerPropsType = {
   flyTo: (center: [number, number]) => void
   currentCenter: [number, number]
   setNewMaposaicColors: (colors: MaposaicColors) => void
+  openCanvasImage: () => void
 }
 
 const Drawer = ({
@@ -32,6 +33,7 @@ const Drawer = ({
   flyTo,
   currentCenter,
   setNewMaposaicColors,
+  openCanvasImage,
 }: DrawerPropsType) => {
   const onStyleUrlChange = (event: RadioChangeEvent) => {
     setDrawerVisible(false)
@@ -94,6 +96,9 @@ const Drawer = ({
         onAfterChange={handleSimilarColorToleranceAfterChange}
         onChange={(value) => onSliderChange(value, setLocalSimilarColorTolerance)}
       />
+      <Button className="open-button" onClick={openCanvasImage}>
+        Open in new window
+      </Button>
     </AntDrawer>
   )
 }

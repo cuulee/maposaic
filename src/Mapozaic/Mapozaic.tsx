@@ -160,6 +160,18 @@ const MapboxGLMap = (): JSX.Element => {
     map.setCenter(center)
   }
 
+  const openCanvasImage = () => {
+    const mosaicElement = document.getElementById('maposaic-cvs') as HTMLCanvasElement
+    const image = new Image()
+    image.src = mosaicElement.toDataURL()
+    image.style.width = '100vw'
+    const w = window.open('bijour ')
+    if (!w) {
+      return
+    }
+    w.document.write(image.outerHTML)
+  }
+
   return (
     <div className="container">
       <canvas className="mosaic-canvas" id="maposaic-cvs" />
@@ -176,6 +188,7 @@ const MapboxGLMap = (): JSX.Element => {
           flyTo={flyTo}
           currentCenter={currentCenter}
           setNewMaposaicColors={setNewMaposaicColors}
+          openCanvasImage={openCanvasImage}
         />
         <Button
           type="primary"
