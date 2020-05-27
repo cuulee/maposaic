@@ -9,15 +9,15 @@
 
 .mapbox-canvas {
   position: absolute;
-  width: 100vw;
-  height: 100vh;
+  width: 70vw;
+  height: 70vh;
   overflow: hidden;
 }
 
 .mosaic-canvas {
   position: absolute;
-  width: 100vw;
-  height: 100vh;
+  width: 70vw;
+  height: 70vh;
   opacity: 1;
 }
 .overmap {

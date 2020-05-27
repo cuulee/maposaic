@@ -28,16 +28,43 @@ export const MAPBOX_STYLE_URL = {
 export const INITIAL_ROAD_COLOR_THRESHOLD = 50
 export const INITIAL_SIMILAR_COLOR_TOLERANCE = 3
 
+const TARGET_INCH_WIDTH = 16.5
+const TARGET_DPI = 300
+// const TARGET_PIXEL_WIDTH = TARGET_DPI * TARGET_INCH_WIDTH
+const TARGET_PIXEL_WIDTH = 1580
+const MAPBOX_PIXEL_FACTOR = 2
+const ARTIFICIAL_MAPBOX_WIDTH = TARGET_PIXEL_WIDTH / MAPBOX_PIXEL_FACTOR
+const DISPLAY_PIXEL_RATIO = 3
+
 export type RGBColor = { r: number; g: number; b: number }
 export type imagePoint = { x: number; y: number }
 
 let paintWorker = new PaintWorker()
+let displayWidth = 0
+let displayHeight = 0
 
-const showMapboxCanvas = (isMapbox: boolean): void => {
-  const mapboxElement = document.getElementById('mapbox-cvs') as HTMLCanvasElement
-  const mosaicElement = document.getElementById('maposaic-cvs') as HTMLCanvasElement
+const toggleCanvasOpacity = (isMapbox: boolean): void => {
+  const mapboxElement = document.getElementById('mapbox-wrapper') as HTMLElement
+  const mosaicCanvas = document.getElementById('maposaic-cvs') as HTMLCanvasElement
   mapboxElement.style.opacity = isMapbox ? '1' : '0'
-  mosaicElement.style.opacity = isMapbox ? '0' : '1'
+  mosaicCanvas.style.opacity = isMapbox ? '0' : '1'
+}
+
+const setMapboxArtificialSize = () => {
+  const mapboxElement = document.getElementById('mapbox-wrapper') as HTMLElement
+  displayWidth = mapboxElement.offsetWidth
+  displayHeight = mapboxElement.offsetHeight
+  mapboxElement.style.width = ARTIFICIAL_MAPBOX_WIDTH.toString() + 'px'
+  mapboxElement.style.height = ((displayHeight * ARTIFICIAL_MAPBOX_WIDTH) / displayWidth).toString() + 'px'
+}
+
+const setMapboxDisplaySize = () => {
+  const mapboxCanvas = document.getElementsByClassName('mapboxgl-canvas')[0] as HTMLCanvasElement
+  const mapboxWrapper = document.getElementById('mapbox-wrapper') as HTMLElement
+  mapboxCanvas.style.width = displayWidth.toString() + 'px'
+  mapboxCanvas.style.height = displayHeight.toString() + 'px'
+  mapboxWrapper.style.width = displayWidth.toString() + 'px'
+  mapboxWrapper.style.height = displayHeight.toString() + 'px'
 }
 
 const MapboxGLMap = (): JSX.Element => {
@@ -55,7 +82,7 @@ const MapboxGLMap = (): JSX.Element => {
   useEffect(() => {
     const paintMosaic = async (newMap: mapboxgl.Map): Promise<void> => {
       setIsLoading(true)
-      showMapboxCanvas(true)
+      toggleCanvasOpacity(true)
       const mapboxCanvas = newMap.getCanvas()
       const gl = mapboxCanvas.getContext('webgl')
       if (!gl) {
@@ -84,7 +111,7 @@ const MapboxGLMap = (): JSX.Element => {
       paintWorker.onmessage = function (e: { data: number[] }): void {
         imageData.data.set(e.data)
         maposaicContext.putImageData(imageData, 0, 0)
-        showMapboxCanvas(false)
+        toggleCanvasOpacity(false)
         setIsLoading(false)
       }
       paintWorker.postMessage({
@@ -103,6 +130,8 @@ const MapboxGLMap = (): JSX.Element => {
     const center = map ? map.getCenter() : new mapboxgl.LngLat(2.338272, 48.858796)
     const zoom = map ? map.getZoom() : 12
 
+    setMapboxArtificialSize()
+
     if (map) {
       map.remove()
     }
@@ -111,14 +140,19 @@ const MapboxGLMap = (): JSX.Element => {
       style: mapboxStyleURL,
       zoom,
       center,
+      maxTileCacheSize: 0,
     })
     newMap.on('load', () => {
       setMap(newMap)
-      newMap.resize()
     })
-    newMap.on('dragstart', showMapboxCanvas)
-    newMap.on('zoomstart', showMapboxCanvas)
+    newMap.on('resize', () => {
+      newMap.remove()
+    })
+    newMap.on('dragstart', toggleCanvasOpacity)
+    newMap.on('zoomstart', toggleCanvasOpacity)
+
     newMap.on('render', () => {
+      setMapboxDisplaySize()
       if (!newMap.loaded() || newMap.isMoving() || newMap.isZooming()) {
         return
       }
@@ -133,7 +167,7 @@ const MapboxGLMap = (): JSX.Element => {
   const [drawerVisible, setDrawerVisible] = useState(false)
 
   const changeMapStyle = (newStyle: string) => {
-    showMapboxCanvas(true)
+    toggleCanvasOpacity(true)
     setIsLoading(true)
     setMapboxStyleURL(newStyle)
   }
@@ -155,7 +189,7 @@ const MapboxGLMap = (): JSX.Element => {
     if (!map) {
       return
     }
-    showMapboxCanvas(true)
+    toggleCanvasOpacity(true)
     setIsLoading(true)
     map.setCenter(center)
   }
@@ -175,7 +209,7 @@ const MapboxGLMap = (): JSX.Element => {
   return (
     <div className="container">
       <canvas className="mosaic-canvas" id="maposaic-cvs" />
-      <div id="mapbox-cvs" className="mapbox-canvas" ref={(el) => (mapContainer.current = el)} />
+      <div id="mapbox-wrapper" className="mapbox-canvas" ref={(el) => (mapContainer.current = el)} />
       <Spin spinning={isLoading} indicator={<img className="spinner" src={spinner} alt="spin" />} />
       <div className="overmap">
         <Drawer
