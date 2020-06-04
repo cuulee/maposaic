@@ -13,6 +13,7 @@ import PaintWorker from 'worker-loader!./paint.worker'
 
 import './style.css'
 import { MaposaicColors, PresetColorName } from './colors'
+import { getTargetSizeFromSourceSize } from './utils'
 
 // eslint-disable-next-line
 export const MAPBOX_TOKEN: string = process.env['REACT_APP_MAPBOX_TOKEN'] || ''
@@ -26,15 +27,15 @@ export const MAPBOX_STYLE_URL = {
 }
 
 export const INITIAL_ROAD_COLOR_THRESHOLD = 50
-export const INITIAL_SIMILAR_COLOR_TOLERANCE = 3
+export const INITIAL_SIMILAR_COLOR_TOLERANCE = 1
 
-const TARGET_INCH_WIDTH = 16.5
+const TARGET_INCH_WIDTH = 12
 const TARGET_DPI = 300
-// const TARGET_PIXEL_WIDTH = TARGET_DPI * TARGET_INCH_WIDTH
-const TARGET_PIXEL_WIDTH = 1580
+const TARGET_PIXEL_WIDTH = TARGET_DPI * TARGET_INCH_WIDTH
+// const TARGET_PIXEL_WIDTH = 1000
 const MAPBOX_PIXEL_FACTOR = 2
 const ARTIFICIAL_MAPBOX_WIDTH = TARGET_PIXEL_WIDTH / MAPBOX_PIXEL_FACTOR
-const DISPLAY_PIXEL_RATIO = 3
+const DISPLAY_PIXEL_RATIO = 2
 
 export type RGBColor = { r: number; g: number; b: number }
 export type imagePoint = { x: number; y: number }
@@ -89,24 +90,34 @@ const MapboxGLMap = (): JSX.Element => {
         console.log('pas de gl')
         return
       }
-      const webglWidth = gl.drawingBufferWidth
-      const webglHeight = gl.drawingBufferHeight
-      const maposaicWidth = webglWidth
-      const maposaicHeight = webglHeight
-
+      const mapboxCanvasSize = { w: gl.drawingBufferWidth, h: gl.drawingBufferHeight }
+      const maposaicCanvasSize = getTargetSizeFromSourceSize(mapboxCanvasSize, DISPLAY_PIXEL_RATIO)
       const maposaicCanvas = document.getElementById('maposaic-cvs') as HTMLCanvasElement
-
-      maposaicCanvas.setAttribute('width', maposaicWidth.toString())
-      maposaicCanvas.setAttribute('height', maposaicHeight.toString())
       const maposaicContext = maposaicCanvas.getContext('2d')
+
       if (!maposaicContext) {
         return
       }
+
+      maposaicCanvas.setAttribute('width', maposaicCanvasSize.w.toString())
+      maposaicCanvas.setAttribute('height', maposaicCanvasSize.h.toString())
+
       const imageData = maposaicContext.getImageData(0, 0, maposaicCanvas.width, maposaicCanvas.height)
       const maposaicData = imageData.data
 
       const mapboxPixels = new Uint8Array(gl.drawingBufferWidth * gl.drawingBufferHeight * 4)
       gl.readPixels(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight, gl.RGBA, gl.UNSIGNED_BYTE, mapboxPixels)
+
+      paintWorker.postMessage({
+        sourcePixelArray: mapboxPixels,
+        targetPixelArray: maposaicData,
+        sourceSize: mapboxCanvasSize,
+        targetSize: maposaicCanvasSize,
+        canvassRatio: DISPLAY_PIXEL_RATIO,
+        maposaicColors,
+        roadColorThreshold,
+        similarColorTolerance,
+      })
 
       paintWorker.onmessage = function (e: { data: number[] }): void {
         imageData.data.set(e.data)
@@ -114,17 +125,6 @@ const MapboxGLMap = (): JSX.Element => {
         toggleCanvasOpacity(false)
         setIsLoading(false)
       }
-      paintWorker.postMessage({
-        mapboxPixels,
-        maposaicData,
-        webglWidth,
-        webglHeight,
-        maposaicHeight,
-        maposaicWidth,
-        maposaicColors,
-        roadColorThreshold,
-        similarColorTolerance,
-      })
     }
 
     const center = map ? map.getCenter() : new mapboxgl.LngLat(2.338272, 48.858796)
