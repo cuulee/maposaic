@@ -52,11 +52,11 @@ const toggleCanvasOpacity = (isMapbox: boolean): void => {
 }
 
 const setMapboxArtificialSize = () => {
-  const mapboxElement = document.getElementById('mapbox-wrapper') as HTMLElement
-  displayWidth = mapboxElement.offsetWidth
-  displayHeight = mapboxElement.offsetHeight
-  mapboxElement.style.width = ARTIFICIAL_MAPBOX_WIDTH.toString() + 'px'
-  mapboxElement.style.height = ((displayHeight * ARTIFICIAL_MAPBOX_WIDTH) / displayWidth).toString() + 'px'
+  const mapboxWrapper = document.getElementById('mapbox-wrapper') as HTMLElement
+  displayWidth = mapboxWrapper.offsetWidth
+  displayHeight = mapboxWrapper.offsetHeight
+  mapboxWrapper.style.width = ARTIFICIAL_MAPBOX_WIDTH.toString() + 'px'
+  mapboxWrapper.style.height = ((displayHeight * ARTIFICIAL_MAPBOX_WIDTH) / displayWidth).toString() + 'px'
 }
 
 const setMapboxDisplaySize = () => {
@@ -64,8 +64,8 @@ const setMapboxDisplaySize = () => {
   const mapboxWrapper = document.getElementById('mapbox-wrapper') as HTMLElement
   mapboxCanvas.style.width = displayWidth.toString() + 'px'
   mapboxCanvas.style.height = displayHeight.toString() + 'px'
-  mapboxWrapper.style.width = displayWidth.toString() + 'px'
-  mapboxWrapper.style.height = displayHeight.toString() + 'px'
+  mapboxWrapper.style.width = ''
+  mapboxWrapper.style.height = ''
 }
 
 const MapboxGLMap = (): JSX.Element => {
@@ -79,6 +79,7 @@ const MapboxGLMap = (): JSX.Element => {
   const [roadColorThreshold, setRoadColorThreshold] = useState(INITIAL_ROAD_COLOR_THRESHOLD)
   const [similarColorTolerance, setSimilarColorTolerance] = useState(INITIAL_SIMILAR_COLOR_TOLERANCE)
   const [currentCenter, setCurrentCenter] = useState<[number, number]>([0, 0])
+  const [sizeRender, setSizeRender] = useState(0)
 
   useEffect(() => {
     const paintMosaic = async (newMap: mapboxgl.Map): Promise<void> => {
@@ -86,23 +87,22 @@ const MapboxGLMap = (): JSX.Element => {
       toggleCanvasOpacity(true)
       const mapboxCanvas = newMap.getCanvas()
       const gl = mapboxCanvas.getContext('webgl')
-      if (!gl) {
+      if (!gl || !gl.drawingBufferWidth) {
         console.log('pas de gl')
         return
       }
       const mapboxCanvasSize = { w: gl.drawingBufferWidth, h: gl.drawingBufferHeight }
       const maposaicCanvasSize = getTargetSizeFromSourceSize(mapboxCanvasSize, DISPLAY_PIXEL_RATIO)
       const maposaicCanvas = document.getElementById('maposaic-cvs') as HTMLCanvasElement
-      const maposaicContext = maposaicCanvas.getContext('2d')
-
-      if (!maposaicContext) {
-        return
-      }
 
       maposaicCanvas.setAttribute('width', maposaicCanvasSize.w.toString())
       maposaicCanvas.setAttribute('height', maposaicCanvasSize.h.toString())
 
-      const imageData = maposaicContext.getImageData(0, 0, maposaicCanvas.width, maposaicCanvas.height)
+      const maposaicContext = maposaicCanvas.getContext('2d')
+      if (!maposaicContext) {
+        return
+      }
+      const imageData = maposaicContext.getImageData(0, 0, maposaicCanvasSize.w, maposaicCanvasSize.h)
       const maposaicData = imageData.data
 
       const mapboxPixels = new Uint8Array(gl.drawingBufferWidth * gl.drawingBufferHeight * 4)
@@ -145,8 +145,9 @@ const MapboxGLMap = (): JSX.Element => {
     newMap.on('load', () => {
       setMap(newMap)
     })
+
     newMap.on('resize', () => {
-      newMap.remove()
+      setSizeRender((s) => s + 1)
     })
     newMap.on('dragstart', toggleCanvasOpacity)
     newMap.on('zoomstart', toggleCanvasOpacity)
@@ -161,8 +162,11 @@ const MapboxGLMap = (): JSX.Element => {
       paintMosaic(newMap)
       setCurrentCenter([newMap.getCenter().lng, newMap.getCenter().lat])
     })
+    return () => {
+      newMap.remove()
+    }
     // eslint-disable-next-line
-  }, [roadColorThreshold, similarColorTolerance, mapboxStyleURL, maposaicColors])
+  }, [roadColorThreshold, similarColorTolerance, mapboxStyleURL, maposaicColors, sizeRender])
 
   const [drawerVisible, setDrawerVisible] = useState(false)
 
