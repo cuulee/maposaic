@@ -18,6 +18,8 @@ const getSourcePointFromTargetPoint = (targetPoint: imagePoint, targetSize: Size
   }
 }
 
+type PaintedBounds = { min: number; max: number }
+
 const getSourcePixelIndexFromTargetPixelIndex = ({
   targetPixelIndex,
   targetSize,
@@ -70,11 +72,13 @@ const paintArrayPixel = ({
   pixelIndex,
   pixelArray,
   visitedPixelSets,
+  paintedBounds,
 }: {
   color: RGBColor
   pixelIndex: number
   pixelArray: Uint8ClampedArray
   visitedPixelSets: Set<number>[]
+  paintedBounds: PaintedBounds
 }) => {
   visitedPixelSets[Math.floor(pixelIndex / MAX_SET_SIZE)].add(pixelIndex)
 
@@ -82,6 +86,13 @@ const paintArrayPixel = ({
   pixelArray[pixelIndex * 4 + 1] = color.g
   pixelArray[pixelIndex * 4 + 2] = color.b
   pixelArray[pixelIndex * 4 + 3] = 255
+
+  if (pixelIndex < paintedBounds.min) {
+    paintedBounds.min = pixelIndex
+  }
+  if (pixelIndex > paintedBounds.max) {
+    paintedBounds.max = pixelIndex
+  }
 }
 
 const paintAdjacentPointsInTarget = ({
@@ -95,6 +106,7 @@ const paintAdjacentPointsInTarget = ({
   targetColor,
   visitedPixelSets,
   similarColorTolerance,
+  paintedBounds,
 }: {
   targetPixelArray: Uint8ClampedArray
   sourcePixelArray: Uint8Array
@@ -106,6 +118,7 @@ const paintAdjacentPointsInTarget = ({
   targetColor: RGBColor
   visitedPixelSets: Set<number>[]
   similarColorTolerance: number
+  paintedBounds: PaintedBounds
 }): void => {
   const toVisitPointStack: imagePoint[] = [initialTargetPoint]
 
@@ -174,6 +187,7 @@ const paintAdjacentPointsInTarget = ({
           visitedPixelSets,
           pixelArray: targetPixelArray,
           pixelIndex: targetPixelIndex,
+          paintedBounds,
         })
       }
       continue
@@ -184,6 +198,7 @@ const paintAdjacentPointsInTarget = ({
       visitedPixelSets,
       pixelArray: targetPixelArray,
       pixelIndex: targetPixelIndex,
+      paintedBounds,
     })
 
     Object.values(adjacentTargetPoints).forEach((adjacentPoint) => {
@@ -260,6 +275,7 @@ onmessage = ({
       const targetColor = initialColor.r < roadColorThreshold ? createColor(maposaicColors) : createRGB(255, 255, 255)
       const initialTargetPoint = getPointFromPixelIndex(targetPixelIndex, targetSize.w)
 
+      const paintedBounds = { min: sourcePixelIndex, max: sourcePixelIndex }
       paintAdjacentPointsInTarget({
         targetPixelArray,
         sourcePixelArray,
@@ -271,7 +287,17 @@ onmessage = ({
         targetColor,
         visitedPixelSets,
         similarColorTolerance,
+        paintedBounds,
       })
+
+      if (Math.random() > 1) {
+        // eslint-disable-next-line
+      // @ts-ignore
+        postMessage({
+          pixels: targetPixelArray.slice(paintedBounds.min, paintedBounds.max + 1),
+          paintedBoundsMin: paintedBounds.min,
+        })
+      }
     }
   }
   const t2 = new Date()
@@ -279,5 +305,5 @@ onmessage = ({
 
   // eslint-disable-next-line
   // @ts-ignore
-  postMessage(targetPixelArray)
+  postMessage({ pixels: targetPixelArray, paintedBoundsMin: 0 })
 }

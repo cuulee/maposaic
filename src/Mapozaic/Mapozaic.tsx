@@ -29,13 +29,13 @@ export const MAPBOX_STYLE_URL = {
 export const INITIAL_ROAD_COLOR_THRESHOLD = 50
 export const INITIAL_SIMILAR_COLOR_TOLERANCE = 1
 
-const TARGET_INCH_WIDTH = 12
+const TARGET_INCH_WIDTH = 33
 const TARGET_DPI = 300
 const TARGET_PIXEL_WIDTH = TARGET_DPI * TARGET_INCH_WIDTH
 // const TARGET_PIXEL_WIDTH = 1000
 const MAPBOX_PIXEL_FACTOR = 2
 const ARTIFICIAL_MAPBOX_WIDTH = TARGET_PIXEL_WIDTH / MAPBOX_PIXEL_FACTOR
-const DISPLAY_PIXEL_RATIO = 2
+const DISPLAY_PIXEL_RATIO = 1
 
 export type RGBColor = { r: number; g: number; b: number }
 export type imagePoint = { x: number; y: number }
@@ -119,8 +119,8 @@ const MapboxGLMap = (): JSX.Element => {
         similarColorTolerance,
       })
 
-      paintWorker.onmessage = function (e: { data: number[] }): void {
-        imageData.data.set(e.data)
+      paintWorker.onmessage = function (e: { data: { pixels: number[]; paintedBoundsMin: number } }): void {
+        imageData.data.set(e.data.pixels, e.data.paintedBoundsMin)
         maposaicContext.putImageData(imageData, 0, 0)
         toggleCanvasOpacity(false)
         setIsLoading(false)
