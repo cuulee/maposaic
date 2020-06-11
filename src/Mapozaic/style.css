@@ -9,15 +9,15 @@
 
 .mapbox-canvas {
   position: absolute;
-  width: 80vw;
-  height: 80vh;
+  width: 100vw;
+  height: 100vh;
   overflow: hidden;
 }
 
 .mosaic-canvas {
   position: absolute;
-  width: 80vw;
-  height: 80vh;
+  width: 100vw;
+  height: 100vh;
   opacity: 1;
 }
 .overmap {
@@ -36,8 +36,4 @@
     -webkit-transform: rotate(360deg);
     transform: rotate(360deg);
   }
-}
-
-.open-button {
-  margin-top: 16px;
 }

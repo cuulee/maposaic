@@ -1,22 +1,22 @@
-import React, { useState } from 'react'
-import { Drawer as AntDrawer, Radio, Divider, Slider, Button } from 'antd'
+import React, { useState, useEffect } from 'react'
+import { Drawer as AntDrawer, Radio, Divider, Button, InputNumber, Tooltip } from 'antd'
 import { RadioChangeEvent } from 'antd/lib/radio'
-import { MAPBOX_STYLE_URL, INITIAL_ROAD_COLOR_THRESHOLD, INITIAL_SIMILAR_COLOR_TOLERANCE } from './Mapozaic'
-import { SliderValue } from 'antd/lib/slider'
+import Title from 'antd/lib/typography/Title'
+import { InfoCircleOutlined } from '@ant-design/icons'
+
+import { MAPBOX_STYLE_URL, INITIAL_SIZE_FACTOR } from './Mapozaic'
 import GeoSearch from './GeoSearchInput'
 import { MaposaicColors } from './colors'
 
-import './style.css'
+import './drawer.style.less'
 import ColorTabs from './ColorTabs'
-import Title from 'antd/lib/typography/Title'
 
 export type DrawerPropsType = {
   visible: boolean
   setDrawerVisible: (visible: boolean) => void
   mapboxStyleURL: string
   changeMapStyle: (style: string) => void
-  setNewRoadColorThreshold: (threshold: number) => void
-  setNewSimilarColorTolerance: (tolerance: number) => void
+  setNewSizeFactor: (sizeFactor: number) => void
   flyTo: (center: [number, number]) => void
   currentCenter: [number, number]
   setNewMaposaicColors: (colors: MaposaicColors) => void
@@ -28,8 +28,7 @@ const Drawer = ({
   setDrawerVisible,
   mapboxStyleURL,
   changeMapStyle,
-  setNewRoadColorThreshold,
-  setNewSimilarColorTolerance,
+  setNewSizeFactor,
   flyTo,
   currentCenter,
   setNewMaposaicColors,
@@ -39,24 +38,19 @@ const Drawer = ({
     setDrawerVisible(false)
     changeMapStyle(event.target.value)
   }
-  const [localRoadColorThreshold, setLocalRoadColorThreshold] = useState(INITIAL_ROAD_COLOR_THRESHOLD)
-  const [localSimilarColorTolerance, setLocalSimilarColorTolerance] = useState(INITIAL_SIMILAR_COLOR_TOLERANCE)
+  const [localSizeFactor, setLocalSizeFactor] = useState(INITIAL_SIZE_FACTOR)
 
-  const onSliderChange = (value: SliderValue, changeCallback: (n: number) => void) => {
-    if (typeof value === 'number') {
-      changeCallback(value)
-    } else {
-      changeCallback(value[0])
+  useEffect(() => {
+    const chrono = setTimeout(() => setNewSizeFactor(localSizeFactor), 400)
+    return () => {
+      clearTimeout(chrono)
     }
-  }
+  }, [localSizeFactor])
 
-  const handleRoadThresholdAfterChange = () => {
-    setNewRoadColorThreshold(localRoadColorThreshold)
-    setDrawerVisible(false)
-  }
-  const handleSimilarColorToleranceAfterChange = () => {
-    setNewSimilarColorTolerance(localSimilarColorTolerance)
-    setDrawerVisible(false)
+  const onNumberInputChange = (value: number | undefined) => {
+    if (value !== undefined) {
+      setLocalSizeFactor(value)
+    }
   }
 
   return (
@@ -72,30 +66,20 @@ const Drawer = ({
       <Title level={4}>Colors</Title>
       <ColorTabs setNewMaposaicColors={setNewMaposaicColors} />
       <Divider />
+      <Title level={4}>
+        Size factor{' '}
+        <Tooltip title="Increase quality and... wait time">
+          <InfoCircleOutlined />
+        </Tooltip>
+      </Title>
+      <InputNumber min={1} max={10} step={0.1} value={localSizeFactor} onChange={onNumberInputChange} />
+      <Divider />
       <Radio.Group onChange={onStyleUrlChange} value={mapboxStyleURL}>
         <Radio value={MAPBOX_STYLE_URL.road}>Road boundaries</Radio>
         <Radio value={MAPBOX_STYLE_URL.water}>Water boundaries</Radio>
         <Radio value={MAPBOX_STYLE_URL.administrative}>Administrative boundaries</Radio>
       </Radio.Group>
       <Divider />
-      <p>Boundary detection threshold</p>
-      <Slider
-        min={0}
-        max={255}
-        range={false}
-        value={localRoadColorThreshold}
-        onAfterChange={handleRoadThresholdAfterChange}
-        onChange={(value) => onSliderChange(value, setLocalRoadColorThreshold)}
-      />
-      <p>Fill Color Tolerance</p>
-      <Slider
-        min={0}
-        max={20}
-        range={false}
-        value={localSimilarColorTolerance}
-        onAfterChange={handleSimilarColorToleranceAfterChange}
-        onChange={(value) => onSliderChange(value, setLocalSimilarColorTolerance)}
-      />
       <Button className="open-button" onClick={openCanvasImage}>
         Open in new window
       </Button>

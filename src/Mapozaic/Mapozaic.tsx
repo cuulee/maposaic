@@ -26,15 +26,16 @@ export const MAPBOX_STYLE_URL = {
   // regular: 'mapbox://styles/mapbox/streets-v11',
 }
 
-export const INITIAL_ROAD_COLOR_THRESHOLD = 50
-export const INITIAL_SIMILAR_COLOR_TOLERANCE = 1
+export const ROAD_COLOR_THRESHOLD = 50
+export const SIMILAR_COLOR_TOLERANCE = 1
+export const INITIAL_SIZE_FACTOR = 1
 
-const TARGET_INCH_WIDTH = 33
+const TARGET_INCH_WIDTH = 10
 const TARGET_DPI = 300
 const TARGET_PIXEL_WIDTH = TARGET_DPI * TARGET_INCH_WIDTH
-// const TARGET_PIXEL_WIDTH = 1000
 const MAPBOX_PIXEL_FACTOR = 2
 const ARTIFICIAL_MAPBOX_WIDTH = TARGET_PIXEL_WIDTH / MAPBOX_PIXEL_FACTOR
+
 const DISPLAY_PIXEL_RATIO = 1
 
 export type RGBColor = { r: number; g: number; b: number }
@@ -51,12 +52,12 @@ const toggleCanvasOpacity = (isMapbox: boolean): void => {
   mosaicCanvas.style.opacity = isMapbox ? '0' : '1'
 }
 
-const setMapboxArtificialSize = () => {
+const setMapboxArtificialSize = (sizeFactor: number) => {
   const mapboxWrapper = document.getElementById('mapbox-wrapper') as HTMLElement
   displayWidth = mapboxWrapper.offsetWidth
   displayHeight = mapboxWrapper.offsetHeight
-  mapboxWrapper.style.width = ARTIFICIAL_MAPBOX_WIDTH.toString() + 'px'
-  mapboxWrapper.style.height = ((displayHeight * ARTIFICIAL_MAPBOX_WIDTH) / displayWidth).toString() + 'px'
+  mapboxWrapper.style.width = (displayWidth * sizeFactor).toString() + 'px'
+  mapboxWrapper.style.height = (displayHeight * sizeFactor).toString() + 'px'
 }
 
 const setMapboxDisplaySize = () => {
@@ -76,10 +77,9 @@ const MapboxGLMap = (): JSX.Element => {
   const [maposaicColors, setMaposaicColors] = useState<MaposaicColors>(PresetColorName.Random)
 
   const [isLoading, setIsLoading] = useState(true)
-  const [roadColorThreshold, setRoadColorThreshold] = useState(INITIAL_ROAD_COLOR_THRESHOLD)
-  const [similarColorTolerance, setSimilarColorTolerance] = useState(INITIAL_SIMILAR_COLOR_TOLERANCE)
   const [currentCenter, setCurrentCenter] = useState<[number, number]>([0, 0])
   const [sizeRender, setSizeRender] = useState(0)
+  const [sizeFactor, setSizeFactor] = useState(INITIAL_SIZE_FACTOR)
 
   useEffect(() => {
     const paintMosaic = async (newMap: mapboxgl.Map): Promise<void> => {
@@ -115,8 +115,8 @@ const MapboxGLMap = (): JSX.Element => {
         targetSize: maposaicCanvasSize,
         canvassRatio: DISPLAY_PIXEL_RATIO,
         maposaicColors,
-        roadColorThreshold,
-        similarColorTolerance,
+        roadColorThreshold: ROAD_COLOR_THRESHOLD,
+        similarColorTolerance: SIMILAR_COLOR_TOLERANCE,
       })
 
       paintWorker.onmessage = function (e: { data: { pixels: number[]; paintedBoundsMin: number } }): void {
@@ -130,7 +130,7 @@ const MapboxGLMap = (): JSX.Element => {
     const center = map ? map.getCenter() : new mapboxgl.LngLat(2.338272, 48.858796)
     const zoom = map ? map.getZoom() : 12
 
-    setMapboxArtificialSize()
+    setMapboxArtificialSize(sizeFactor)
 
     if (map) {
       map.remove()
@@ -166,7 +166,7 @@ const MapboxGLMap = (): JSX.Element => {
       newMap.remove()
     }
     // eslint-disable-next-line
-  }, [roadColorThreshold, similarColorTolerance, mapboxStyleURL, maposaicColors, sizeRender])
+  }, [mapboxStyleURL, maposaicColors, sizeRender, sizeFactor])
 
   const [drawerVisible, setDrawerVisible] = useState(false)
 
@@ -176,16 +176,12 @@ const MapboxGLMap = (): JSX.Element => {
     setMapboxStyleURL(newStyle)
   }
 
-  const setNewRoadColorThreshold = (threshold: number) => {
-    setRoadColorThreshold(threshold)
-    setIsLoading(true)
-  }
-  const setNewSimilarColorTolerance = (tolerance: number) => {
-    setSimilarColorTolerance(tolerance)
-    setIsLoading(true)
-  }
   const setNewMaposaicColors = (colors: MaposaicColors) => {
     setMaposaicColors(colors)
+    setIsLoading(true)
+  }
+  const setNewSizeFactor = (sizeFactor: number) => {
+    setSizeFactor(sizeFactor)
     setIsLoading(true)
   }
 
@@ -221,11 +217,10 @@ const MapboxGLMap = (): JSX.Element => {
           setDrawerVisible={setDrawerVisible}
           changeMapStyle={changeMapStyle}
           mapboxStyleURL={mapboxStyleURL}
-          setNewRoadColorThreshold={setNewRoadColorThreshold}
-          setNewSimilarColorTolerance={setNewSimilarColorTolerance}
           flyTo={flyTo}
           currentCenter={currentCenter}
           setNewMaposaicColors={setNewMaposaicColors}
+          setNewSizeFactor={setNewSizeFactor}
           openCanvasImage={openCanvasImage}
         />
         <Button
