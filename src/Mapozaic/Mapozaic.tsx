@@ -13,6 +13,7 @@ import PaintWorker from 'worker-loader!./paint.worker'
 
 import './style.css'
 import { MaposaicColors, PresetColorName } from './colors'
+import { getTargetSizeFromSourceSize } from './utils'
 
 // eslint-disable-next-line
 export const MAPBOX_TOKEN: string = process.env['REACT_APP_MAPBOX_TOKEN'] || ''
@@ -25,19 +26,47 @@ export const MAPBOX_STYLE_URL = {
   // regular: 'mapbox://styles/mapbox/streets-v11',
 }
 
-export const INITIAL_ROAD_COLOR_THRESHOLD = 50
-export const INITIAL_SIMILAR_COLOR_TOLERANCE = 3
+export const ROAD_COLOR_THRESHOLD = 50
+export const SIMILAR_COLOR_TOLERANCE = 1
+export const INITIAL_SIZE_FACTOR = 1
+
+const TARGET_INCH_WIDTH = 10
+const TARGET_DPI = 300
+const TARGET_PIXEL_WIDTH = TARGET_DPI * TARGET_INCH_WIDTH
+const MAPBOX_PIXEL_FACTOR = 2
+const ARTIFICIAL_MAPBOX_WIDTH = TARGET_PIXEL_WIDTH / MAPBOX_PIXEL_FACTOR
+
+const DISPLAY_PIXEL_RATIO = 1
 
 export type RGBColor = { r: number; g: number; b: number }
 export type imagePoint = { x: number; y: number }
 
 let paintWorker = new PaintWorker()
+let displayWidth = 0
+let displayHeight = 0
 
-const showMapboxCanvas = (isMapbox: boolean): void => {
-  const mapboxElement = document.getElementById('mapbox-cvs') as HTMLCanvasElement
-  const mosaicElement = document.getElementById('maposaic-cvs') as HTMLCanvasElement
+const toggleCanvasOpacity = (isMapbox: boolean): void => {
+  const mapboxElement = document.getElementById('mapbox-wrapper') as HTMLElement
+  const mosaicCanvas = document.getElementById('maposaic-cvs') as HTMLCanvasElement
   mapboxElement.style.opacity = isMapbox ? '1' : '0'
-  mosaicElement.style.opacity = isMapbox ? '0' : '1'
+  mosaicCanvas.style.opacity = isMapbox ? '0' : '1'
+}
+
+const setMapboxArtificialSize = (sizeFactor: number) => {
+  const mapboxWrapper = document.getElementById('mapbox-wrapper') as HTMLElement
+  displayWidth = mapboxWrapper.offsetWidth
+  displayHeight = mapboxWrapper.offsetHeight
+  mapboxWrapper.style.width = (displayWidth * sizeFactor).toString() + 'px'
+  mapboxWrapper.style.height = (displayHeight * sizeFactor).toString() + 'px'
+}
+
+const setMapboxDisplaySize = () => {
+  const mapboxCanvas = document.getElementsByClassName('mapboxgl-canvas')[0] as HTMLCanvasElement
+  const mapboxWrapper = document.getElementById('mapbox-wrapper') as HTMLElement
+  mapboxCanvas.style.width = displayWidth.toString() + 'px'
+  mapboxCanvas.style.height = displayHeight.toString() + 'px'
+  mapboxWrapper.style.width = ''
+  mapboxWrapper.style.height = ''
 }
 
 const MapboxGLMap = (): JSX.Element => {
@@ -48,60 +77,60 @@ const MapboxGLMap = (): JSX.Element => {
   const [maposaicColors, setMaposaicColors] = useState<MaposaicColors>(PresetColorName.Random)
 
   const [isLoading, setIsLoading] = useState(true)
-  const [roadColorThreshold, setRoadColorThreshold] = useState(INITIAL_ROAD_COLOR_THRESHOLD)
-  const [similarColorTolerance, setSimilarColorTolerance] = useState(INITIAL_SIMILAR_COLOR_TOLERANCE)
   const [currentCenter, setCurrentCenter] = useState<[number, number]>([0, 0])
+  const [sizeRender, setSizeRender] = useState(0)
+  const [sizeFactor, setSizeFactor] = useState(INITIAL_SIZE_FACTOR)
 
   useEffect(() => {
     const paintMosaic = async (newMap: mapboxgl.Map): Promise<void> => {
       setIsLoading(true)
-      showMapboxCanvas(true)
+      toggleCanvasOpacity(true)
       const mapboxCanvas = newMap.getCanvas()
       const gl = mapboxCanvas.getContext('webgl')
-      if (!gl) {
+      if (!gl || !gl.drawingBufferWidth) {
         console.log('pas de gl')
         return
       }
-      const webglWidth = gl.drawingBufferWidth
-      const webglHeight = gl.drawingBufferHeight
-      const maposaicWidth = webglWidth
-      const maposaicHeight = webglHeight
-
+      const mapboxCanvasSize = { w: gl.drawingBufferWidth, h: gl.drawingBufferHeight }
+      const maposaicCanvasSize = getTargetSizeFromSourceSize(mapboxCanvasSize, DISPLAY_PIXEL_RATIO)
       const maposaicCanvas = document.getElementById('maposaic-cvs') as HTMLCanvasElement
 
-      maposaicCanvas.setAttribute('width', maposaicWidth.toString())
-      maposaicCanvas.setAttribute('height', maposaicHeight.toString())
+      maposaicCanvas.setAttribute('width', maposaicCanvasSize.w.toString())
+      maposaicCanvas.setAttribute('height', maposaicCanvasSize.h.toString())
+
       const maposaicContext = maposaicCanvas.getContext('2d')
       if (!maposaicContext) {
         return
       }
-      const imageData = maposaicContext.getImageData(0, 0, maposaicCanvas.width, maposaicCanvas.height)
+      const imageData = maposaicContext.getImageData(0, 0, maposaicCanvasSize.w, maposaicCanvasSize.h)
       const maposaicData = imageData.data
 
       const mapboxPixels = new Uint8Array(gl.drawingBufferWidth * gl.drawingBufferHeight * 4)
       gl.readPixels(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight, gl.RGBA, gl.UNSIGNED_BYTE, mapboxPixels)
 
-      paintWorker.onmessage = function (e: { data: number[] }): void {
-        imageData.data.set(e.data)
+      paintWorker.postMessage({
+        sourcePixelArray: mapboxPixels,
+        targetPixelArray: maposaicData,
+        sourceSize: mapboxCanvasSize,
+        targetSize: maposaicCanvasSize,
+        canvassRatio: DISPLAY_PIXEL_RATIO,
+        maposaicColors,
+        roadColorThreshold: ROAD_COLOR_THRESHOLD,
+        similarColorTolerance: SIMILAR_COLOR_TOLERANCE,
+      })
+
+      paintWorker.onmessage = function (e: { data: { pixels: number[]; paintedBoundsMin: number } }): void {
+        imageData.data.set(e.data.pixels, e.data.paintedBoundsMin)
         maposaicContext.putImageData(imageData, 0, 0)
-        showMapboxCanvas(false)
+        toggleCanvasOpacity(false)
         setIsLoading(false)
       }
-      paintWorker.postMessage({
-        mapboxPixels,
-        maposaicData,
-        webglWidth,
-        webglHeight,
-        maposaicHeight,
-        maposaicWidth,
-        maposaicColors,
-        roadColorThreshold,
-        similarColorTolerance,
-      })
     }
 
     const center = map ? map.getCenter() : new mapboxgl.LngLat(2.338272, 48.858796)
     const zoom = map ? map.getZoom() : 12
+
+    setMapboxArtificialSize(sizeFactor)
 
     if (map) {
       map.remove()
@@ -111,14 +140,20 @@ const MapboxGLMap = (): JSX.Element => {
       style: mapboxStyleURL,
       zoom,
       center,
+      maxTileCacheSize: 0,
     })
     newMap.on('load', () => {
       setMap(newMap)
-      newMap.resize()
     })
-    newMap.on('dragstart', showMapboxCanvas)
-    newMap.on('zoomstart', showMapboxCanvas)
+
+    newMap.on('resize', () => {
+      setSizeRender((s) => s + 1)
+    })
+    newMap.on('dragstart', toggleCanvasOpacity)
+    newMap.on('zoomstart', toggleCanvasOpacity)
+
     newMap.on('render', () => {
+      setMapboxDisplaySize()
       if (!newMap.loaded() || newMap.isMoving() || newMap.isZooming()) {
         return
       }
@@ -127,27 +162,26 @@ const MapboxGLMap = (): JSX.Element => {
       paintMosaic(newMap)
       setCurrentCenter([newMap.getCenter().lng, newMap.getCenter().lat])
     })
+    return () => {
+      newMap.remove()
+    }
     // eslint-disable-next-line
-  }, [roadColorThreshold, similarColorTolerance, mapboxStyleURL, maposaicColors])
+  }, [mapboxStyleURL, maposaicColors, sizeRender, sizeFactor])
 
   const [drawerVisible, setDrawerVisible] = useState(false)
 
   const changeMapStyle = (newStyle: string) => {
-    showMapboxCanvas(true)
+    toggleCanvasOpacity(true)
     setIsLoading(true)
     setMapboxStyleURL(newStyle)
   }
 
-  const setNewRoadColorThreshold = (threshold: number) => {
-    setRoadColorThreshold(threshold)
-    setIsLoading(true)
-  }
-  const setNewSimilarColorTolerance = (tolerance: number) => {
-    setSimilarColorTolerance(tolerance)
-    setIsLoading(true)
-  }
   const setNewMaposaicColors = (colors: MaposaicColors) => {
     setMaposaicColors(colors)
+    setIsLoading(true)
+  }
+  const setNewSizeFactor = (sizeFactor: number) => {
+    setSizeFactor(sizeFactor)
     setIsLoading(true)
   }
 
@@ -155,7 +189,7 @@ const MapboxGLMap = (): JSX.Element => {
     if (!map) {
       return
     }
-    showMapboxCanvas(true)
+    toggleCanvasOpacity(true)
     setIsLoading(true)
     map.setCenter(center)
   }
@@ -175,7 +209,7 @@ const MapboxGLMap = (): JSX.Element => {
   return (
     <div className="container">
       <canvas className="mosaic-canvas" id="maposaic-cvs" />
-      <div id="mapbox-cvs" className="mapbox-canvas" ref={(el) => (mapContainer.current = el)} />
+      <div id="mapbox-wrapper" className="mapbox-canvas" ref={(el) => (mapContainer.current = el)} />
       <Spin spinning={isLoading} indicator={<img className="spinner" src={spinner} alt="spin" />} />
       <div className="overmap">
         <Drawer
@@ -183,11 +217,10 @@ const MapboxGLMap = (): JSX.Element => {
           setDrawerVisible={setDrawerVisible}
           changeMapStyle={changeMapStyle}
           mapboxStyleURL={mapboxStyleURL}
-          setNewRoadColorThreshold={setNewRoadColorThreshold}
-          setNewSimilarColorTolerance={setNewSimilarColorTolerance}
           flyTo={flyTo}
           currentCenter={currentCenter}
           setNewMaposaicColors={setNewMaposaicColors}
+          setNewSizeFactor={setNewSizeFactor}
           openCanvasImage={openCanvasImage}
         />
         <Button
