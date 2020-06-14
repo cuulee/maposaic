@@ -68,8 +68,8 @@ const Drawer = ({
       <ColorTabs setNewMaposaicColors={setNewMaposaicColors} />
       <Divider />
       <Title level={4}>
-        Size factor{' '}
-        <Tooltip title="Increase quality and... wait time">
+        Granularity{' '}
+        <Tooltip title="Increase size and... waiting time">
           <InfoCircleOutlined />
         </Tooltip>
       </Title>
@@ -82,7 +82,7 @@ const Drawer = ({
       </Radio.Group>
       <Divider />
       <Button className="open-button" onClick={openCanvasImage}>
-        Open in new window
+        Open map image in new window
       </Button>
     </AntDrawer>
   )
