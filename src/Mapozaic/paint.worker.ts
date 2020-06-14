@@ -3,6 +3,8 @@ import { MaposaicColors, PresetColorName } from './colors'
 import { Size } from './types'
 
 const MAX_SET_SIZE = 16777216
+export const ROAD_COLOR_THRESHOLD = 50
+export const SIMILAR_COLOR_TOLERANCE = 1
 
 const getPointFromPixelIndex = (pixelIndex: number, canvasWidth: number): imagePoint => {
   return { x: pixelIndex % canvasWidth, y: Math.floor(pixelIndex / canvasWidth) }
@@ -105,7 +107,6 @@ const paintAdjacentPointsInTarget = ({
   initialColor,
   targetColor,
   visitedPixelSets,
-  similarColorTolerance,
   paintedBounds,
 }: {
   targetPixelArray: Uint8ClampedArray
@@ -117,7 +118,6 @@ const paintAdjacentPointsInTarget = ({
   initialColor: RGBColor
   targetColor: RGBColor
   visitedPixelSets: Set<number>[]
-  similarColorTolerance: number
   paintedBounds: PaintedBounds
 }): void => {
   const toVisitPointStack: imagePoint[] = [initialTargetPoint]
@@ -148,7 +148,7 @@ const paintAdjacentPointsInTarget = ({
     const adjacentTargetPoints = getAdjacentPoints({ point: targetPoint, canvasSize: targetSize })
 
     // anti-aliasing
-    if (!isColorSimilar(targetPointColor, initialColor, similarColorTolerance)) {
+    if (!isColorSimilar(targetPointColor, initialColor, SIMILAR_COLOR_TOLERANCE)) {
       const similarPointCount = Object.values(adjacentTargetPoints).filter((adjacentTargetPoint) => {
         if (!adjacentTargetPoint) {
           return false
@@ -171,7 +171,7 @@ const paintAdjacentPointsInTarget = ({
             sourcePixelArray[adjSourceIndex * 4 + 2],
           ),
           targetPointColor,
-          similarColorTolerance,
+          SIMILAR_COLOR_TOLERANCE,
         )
       }).length
 
@@ -221,16 +221,7 @@ const createColor = (colors: MaposaicColors) => {
 }
 
 onmessage = ({
-  data: {
-    sourcePixelArray,
-    targetPixelArray,
-    sourceSize,
-    targetSize,
-    canvassRatio,
-    maposaicColors,
-    roadColorThreshold,
-    similarColorTolerance,
-  },
+  data: { sourcePixelArray, targetPixelArray, sourceSize, targetSize, canvassRatio, maposaicColors },
 }: {
   data: {
     sourcePixelArray: Uint8Array
@@ -239,8 +230,6 @@ onmessage = ({
     targetSize: Size
     canvassRatio: number
     maposaicColors: MaposaicColors
-    roadColorThreshold: number
-    similarColorTolerance: number
   }
 }): void => {
   const t1 = new Date()
@@ -272,7 +261,7 @@ onmessage = ({
         sourcePixelArray[sourcePixelIndex * 4 + 1],
         sourcePixelArray[sourcePixelIndex * 4 + 2],
       )
-      const targetColor = initialColor.r < roadColorThreshold ? createColor(maposaicColors) : createRGB(255, 255, 255)
+      const targetColor = initialColor.r < ROAD_COLOR_THRESHOLD ? createColor(maposaicColors) : createRGB(255, 255, 255)
       const initialTargetPoint = getPointFromPixelIndex(targetPixelIndex, targetSize.w)
 
       const paintedBounds = { min: sourcePixelIndex, max: sourcePixelIndex }
@@ -286,7 +275,6 @@ onmessage = ({
         initialColor,
         targetColor,
         visitedPixelSets,
-        similarColorTolerance,
         paintedBounds,
       })
 
