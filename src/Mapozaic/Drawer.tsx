@@ -45,6 +45,7 @@ const Drawer = ({
     return () => {
       clearTimeout(chrono)
     }
+    // eslint-disable-next-line
   }, [localSizeFactor])
 
   const onNumberInputChange = (value: number | undefined) => {
