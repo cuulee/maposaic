@@ -48,8 +48,8 @@ const Drawer = ({
     // eslint-disable-next-line
   }, [localSizeFactor])
 
-  const onNumberInputChange = (value: number | undefined) => {
-    if (value !== undefined) {
+  const onNumberInputChange = (value: number | undefined | string) => {
+    if (value !== undefined && typeof value !== 'string') {
       setLocalSizeFactor(value)
     }
   }
