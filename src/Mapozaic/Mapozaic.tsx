@@ -132,9 +132,6 @@ const MapboxGLMap = (): JSX.Element => {
 
     setMapboxArtificialSize(sizeFactor)
 
-    if (map) {
-      map.remove()
-    }
     const newMap = new mapboxgl.Map({
       container: mapContainer.current ? mapContainer.current : '',
       style: mapboxStyleURL,
