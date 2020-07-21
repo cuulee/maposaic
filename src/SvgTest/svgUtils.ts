@@ -105,3 +105,51 @@ export const isColorSimilar = (color1: RGBColor, color2: RGBColor, similarColorT
 export const createRGB = (r: number, g: number, b: number): RGBColor => {
   return { r, g, b }
 }
+
+export const getAdjacentPoint = ({
+  point,
+  adjacent,
+  width,
+  height,
+}: {
+  point: ImagePoint
+  adjacent: Adjacent
+  width: number
+  height: number
+}) => {
+  switch (adjacent) {
+    case Adjacent.N:
+      return point.y > 0 ? { x: point.x, y: point.y - 1 } : null
+    case Adjacent.S:
+      return point.y < height - 1 ? { x: point.x, y: point.y + 1 } : null
+    case Adjacent.E:
+      return point.x < width - 1 ? { x: point.x + 1, y: point.y } : null
+    case Adjacent.O:
+      return point.x > 0 ? { x: point.x - 1, y: point.y } : null
+    default:
+      return null
+  }
+}
+
+export const getAdjacentFromBorder = ({
+  border,
+  index,
+  width,
+  height,
+}: {
+  border: BorderPoint
+  index: number
+  width: number
+  height: number
+}) => {
+  const borderName = ADJACENT_PROCESSING_ORDER[border.parentCorner][index]
+  const adjacent = ADJACENT_PROCESSING[borderName]
+  const adjacentPoint = getAdjacentPoint({
+    point: border.point,
+    adjacent: adjacent.adjacent,
+    width,
+    height,
+  })
+  const adjacentPixel = adjacentPoint ? getPixelIndexFromPoint(adjacentPoint, width) : null
+  return { adjacent, adjacentPoint, adjacentPixel }
+}
