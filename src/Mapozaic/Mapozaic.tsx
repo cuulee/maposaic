@@ -12,7 +12,7 @@ import Drawer from './Drawer'
 import PaintWorker from 'worker-loader!./paint.worker'
 
 import './style.css'
-import { MaposaicColors, PresetColorName } from './colors'
+import { MaposaicColors, PresetColorName } from 'Colors/types'
 import { getTargetSizeFromSourceSize } from 'Canvas/utils'
 
 // eslint-disable-next-line

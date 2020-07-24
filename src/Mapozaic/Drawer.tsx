@@ -6,7 +6,7 @@ import { InfoCircleOutlined } from '@ant-design/icons'
 
 import { MAPBOX_STYLE_URL, INITIAL_SIZE_FACTOR } from './Mapozaic'
 import GeoSearch from './GeoSearchInput'
-import { MaposaicColors } from './colors'
+import { MaposaicColors } from 'Colors/types'
 
 import './drawer.style.less'
 import ColorTabs from './ColorTabs'

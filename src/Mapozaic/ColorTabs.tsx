@@ -5,7 +5,8 @@ import { ChromePicker, ColorResult as ReactColorResult, ColorResult } from 'reac
 import { generate } from '@ant-design/colors'
 
 import { THEME_COLOR_PURPLE } from 'constants/colors'
-import { MaposaicColors, PresetColorName, AntColors, ShadingColor, PaletteOrigin, PRESET_PALETTES } from './colors'
+import { AntColors, PRESET_PALETTES } from 'Colors/colors'
+import { MaposaicColors, PresetColorName, PaletteOrigin, ShadingColor } from 'Colors/types'
 import './colorTabs.style.less'
 
 const ColorTabs = ({ setNewMaposaicColors }: { setNewMaposaicColors: (colors: MaposaicColors) => void }) => {

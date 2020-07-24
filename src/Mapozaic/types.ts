@@ -1,4 +1,4 @@
-import { MaposaicColors } from './colors'
+import { MaposaicColors } from 'Colors/types'
 import { Size } from 'Canvas/types'
 
 export type PaintWorkerData = {

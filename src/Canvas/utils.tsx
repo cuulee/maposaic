@@ -1,5 +1,5 @@
 import { imagePoint, RGBColor, Size } from 'Canvas/types'
-import { MaposaicColors, PresetColorName } from 'Mapozaic/colors'
+import { MaposaicColors, PresetColorName } from 'Colors/types'
 
 export const getPointFromPixelIndex = (pixelIndex: number, canvasWidth: number): imagePoint => {
   return { x: pixelIndex % canvasWidth, y: Math.floor(pixelIndex / canvasWidth) }

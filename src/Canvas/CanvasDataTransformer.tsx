@@ -1,5 +1,5 @@
 import { Size, imagePoint, RGBColor } from 'Canvas/types'
-import { MaposaicColors } from 'Mapozaic/colors'
+import { MaposaicColors } from 'Colors/types'
 import { getSourcePixelIndexFromTargetPixelIndex, createColor, getAdjacentPoints, isColorSimilar } from 'Canvas/utils'
 import { createRGB, getPointFromPixelIndex, getPixelIndexFromPoint } from 'Canvas/utils'
 
