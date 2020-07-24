@@ -13,7 +13,7 @@ import PaintWorker from 'worker-loader!./paint.worker'
 
 import './style.css'
 import { MaposaicColors, PresetColorName } from './colors'
-import { getTargetSizeFromSourceSize } from './utils'
+import { getTargetSizeFromSourceSize } from 'Canvas/utils'
 
 // eslint-disable-next-line
 export const MAPBOX_TOKEN: string = process.env['REACT_APP_MAPBOX_TOKEN'] || ''
@@ -26,8 +26,6 @@ export const MAPBOX_STYLE_URL = {
   // regular: 'mapbox://styles/mapbox/streets-v11',
 }
 
-export const ROAD_COLOR_THRESHOLD = 50
-export const SIMILAR_COLOR_TOLERANCE = 1
 export const INITIAL_SIZE_FACTOR = 1
 
 // const TARGET_INCH_WIDTH = 10
@@ -37,9 +35,6 @@ export const INITIAL_SIZE_FACTOR = 1
 // const ARTIFICIAL_MAPBOX_WIDTH = TARGET_PIXEL_WIDTH / MAPBOX_PIXEL_FACTOR
 
 const DISPLAY_PIXEL_RATIO = 1
-
-export type RGBColor = { r: number; g: number; b: number }
-export type imagePoint = { x: number; y: number }
 
 let paintWorker = new PaintWorker()
 let displayWidth = 0
@@ -115,8 +110,6 @@ const MapboxGLMap = (): JSX.Element => {
         targetSize: maposaicCanvasSize,
         canvassRatio: DISPLAY_PIXEL_RATIO,
         maposaicColors,
-        roadColorThreshold: ROAD_COLOR_THRESHOLD,
-        similarColorTolerance: SIMILAR_COLOR_TOLERANCE,
       })
 
       paintWorker.onmessage = function (e: { data: { pixels: number[]; paintedBoundsMin: number } }): void {

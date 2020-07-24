@@ -1,9 +1,5 @@
 import { MaposaicColors } from './colors'
-
-export type Size = {
-  w: number
-  h: number
-}
+import { Size } from 'Canvas/types'
 
 export type PaintWorkerData = {
   sourcePixelArray: Uint8Array
