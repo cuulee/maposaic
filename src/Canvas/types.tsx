@@ -3,5 +3,4 @@ export type Size = {
   h: number
 }
 
-export type RGBColor = { r: number; g: number; b: number }
 export type imagePoint = { x: number; y: number }
