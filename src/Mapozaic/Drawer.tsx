@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react'
-import { Drawer as AntDrawer, Radio, Divider, Button, InputNumber, Tooltip } from 'antd'
+import { Drawer as AntDrawer, Radio, Divider, Button, InputNumber, Tooltip, Checkbox } from 'antd'
 import { RadioChangeEvent } from 'antd/lib/radio'
 import Title from 'antd/lib/typography/Title'
 import { InfoCircleOutlined } from '@ant-design/icons'
 
 import { MAPBOX_STYLE_URL, INITIAL_SIZE_FACTOR } from './Mapozaic'
 import GeoSearch from './GeoSearchInput'
-import { MaposaicColors } from 'Colors/types'
+import { MaposaicColors, PresetColorName } from 'Colors/types'
 
 import './drawer.style.less'
 import ColorTabs from './ColorTabs'
+import { CheckboxChangeEvent } from 'antd/lib/checkbox'
 
 export type DrawerPropsType = {
   visible: boolean
@@ -21,6 +22,8 @@ export type DrawerPropsType = {
   currentCenter: [number, number]
   setNewMaposaicColors: (colors: MaposaicColors) => void
   openCanvasImage: () => void
+  specificWaterColor: null | MaposaicColors
+  setSpecificWaterColor: (color: MaposaicColors | null) => void
 }
 
 const Drawer = ({
@@ -33,6 +36,8 @@ const Drawer = ({
   currentCenter,
   setNewMaposaicColors,
   openCanvasImage,
+  specificWaterColor,
+  setSpecificWaterColor,
 }: DrawerPropsType) => {
   const onStyleUrlChange = (event: RadioChangeEvent) => {
     setDrawerVisible(false)
@@ -65,7 +70,12 @@ const Drawer = ({
       <GeoSearch flyTo={flyTo} currentCenter={currentCenter} setDrawerVisible={setDrawerVisible} />
       <Divider />
       <Title level={4}>Colors</Title>
-      <ColorTabs setNewMaposaicColors={setNewMaposaicColors} />
+      <ColorTabs
+        setNewMaposaicColors={setNewMaposaicColors}
+        specificWaterColor={specificWaterColor}
+        setSpecificWaterColor={setSpecificWaterColor}
+      />
+
       <Divider />
       <Title level={4}>
         Granularity{' '}

@@ -77,7 +77,7 @@ const MapboxGLMap = (): JSX.Element => {
   const [sizeRender, setSizeRender] = useState(0)
   const [sizeFactor, setSizeFactor] = useState(INITIAL_SIZE_FACTOR)
   const [specificWaterColor, setSpecificWaterColor] = useState<MaposaicColors | null>(null)
-  const [specificColorTransforms, setSpecificColorTransforms] = useState({
+  const [specificColorTransforms, setSpecificColorTransforms] = useState<Record<string, MaposaicColors>>({
     [ROAD_SIMPLE_GREY]: ROAD_WHITE,
   })
 
@@ -162,7 +162,7 @@ const MapboxGLMap = (): JSX.Element => {
       newMap.remove()
     }
     // eslint-disable-next-line
-  }, [mapboxStyleURL, maposaicColors, sizeRender, sizeFactor])
+  }, [mapboxStyleURL, maposaicColors, sizeRender, sizeFactor, specificColorTransforms])
 
   const [drawerVisible, setDrawerVisible] = useState(false)
 
@@ -202,6 +202,16 @@ const MapboxGLMap = (): JSX.Element => {
     w.document.write(image.outerHTML)
   }
 
+  useEffect(() => {
+    const newSpecificColorTransforms = { ...specificColorTransforms }
+    if (specificWaterColor === null) {
+      delete newSpecificColorTransforms[WATER_BLACK]
+    } else {
+      newSpecificColorTransforms[WATER_BLACK] = specificWaterColor
+    }
+    setSpecificColorTransforms(newSpecificColorTransforms)
+  }, [specificWaterColor])
+
   return (
     <div className="container">
       <canvas className="mosaic-canvas" id="maposaic-cvs" />
@@ -218,6 +228,8 @@ const MapboxGLMap = (): JSX.Element => {
           setNewMaposaicColors={setNewMaposaicColors}
           setNewSizeFactor={setNewSizeFactor}
           openCanvasImage={openCanvasImage}
+          specificWaterColor={specificWaterColor}
+          setSpecificWaterColor={setSpecificWaterColor}
         />
         <Button
           type="primary"
