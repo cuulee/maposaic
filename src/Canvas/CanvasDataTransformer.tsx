@@ -1,12 +1,11 @@
 import { Size, imagePoint } from 'Canvas/types'
-import { MaposaicColors, RGBColor } from 'Colors/types'
+import { MaposaicColors, RGBColor, ColorTransforms } from 'Colors/types'
 import { getSourcePixelIndexFromTargetPixelIndex, getAdjacentPoints } from 'Canvas/utils'
 import { getPointFromPixelIndex, getPixelIndexFromPoint } from 'Canvas/utils'
-import { createRGB, createColor, isColorSimilar } from 'Colors/utils'
+import { createRGB, transformInitialColor, isColorSimilar } from 'Colors/utils'
 
 const MAX_SET_SIZE = 16777216
 const SIMILAR_COLOR_TOLERANCE = 1
-const ROAD_COLOR_THRESHOLD = 50
 
 export class CanvasDataTransformer {
   sourcePixelArray: Uint8Array
@@ -14,7 +13,8 @@ export class CanvasDataTransformer {
   sourceSize: Size
   targetSize: Size
   canvassRatio: number
-  maposaicColors: MaposaicColors
+  targetColors: MaposaicColors
+  specificColorTransforms: ColorTransforms
 
   visitedPixelSets: Set<number>[] = []
 
@@ -31,14 +31,16 @@ export class CanvasDataTransformer {
     sourceSize: Size,
     targetSize: Size,
     canvassRatio: number,
-    maposaicColors: MaposaicColors,
+    targetColors: MaposaicColors,
+    specificColorTransforms: ColorTransforms,
   ) {
     this.sourcePixelArray = sourcePixelArray
     this.targetPixelArray = targetPixelArray
     this.sourceSize = sourceSize
     this.targetSize = targetSize
     this.canvassRatio = canvassRatio
-    this.maposaicColors = maposaicColors
+    this.specificColorTransforms = specificColorTransforms
+    this.targetColors = targetColors
 
     const numberOfSets = Math.floor((targetSize.h * targetSize.w) / MAX_SET_SIZE) + 1
     for (let index = 0; index < numberOfSets; index++) {
@@ -68,10 +70,11 @@ export class CanvasDataTransformer {
           this.sourcePixelArray[sourcePixelIndex * 4 + 1],
           this.sourcePixelArray[sourcePixelIndex * 4 + 2],
         )
-        this.currentArea.targetColor =
-          this.currentArea.initialColor.r < ROAD_COLOR_THRESHOLD
-            ? createColor(this.maposaicColors)
-            : createRGB(255, 255, 255)
+        this.currentArea.targetColor = transformInitialColor(
+          this.currentArea.initialColor,
+          this.targetColors,
+          this.specificColorTransforms,
+        )
         this.currentArea.initialTargetPoint = getPointFromPixelIndex(targetPixelIndex, this.targetSize.w)
         this.currentArea.bounds = { min: sourcePixelIndex, max: sourcePixelIndex }
 

@@ -36,3 +36,5 @@ export const PRESET_PALETTES: { [key in PaletteOrigin]: { name: string; palettes
   [PaletteOrigin.Coolors]: { name: 'Coolors', palettes: coolors },
   [PaletteOrigin.ColorHunt]: { name: 'Color Hunt', palettes: colorHunt },
 }
+
+export const ROAD_WHITE = '#ffffff'

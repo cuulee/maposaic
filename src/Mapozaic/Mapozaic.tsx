@@ -14,6 +14,8 @@ import PaintWorker from 'worker-loader!./paint.worker'
 import './style.css'
 import { MaposaicColors, PresetColorName } from 'Colors/types'
 import { getTargetSizeFromSourceSize } from 'Canvas/utils'
+import { ROAD_SIMPLE_GREY, WATER_BLACK } from 'Colors/mapbox'
+import { ROAD_WHITE } from 'Colors/colors'
 
 // eslint-disable-next-line
 export const MAPBOX_TOKEN: string = process.env['REACT_APP_MAPBOX_TOKEN'] || ''
@@ -27,14 +29,13 @@ export const MAPBOX_STYLE_URL = {
 }
 
 export const INITIAL_SIZE_FACTOR = 1
+const DISPLAY_PIXEL_RATIO = 1
 
 // const TARGET_INCH_WIDTH = 10
 // const TARGET_DPI = 300
 // const TARGET_PIXEL_WIDTH = TARGET_DPI * TARGET_INCH_WIDTH
 // const MAPBOX_PIXEL_FACTOR = 2
 // const ARTIFICIAL_MAPBOX_WIDTH = TARGET_PIXEL_WIDTH / MAPBOX_PIXEL_FACTOR
-
-const DISPLAY_PIXEL_RATIO = 1
 
 let paintWorker = new PaintWorker()
 let displayWidth = 0
@@ -75,6 +76,10 @@ const MapboxGLMap = (): JSX.Element => {
   const [currentCenter, setCurrentCenter] = useState<[number, number]>([0, 0])
   const [sizeRender, setSizeRender] = useState(0)
   const [sizeFactor, setSizeFactor] = useState(INITIAL_SIZE_FACTOR)
+  const [specificWaterColor, setSpecificWaterColor] = useState<MaposaicColors | null>(null)
+  const [specificColorTransforms, setSpecificColorTransforms] = useState({
+    [ROAD_SIMPLE_GREY]: ROAD_WHITE,
+  })
 
   useEffect(() => {
     const paintMosaic = async (newMap: mapboxgl.Map): Promise<void> => {
@@ -110,6 +115,7 @@ const MapboxGLMap = (): JSX.Element => {
         targetSize: maposaicCanvasSize,
         canvassRatio: DISPLAY_PIXEL_RATIO,
         maposaicColors,
+        specificColorTransforms,
       })
 
       paintWorker.onmessage = function (e: { data: { pixels: number[]; paintedBoundsMin: number } }): void {

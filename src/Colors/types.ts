@@ -27,8 +27,4 @@ export enum PresetColorName {
   Grey = 'grey',
 }
 
-export type ColorTransformMap = {
-  initialColor: RGBColor
-  tolerance: number
-  transformColor: MaposaicColors
-}
+export type ColorTransforms = Record<string, MaposaicColors>

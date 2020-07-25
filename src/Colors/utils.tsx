@@ -1,4 +1,4 @@
-import { MaposaicColors, PresetColorName, RGBColor } from 'Colors/types'
+import { MaposaicColors, PresetColorName, RGBColor, ColorTransforms } from 'Colors/types'
 
 export const createRGB = (r: number, g: number, b: number): RGBColor => {
   return { r, g, b }
@@ -12,6 +12,15 @@ const hexToRgb = (hex: string) => {
   )
 }
 
+const HEXA = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f']
+const intToHex = (int: number) => {
+  return `${HEXA[Math.floor(int / 16)] || 0}${HEXA[int % 16] || 0}`
+}
+
+const rgbToHex = (rgb: RGBColor) => {
+  return `#${intToHex(rgb.r)}${intToHex(rgb.g)}${intToHex(rgb.b)}`
+}
+
 export const createColor = (colors: MaposaicColors) => {
   if (colors === PresetColorName.Random) {
     return createRGB(Math.floor(Math.random() * 256), Math.floor(Math.random() * 256), Math.floor(Math.random() * 256))
@@ -20,6 +29,19 @@ export const createColor = (colors: MaposaicColors) => {
     return hexToRgb(colors)
   }
   return hexToRgb(colors[Math.floor(Math.random() * colors.length)])
+}
+
+export const transformInitialColor = (
+  initialColor: RGBColor,
+  colors: MaposaicColors,
+  specificColorTransforms: ColorTransforms,
+) => {
+  const initialColorHex = rgbToHex(initialColor)
+  if (initialColorHex in specificColorTransforms) {
+    return createColor(specificColorTransforms[initialColorHex])
+  }
+
+  return createColor(colors)
 }
 
 export const isColorSimilar = (color1: RGBColor, color2: RGBColor, similarColorTolerance: number): boolean => {
