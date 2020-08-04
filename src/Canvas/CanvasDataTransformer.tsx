@@ -1,8 +1,9 @@
 import { Size, imagePoint } from 'Canvas/types'
-import { MaposaicColors, RGBColor, ColorTransforms } from 'Colors/types'
+import { MaposaicColors, RGBColor } from 'Colors/types'
 import { getSourcePixelIndexFromTargetPixelIndex, getAdjacentPoints } from 'Canvas/utils'
 import { getPointFromPixelIndex, getPixelIndexFromPoint } from 'Canvas/utils'
 import { createRGB, transformInitialColor, isColorSimilar } from 'Colors/utils'
+import { SpecificColorTransforms } from 'Mapozaic/types'
 
 const MAX_SET_SIZE = 16777216
 const SIMILAR_COLOR_TOLERANCE = 1
@@ -14,7 +15,7 @@ export class CanvasDataTransformer {
   targetSize: Size
   canvassRatio: number
   targetColors: MaposaicColors
-  specificColorTransforms: ColorTransforms
+  specificColorTransforms: SpecificColorTransforms
 
   visitedPixelSets: Set<number>[] = []
 
@@ -32,7 +33,7 @@ export class CanvasDataTransformer {
     targetSize: Size,
     canvassRatio: number,
     targetColors: MaposaicColors,
-    specificColorTransforms: ColorTransforms,
+    specificColorTransforms: SpecificColorTransforms,
   ) {
     this.sourcePixelArray = sourcePixelArray
     this.targetPixelArray = targetPixelArray

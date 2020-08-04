@@ -26,5 +26,3 @@ export enum PresetColorName {
   Magenta = 'magenta',
   Grey = 'grey',
 }
-
-export type ColorTransforms = Record<string, MaposaicColors>

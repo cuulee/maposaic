@@ -1,6 +1,7 @@
 import { Size } from 'Canvas/types'
-import { MaposaicColors, ColorTransforms } from 'Colors/types'
+import { MaposaicColors } from 'Colors/types'
 import { CanvasDataTransformer } from 'Canvas/CanvasDataTransformer'
+import { SpecificColorTransforms } from 'Mapozaic/types'
 
 onmessage = ({
   data: {
@@ -20,7 +21,7 @@ onmessage = ({
     targetSize: Size
     canvassRatio: number
     maposaicColors: MaposaicColors
-    specificColorTransforms: ColorTransforms
+    specificColorTransforms: SpecificColorTransforms
   }
 }): void => {
   const t1 = new Date()

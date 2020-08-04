@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Radio, Tabs, Popover, Select, Button, Checkbox } from 'antd'
 import { RadioChangeEvent } from 'antd/lib/radio'
 import { ChromePicker, ColorResult as ReactColorResult, ColorResult } from 'react-color'
@@ -9,15 +9,19 @@ import { AntColors, PRESET_PALETTES } from 'Colors/colors'
 import { MaposaicColors, PresetColorName, PaletteOrigin, ShadingColor } from 'Colors/types'
 import './colorTabs.style.less'
 import { CheckboxChangeEvent } from 'antd/lib/checkbox'
+import { SpecificColorTransforms } from 'Mapozaic/types'
+import { createColor, rgbToHex } from 'Colors/utils'
 
 const ColorTabs = ({
+  maposaicColors,
   setNewMaposaicColors,
-  specificWaterColor,
-  setSpecificWaterColor,
+  specificColorTransforms,
+  setNewSpecificColorTransforms,
 }: {
+  maposaicColors: MaposaicColors
   setNewMaposaicColors: (colors: MaposaicColors) => void
-  specificWaterColor: MaposaicColors | null
-  setSpecificWaterColor: (color: MaposaicColors | null) => void
+  specificColorTransforms: SpecificColorTransforms
+  setNewSpecificColorTransforms: (colors: SpecificColorTransforms) => void
 }) => {
   const [shadingColor, setShadingColor] = useState<ShadingColor>(PresetColorName.Random)
   const [customShadingColor, setCustomShadingColor] = useState('#3C22C3')
@@ -27,6 +31,16 @@ const ColorTabs = ({
   })
   const [customPaletteColors, setCustomPaletteColors] = useState<string[]>(['#F3D2A6', '#13DFF6'])
   const [paletteOrigin, setPaletteOrigin] = useState<PaletteOrigin>(PaletteOrigin.Coolors)
+  const [specificColorPicks, setSpecificColorPicks] = useState<Record<string, string>>({})
+
+  useEffect(() => {
+    const newPicks: Record<string, string> = {}
+    for (const colorKey in specificColorTransforms) {
+      const transform = specificColorTransforms[colorKey]
+      newPicks[colorKey] = transform.color ? transform.color : ''
+    }
+    setSpecificColorPicks(newPicks)
+  }, [specificColorTransforms])
 
   const handlePresetColorChange = (e: RadioChangeEvent) => {
     const color = e.target.value as PresetColorName
@@ -88,9 +102,7 @@ const ColorTabs = ({
   }
 
   const onCustomPalettePickerChangeComplete = (color: ColorResult, index: number) => {
-    const newPalette = [...customPaletteColors]
-    newPalette[index] = color.hex
-    setCustomPaletteColors(newPalette)
+    onCustomPalettePickerChange(color, index)
     setNewMaposaicColors(customPaletteColors)
   }
 
@@ -101,12 +113,23 @@ const ColorTabs = ({
     setNewMaposaicColors(PRESET_PALETTES[paletteOrigin].palettes[index])
   }
 
-  const onSameWaterColorChange = (e: CheckboxChangeEvent) => {
-    if (e.target.checked) {
-      setSpecificWaterColor('#ff9876')
-    } else {
-      setSpecificWaterColor(null)
-    }
+  const onColorTransformChange = (colorKey: string, e: CheckboxChangeEvent) => {
+    const newColorTransform = { ...specificColorTransforms }
+    newColorTransform[colorKey].color = e.target.checked ? rgbToHex(createColor(maposaicColors)) : null
+    setNewSpecificColorTransforms(newColorTransform)
+  }
+
+  const onSpecificColorPickerChange = (color: ColorResult, colorKey: string) => {
+    const newSpecificColorPicks = { ...specificColorPicks }
+    newSpecificColorPicks[colorKey] = color.hex
+    setSpecificColorPicks(newSpecificColorPicks)
+  }
+
+  const onSpecificColorPickerChangeComplete = (color: ColorResult, colorKey: string) => {
+    onSpecificColorPickerChange(color, colorKey)
+    const newColorTransform = { ...specificColorTransforms }
+    newColorTransform[colorKey].color = color.hex
+    setNewSpecificColorTransforms(newColorTransform)
   }
 
   return (
@@ -229,9 +252,40 @@ const ColorTabs = ({
           </div>
         </Tabs.TabPane>
       </Tabs>
-      <Checkbox checked={specificWaterColor !== null} onChange={onSameWaterColorChange} className="water-check">
-        Same color for Water
-      </Checkbox>
+      <div className="specific-colors">
+        {Object.entries(specificColorTransforms).map(([colorKey, transform]) => (
+          <div key={colorKey} className="specific-colors__color">
+            <Checkbox
+              checked={transform.color !== null}
+              onChange={(e) => onColorTransformChange(colorKey, e)}
+              className="specific-color-checks__check"
+            >
+              {`Same color for ${transform.name}`}
+            </Checkbox>
+            {transform.color && (
+              <Popover
+                content={
+                  <ChromePicker
+                    color={specificColorPicks[colorKey]}
+                    onChange={(c) => {
+                      onSpecificColorPickerChange(c, colorKey)
+                    }}
+                    onChangeComplete={(c) => {
+                      onSpecificColorPickerChangeComplete(c, colorKey)
+                    }}
+                    disableAlpha
+                  />
+                }
+              >
+                <div className="custom-palette-color-container">
+                  <div className="custom-palette-color" style={{ backgroundColor: specificColorPicks[colorKey] }} />
+                </div>
+              </Popover>
+            )}
+            <br />
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react'
-import { Drawer as AntDrawer, Radio, Divider, Button, InputNumber, Tooltip, Checkbox } from 'antd'
+import { Drawer as AntDrawer, Radio, Divider, Button, InputNumber, Tooltip } from 'antd'
 import { RadioChangeEvent } from 'antd/lib/radio'
 import Title from 'antd/lib/typography/Title'
 import { InfoCircleOutlined } from '@ant-design/icons'
 
 import { MAPBOX_STYLE_URL, INITIAL_SIZE_FACTOR } from './Mapozaic'
 import GeoSearch from './GeoSearchInput'
-import { MaposaicColors, PresetColorName } from 'Colors/types'
+import { MaposaicColors } from 'Colors/types'
 
 import './drawer.style.less'
 import ColorTabs from './ColorTabs'
-import { CheckboxChangeEvent } from 'antd/lib/checkbox'
+import { SpecificColorTransforms } from 'Mapozaic/types'
 
 export type DrawerPropsType = {
   visible: boolean
@@ -20,10 +20,11 @@ export type DrawerPropsType = {
   setNewSizeFactor: (sizeFactor: number) => void
   flyTo: (center: [number, number]) => void
   currentCenter: [number, number]
+  maposaicColors: MaposaicColors
   setNewMaposaicColors: (colors: MaposaicColors) => void
   openCanvasImage: () => void
-  specificWaterColor: null | MaposaicColors
-  setSpecificWaterColor: (color: MaposaicColors | null) => void
+  specificColorTransforms: SpecificColorTransforms
+  setNewSpecificColorTransforms: (colors: SpecificColorTransforms) => void
 }
 
 const Drawer = ({
@@ -34,10 +35,11 @@ const Drawer = ({
   setNewSizeFactor,
   flyTo,
   currentCenter,
+  maposaicColors,
   setNewMaposaicColors,
   openCanvasImage,
-  specificWaterColor,
-  setSpecificWaterColor,
+  specificColorTransforms,
+  setNewSpecificColorTransforms,
 }: DrawerPropsType) => {
   const onStyleUrlChange = (event: RadioChangeEvent) => {
     setDrawerVisible(false)
@@ -71,9 +73,10 @@ const Drawer = ({
       <Divider />
       <Title level={4}>Colors</Title>
       <ColorTabs
+        maposaicColors={maposaicColors}
         setNewMaposaicColors={setNewMaposaicColors}
-        specificWaterColor={specificWaterColor}
-        setSpecificWaterColor={setSpecificWaterColor}
+        specificColorTransforms={specificColorTransforms}
+        setNewSpecificColorTransforms={setNewSpecificColorTransforms}
       />
 
       <Divider />

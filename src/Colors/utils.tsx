@@ -1,4 +1,5 @@
-import { MaposaicColors, PresetColorName, RGBColor, ColorTransforms } from 'Colors/types'
+import { MaposaicColors, PresetColorName, RGBColor } from 'Colors/types'
+import { SpecificColorTransforms } from 'Mapozaic/types'
 
 export const createRGB = (r: number, g: number, b: number): RGBColor => {
   return { r, g, b }
@@ -17,7 +18,7 @@ const intToHex = (int: number) => {
   return `${HEXA[Math.floor(int / 16)] || 0}${HEXA[int % 16] || 0}`
 }
 
-const rgbToHex = (rgb: RGBColor) => {
+export const rgbToHex = (rgb: RGBColor) => {
   return `#${intToHex(rgb.r)}${intToHex(rgb.g)}${intToHex(rgb.b)}`
 }
 
@@ -34,11 +35,14 @@ export const createColor = (colors: MaposaicColors) => {
 export const transformInitialColor = (
   initialColor: RGBColor,
   colors: MaposaicColors,
-  specificColorTransforms: ColorTransforms,
+  specificColorTransforms: SpecificColorTransforms,
 ) => {
   const initialColorHex = rgbToHex(initialColor)
   if (initialColorHex in specificColorTransforms) {
-    return createColor(specificColorTransforms[initialColorHex])
+    const transform = specificColorTransforms[initialColorHex].color
+    if (transform) {
+      return createColor(transform)
+    }
   }
 
   return createColor(colors)

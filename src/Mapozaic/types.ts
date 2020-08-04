@@ -10,3 +10,5 @@ export type PaintWorkerData = {
   roadColorThreshold: number
   similarColorTolerance: number
 }
+
+export type SpecificColorTransforms = Record<string, { color: string | null; name: string; isEditable: boolean }>

@@ -16,6 +16,7 @@ import { MaposaicColors, PresetColorName } from 'Colors/types'
 import { getTargetSizeFromSourceSize } from 'Canvas/utils'
 import { ROAD_SIMPLE_GREY, WATER_BLACK } from 'Colors/mapbox'
 import { ROAD_WHITE } from 'Colors/colors'
+import { SpecificColorTransforms } from 'Mapozaic/types'
 
 // eslint-disable-next-line
 export const MAPBOX_TOKEN: string = process.env['REACT_APP_MAPBOX_TOKEN'] || ''
@@ -76,9 +77,9 @@ const MapboxGLMap = (): JSX.Element => {
   const [currentCenter, setCurrentCenter] = useState<[number, number]>([0, 0])
   const [sizeRender, setSizeRender] = useState(0)
   const [sizeFactor, setSizeFactor] = useState(INITIAL_SIZE_FACTOR)
-  const [specificWaterColor, setSpecificWaterColor] = useState<MaposaicColors | null>(null)
-  const [specificColorTransforms, setSpecificColorTransforms] = useState<Record<string, MaposaicColors>>({
-    [ROAD_SIMPLE_GREY]: ROAD_WHITE,
+  const [specificColorTransforms, setSpecificColorTransforms] = useState<SpecificColorTransforms>({
+    [ROAD_SIMPLE_GREY]: { color: ROAD_WHITE, isEditable: true, name: 'roads' },
+    [WATER_BLACK]: { color: null, isEditable: true, name: 'water' },
   })
 
   useEffect(() => {
@@ -180,6 +181,10 @@ const MapboxGLMap = (): JSX.Element => {
     setSizeFactor(sizeFactor)
     setIsLoading(true)
   }
+  const setNewSpecificColorTransforms = (colorTransforms: SpecificColorTransforms) => {
+    setSpecificColorTransforms(colorTransforms)
+    setIsLoading(true)
+  }
 
   const flyTo = (center: [number, number]) => {
     if (!map) {
@@ -202,16 +207,6 @@ const MapboxGLMap = (): JSX.Element => {
     w.document.write(image.outerHTML)
   }
 
-  useEffect(() => {
-    const newSpecificColorTransforms = { ...specificColorTransforms }
-    if (specificWaterColor === null) {
-      delete newSpecificColorTransforms[WATER_BLACK]
-    } else {
-      newSpecificColorTransforms[WATER_BLACK] = specificWaterColor
-    }
-    setSpecificColorTransforms(newSpecificColorTransforms)
-  }, [specificWaterColor])
-
   return (
     <div className="container">
       <canvas className="mosaic-canvas" id="maposaic-cvs" />
@@ -225,11 +220,12 @@ const MapboxGLMap = (): JSX.Element => {
           mapboxStyleURL={mapboxStyleURL}
           flyTo={flyTo}
           currentCenter={currentCenter}
+          maposaicColors={maposaicColors}
           setNewMaposaicColors={setNewMaposaicColors}
           setNewSizeFactor={setNewSizeFactor}
           openCanvasImage={openCanvasImage}
-          specificWaterColor={specificWaterColor}
-          setSpecificWaterColor={setSpecificWaterColor}
+          specificColorTransforms={specificColorTransforms}
+          setNewSpecificColorTransforms={setNewSpecificColorTransforms}
         />
         <Button
           type="primary"
