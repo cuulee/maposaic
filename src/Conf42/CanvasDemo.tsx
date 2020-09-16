@@ -5,6 +5,7 @@ import { Spin } from 'antd'
 import spinner from 'assets/spinner.png'
 
 import './style.less'
+import { getRandomNumberBetween, getSourcePixelIndexFromTargetPixelIndex } from 'Conf42/utils'
 
 // eslint-disable-next-line
 export const MAPBOX_TOKEN: string = process.env['REACT_APP_MAPBOX_TOKEN'] || ''
@@ -19,59 +20,70 @@ export const MAPBOX_STYLE_URL = {
 
 const CanvasDemo = (): JSX.Element => {
   const mapContainer = useRef<HTMLDivElement | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-
-  const paintMosaic = async (newMap: mapboxgl.Map): Promise<void> => {
-    setIsLoading(false)
-    const mosaicCanvas = document.getElementById('mosaic-canvas') as HTMLCanvasElement
-
-    const mosaicContext = mosaicCanvas.getContext('2d')
-    if (!mosaicContext) {
-      return
-    }
-    // mosaicCanvas.width = 500
-    // mosaicCanvas.height = 1
-    const mapboxCanvas = newMap.getCanvas()
-    const mapboxContext = mapboxCanvas.getContext('webgl')
-    if (!mapboxContext) {
-      return
-    }
-    mosaicCanvas.width = mapboxContext.drawingBufferWidth
-    mosaicCanvas.height = mapboxContext.drawingBufferHeight
-    mosaicCanvas.style.width = Math.floor(mapboxContext.drawingBufferWidth / 2).toString() + 'px'
-    mosaicCanvas.style.height = Math.floor(mapboxContext.drawingBufferHeight / 2).toString() + 'px'
-
-    console.log('size', mosaicCanvas.width, mosaicCanvas.height)
-    mosaicContext.fillStyle = 'green'
-    mosaicContext.fillRect(0, 0, mosaicCanvas.width, mosaicCanvas.height)
-
-    const mosaicImageData = mosaicContext.getImageData(0, 0, mosaicCanvas.width, mosaicCanvas.height)
-    const mosaicData = mosaicImageData.data
-    for (let i = 0; i < mosaicCanvas.width * mosaicCanvas.height; i++) {
-      mosaicData[i * 4] = Math.random() * 255
-      mosaicData[i * 4 + 1] = Math.random() * 255
-      mosaicData[i * 4 + 2] = Math.random() * 255
-    }
-
-    mosaicContext.putImageData(mosaicImageData, 0, 0)
-  }
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    const newMap = new mapboxgl.Map({
-      container: mapContainer.current ? mapContainer.current : '',
-      style: MAPBOX_STYLE_URL.road,
-      zoom: 12,
-      center: new mapboxgl.LngLat(2.338272, 48.858796),
-    })
+    const paintMosaic = async (map: mapboxgl.Map): Promise<void> => {
+      setIsLoading(true)
+      const mosaicCanvas = document.getElementById('mosaic-canvas') as HTMLCanvasElement
 
-    newMap.on('render', () => {
-      if (!newMap.loaded() || newMap.isMoving() || newMap.isZooming()) {
+      const mosaicContext = mosaicCanvas.getContext('2d')
+      if (!mosaicContext) {
         return
       }
-      paintMosaic(newMap)
+      // mosaicCanvas.width = 500
+      // mosaicCanvas.height = 1
+      const mapboxCanvas = map.getCanvas()
+      const mapboxContext = mapboxCanvas.getContext('webgl')
+      if (!mapboxContext) {
+        return
+      }
+      mosaicCanvas.width = mapboxContext.drawingBufferWidth
+      mosaicCanvas.height = mapboxContext.drawingBufferHeight
+      mosaicCanvas.style.width = Math.floor(mapboxContext.drawingBufferWidth / 2).toString() + 'px'
+      mosaicCanvas.style.height = Math.floor(mapboxContext.drawingBufferHeight / 2).toString() + 'px'
+
+      console.log('size', mosaicCanvas.width, mosaicCanvas.height)
+
+      const mapboxPixels = new Uint8Array(mapboxContext.drawingBufferWidth * mapboxContext.drawingBufferHeight * 4)
+      mapboxContext.readPixels(
+        0,
+        0,
+        mapboxContext.drawingBufferWidth,
+        mapboxContext.drawingBufferHeight,
+        mapboxContext.RGBA,
+        mapboxContext.UNSIGNED_BYTE,
+        mapboxPixels,
+      )
+
+      const canvasSize = { w: mapboxContext.drawingBufferWidth, h: mapboxContext.drawingBufferHeight }
+
+      const mosaicImageData = mosaicContext.getImageData(0, 0, mosaicCanvas.width, mosaicCanvas.height)
+      for (let i = 0; i < mosaicCanvas.width * mosaicCanvas.height; i++) {
+        const mapboxIndex = getSourcePixelIndexFromTargetPixelIndex({ targetPixelIndex: i, canvasSize })
+        mosaicImageData.data[i * 4] = mapboxPixels[mapboxIndex * 4]
+        mosaicImageData.data[i * 4 + 1] = mapboxPixels[mapboxIndex * 4 + 1]
+        mosaicImageData.data[i * 4 + 2] = mapboxPixels[mapboxIndex * 4 + 2]
+        mosaicImageData.data[i * 4 + 3] = 255
+      }
+      mosaicContext.putImageData(mosaicImageData, 0, 0)
+      setIsLoading(false)
+    }
+    const map = new mapboxgl.Map({
+      container: mapContainer.current ? mapContainer.current : '',
+      style: MAPBOX_STYLE_URL.regular,
+      zoom: getRandomNumberBetween(0, 20),
+      center: new mapboxgl.LngLat(getRandomNumberBetween(-1, 14), getRandomNumberBetween(40, 50)),
+    })
+    ////2.338272, 48.858796
+    map.on('render', () => {
+      if (!map.loaded() || map.isMoving() || map.isZooming()) {
+        return
+      }
+      paintMosaic(map)
     })
     return () => {
-      newMap.remove()
+      map.remove()
     }
   }, [])
 
