@@ -16,6 +16,7 @@ export const MAPBOX_STYLE_URL = {
   water: 'mapbox://styles/cartapuce/ck8ynyj0x022h1hpmffi87im9',
   administrative: 'mapbox://styles/cartapuce/ck8vkvxjt27z71ila3b3jecka',
   regular: 'mapbox://styles/mapbox/streets-v11',
+  satellite: 'mapbox://styles/mapbox/satellite-v9',
 }
 
 const CanvasDemo = (): JSX.Element => {
@@ -71,7 +72,7 @@ const CanvasDemo = (): JSX.Element => {
     }
     const map = new mapboxgl.Map({
       container: mapContainer.current ? mapContainer.current : '',
-      style: MAPBOX_STYLE_URL.regular,
+      style: MAPBOX_STYLE_URL.satellite,
       zoom: getRandomNumberBetween(0, 20),
       center: new mapboxgl.LngLat(getRandomNumberBetween(-1, 14), getRandomNumberBetween(40, 50)),
     })
