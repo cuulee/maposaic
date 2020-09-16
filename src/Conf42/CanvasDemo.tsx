@@ -23,6 +23,37 @@ const CanvasDemo = (): JSX.Element => {
 
   const paintMosaic = async (newMap: mapboxgl.Map): Promise<void> => {
     setIsLoading(false)
+    const mosaicCanvas = document.getElementById('mosaic-canvas') as HTMLCanvasElement
+
+    const mosaicContext = mosaicCanvas.getContext('2d')
+    if (!mosaicContext) {
+      return
+    }
+    // mosaicCanvas.width = 500
+    // mosaicCanvas.height = 1
+    const mapboxCanvas = newMap.getCanvas()
+    const mapboxContext = mapboxCanvas.getContext('webgl')
+    if (!mapboxContext) {
+      return
+    }
+    mosaicCanvas.width = mapboxContext.drawingBufferWidth
+    mosaicCanvas.height = mapboxContext.drawingBufferHeight
+    mosaicCanvas.style.width = Math.floor(mapboxContext.drawingBufferWidth / 2).toString() + 'px'
+    mosaicCanvas.style.height = Math.floor(mapboxContext.drawingBufferHeight / 2).toString() + 'px'
+
+    console.log('size', mosaicCanvas.width, mosaicCanvas.height)
+    mosaicContext.fillStyle = 'green'
+    mosaicContext.fillRect(0, 0, mosaicCanvas.width, mosaicCanvas.height)
+
+    const mosaicImageData = mosaicContext.getImageData(0, 0, mosaicCanvas.width, mosaicCanvas.height)
+    const mosaicData = mosaicImageData.data
+    for (let i = 0; i < mosaicCanvas.width * mosaicCanvas.height; i++) {
+      mosaicData[i * 4] = Math.random() * 255
+      mosaicData[i * 4 + 1] = Math.random() * 255
+      mosaicData[i * 4 + 2] = Math.random() * 255
+    }
+
+    mosaicContext.putImageData(mosaicImageData, 0, 0)
   }
 
   useEffect(() => {
@@ -46,7 +77,7 @@ const CanvasDemo = (): JSX.Element => {
 
   return (
     <div className="container">
-      <div className="mapbox-canvas" id="mapbox-canvas" ref={(el) => (mapContainer.current = el)} />
+      <div className="mapbox-container" id="mapbox-container" ref={(el) => (mapContainer.current = el)} />
       <div className="mosaic-container">
         <canvas className="mosaic-canvas" id="mosaic-canvas" />
         {isLoading && (
