@@ -34,3 +34,10 @@ export const getSourcePixelIndexFromTargetPixelIndex = ({
   const sourcePoint = getSourcePointFromTargetPoint(targetPoint, canvasSize)
   return getPixelIndexFromPoint(sourcePoint, canvasSize.w)
 }
+
+export const getAdjacentPoints = ({ point, canvasSize }: { point: imagePoint; canvasSize: Size }) => ({
+  S: point.y < canvasSize.h - 1 ? { x: point.x, y: point.y + 1 } : null,
+  E: point.x < canvasSize.w - 1 ? { x: point.x + 1, y: point.y } : null,
+  O: point.x > 0 ? { x: point.x - 1, y: point.y } : null,
+  N: point.y > 0 ? { x: point.x, y: point.y - 1 } : null,
+})

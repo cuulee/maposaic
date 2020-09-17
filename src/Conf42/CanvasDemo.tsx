@@ -6,6 +6,7 @@ import spinner from 'assets/spinner.png'
 
 import './style.less'
 import { getRandomNumberBetween, getSourcePixelIndexFromTargetPixelIndex } from 'Conf42/utils'
+import { CanvasDataTransformer } from 'Conf42/CanvasDataTransformer'
 
 // eslint-disable-next-line
 export const MAPBOX_TOKEN: string = process.env['REACT_APP_MAPBOX_TOKEN'] || ''
@@ -16,7 +17,7 @@ export const MAPBOX_STYLE_URL = {
   water: 'mapbox://styles/cartapuce/ck8ynyj0x022h1hpmffi87im9',
   administrative: 'mapbox://styles/cartapuce/ck8vkvxjt27z71ila3b3jecka',
   regular: 'mapbox://styles/mapbox/streets-v11',
-  satellite: 'mapbox://styles/mapbox/satellite-v9',
+  satellite: 'mapbox://styles/mapbox/satellite-streets-v11',
 }
 
 const CanvasDemo = (): JSX.Element => {
@@ -60,20 +61,20 @@ const CanvasDemo = (): JSX.Element => {
       const canvasSize = { w: mapboxContext.drawingBufferWidth, h: mapboxContext.drawingBufferHeight }
 
       const mosaicImageData = mosaicContext.getImageData(0, 0, mosaicCanvas.width, mosaicCanvas.height)
-      for (let i = 0; i < mosaicCanvas.width * mosaicCanvas.height; i++) {
-        const mapboxIndex = getSourcePixelIndexFromTargetPixelIndex({ targetPixelIndex: i, canvasSize })
-        mosaicImageData.data[i * 4] = mapboxPixels[mapboxIndex * 4]
-        mosaicImageData.data[i * 4 + 1] = mapboxPixels[mapboxIndex * 4 + 1]
-        mosaicImageData.data[i * 4 + 2] = mapboxPixels[mapboxIndex * 4 + 2]
-        mosaicImageData.data[i * 4 + 3] = 255
-      }
+
+      const canvasDataTransformer = new CanvasDataTransformer(mapboxPixels, mosaicImageData.data, canvasSize)
+
+      canvasDataTransformer.paintTargetData()
+
+      mosaicImageData.data.set(canvasDataTransformer.targetPixelArray)
+
       mosaicContext.putImageData(mosaicImageData, 0, 0)
       setIsLoading(false)
     }
     const map = new mapboxgl.Map({
       container: mapContainer.current ? mapContainer.current : '',
-      style: MAPBOX_STYLE_URL.satellite,
-      zoom: getRandomNumberBetween(0, 20),
+      style: MAPBOX_STYLE_URL.road,
+      zoom: getRandomNumberBetween(0, 18),
       center: new mapboxgl.LngLat(getRandomNumberBetween(-1, 14), getRandomNumberBetween(40, 50)),
     })
     ////2.338272, 48.858796
@@ -81,7 +82,9 @@ const CanvasDemo = (): JSX.Element => {
       if (!map.loaded() || map.isMoving() || map.isZooming()) {
         return
       }
-      paintMosaic(map)
+      if (!isLoading) {
+        paintMosaic(map)
+      }
     })
     return () => {
       map.remove()
