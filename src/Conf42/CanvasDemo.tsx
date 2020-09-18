@@ -9,6 +9,12 @@ import { getRandomNumberBetween, getSourcePixelIndexFromTargetPixelIndex } from 
 import { CanvasDataTransformer } from 'Conf42/CanvasDataTransformer'
 
 // eslint-disable-next-line
+import Worker from 'worker-loader!./canvas.worker.ts'
+import { WorkerPayload, WorkerResponse } from 'Conf42/canvas.worker'
+
+let worker = new Worker()
+
+// eslint-disable-next-line
 export const MAPBOX_TOKEN: string = process.env['REACT_APP_MAPBOX_TOKEN'] || ''
 mapboxgl.accessToken = MAPBOX_TOKEN
 
@@ -22,7 +28,7 @@ export const MAPBOX_STYLE_URL = {
 
 const CanvasDemo = (): JSX.Element => {
   const mapContainer = useRef<HTMLDivElement | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const paintMosaic = async (map: mapboxgl.Map): Promise<void> => {
@@ -47,7 +53,7 @@ const CanvasDemo = (): JSX.Element => {
 
       console.log('size', mosaicCanvas.width, mosaicCanvas.height)
 
-      const mapboxPixels = new Uint8Array(mapboxContext.drawingBufferWidth * mapboxContext.drawingBufferHeight * 4)
+      const mapboxPixelsArray = new Uint8Array(mapboxContext.drawingBufferWidth * mapboxContext.drawingBufferHeight * 4)
       mapboxContext.readPixels(
         0,
         0,
@@ -55,21 +61,30 @@ const CanvasDemo = (): JSX.Element => {
         mapboxContext.drawingBufferHeight,
         mapboxContext.RGBA,
         mapboxContext.UNSIGNED_BYTE,
-        mapboxPixels,
+        mapboxPixelsArray,
       )
 
       const canvasSize = { w: mapboxContext.drawingBufferWidth, h: mapboxContext.drawingBufferHeight }
-
       const mosaicImageData = mosaicContext.getImageData(0, 0, mosaicCanvas.width, mosaicCanvas.height)
 
-      const canvasDataTransformer = new CanvasDataTransformer(mapboxPixels, mosaicImageData.data, canvasSize)
+      const workerPayload: WorkerPayload = {
+        sourcePixels: mapboxPixelsArray,
+        targetPixels: mosaicImageData.data,
+        canvasSize,
+      }
+      worker.postMessage(workerPayload)
 
-      canvasDataTransformer.paintTargetData()
+      worker.dispatchEvent(new Event('yolo'))
 
-      mosaicImageData.data.set(canvasDataTransformer.targetPixelArray)
-
-      mosaicContext.putImageData(mosaicImageData, 0, 0)
-      setIsLoading(false)
+      worker.onmessage = ({ data }: { data: WorkerResponse }) => {
+        if (typeof data === 'string') {
+          console.log('main thread', data)
+          return
+        }
+        mosaicImageData.data.set(data)
+        mosaicContext.putImageData(mosaicImageData, 0, 0)
+        setIsLoading(false)
+      }
     }
     const map = new mapboxgl.Map({
       container: mapContainer.current ? mapContainer.current : '',
@@ -82,9 +97,9 @@ const CanvasDemo = (): JSX.Element => {
       if (!map.loaded() || map.isMoving() || map.isZooming()) {
         return
       }
-      if (!isLoading) {
-        paintMosaic(map)
-      }
+      worker.terminate()
+      worker = new Worker()
+      paintMosaic(map)
     })
     return () => {
       map.remove()

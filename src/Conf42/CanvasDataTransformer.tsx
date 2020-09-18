@@ -82,7 +82,7 @@ export class CanvasDataTransformer {
         b: this.sourcePixelArray[sourcePixelIndex * 4 + 2],
       }
 
-      if (targetPointColor.r !== initialColor.r) {
+      if (Math.abs(targetPointColor.r - initialColor.r) > 0) {
         continue
       }
 
