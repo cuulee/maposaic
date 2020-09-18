@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import mapboxgl from 'mapbox-gl'
-// import 'mapbox-gl/dist/mapbox-gl.css'
+import 'mapbox-gl/dist/mapbox-gl.css'
 import { Button } from 'antd'
 import { RightCircleFilled } from '@ant-design/icons'
 import { Spin } from 'antd'
