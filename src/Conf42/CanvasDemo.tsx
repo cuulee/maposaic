@@ -72,6 +72,7 @@ const CanvasDemo = (): JSX.Element => {
         targetPixels: mosaicImageData.data,
         canvasSize,
       }
+      console.log('work', worker)
       worker.postMessage(workerPayload)
 
       worker.dispatchEvent(new Event('yolo'))

@@ -5,9 +5,6 @@ import { Size } from 'Conf42/utils'
 const ctx: Worker = self as any
 
 // Respond to message from parent thread
-ctx.addEventListener('yolo', (event) => {
-  console.log('ici worker', event)
-})
 
 export type WorkerPayload = {
   sourcePixels: Uint8Array
@@ -17,6 +14,7 @@ export type WorkerPayload = {
 export type WorkerResponse = Uint8ClampedArray | string
 
 ctx.onmessage = ({ data: { sourcePixels, targetPixels, canvasSize } }: { data: WorkerPayload }) => {
+  console.log('worker')
   ctx.postMessage('lets work on this')
 
   const canvasDataTransformer = new CanvasDataTransformer(sourcePixels, targetPixels, canvasSize)
