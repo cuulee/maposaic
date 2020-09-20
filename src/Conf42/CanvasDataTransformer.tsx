@@ -1,7 +1,10 @@
-import { Size, imagePoint } from 'Canvas/types'
-import { RGBColor } from 'Colors/types'
-import { getSourcePixelIndexFromTargetPixelIndex, getAdjacentPoints } from './utils'
-import { getPointFromPixelIndex, getPixelIndexFromPoint } from 'Canvas/utils'
+import { Size, imagePoint, RGBColor } from './types'
+import {
+  getSourcePixelIndexFromTargetPixelIndex,
+  getAdjacentPoints,
+  getPointFromPixelIndex,
+  getPixelIndexFromPoint,
+} from './utils'
 
 export class CanvasDataTransformer {
   sourcePixelArray: Uint8Array

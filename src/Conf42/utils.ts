@@ -7,6 +7,15 @@ export type Size = {
   h: number
 }
 
+// eslint-disable-next-line
+export const MAPBOX_TOKEN: string = process.env['REACT_APP_MAPBOX_TOKEN'] || ''
+
+export type WorkerPayload = {
+  sourcePixels: Uint8Array
+  targetPixels: Uint8ClampedArray
+  size: Size
+}
+
 export type imagePoint = { x: number; y: number }
 
 export const getPointFromPixelIndex = (pixelIndex: number, canvasWidth: number): imagePoint => {
