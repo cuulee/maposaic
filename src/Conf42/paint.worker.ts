@@ -1,11 +1,14 @@
+import { CanvasDataTransformer } from 'Conf42/CanvasDataTransformer'
+import { WorkerPayload } from 'Conf42/types'
+
 const ctx: Worker = self as any
 
-export type WorkerResponse = Uint8ClampedArray
+ctx.onmessage = ({ data: { sourcePixelArray, targetPixelArray, size } }: { data: WorkerPayload }) => {
+  console.log('working on this')
+  const transformer = new CanvasDataTransformer(sourcePixelArray, targetPixelArray, size)
+  transformer.paintTargetData()
 
-// Respond to message from parent thread
-ctx.onmessage = (ev) => {
-  console.log('worker', ev)
-  ctx.postMessage('gotit')
+  ctx.postMessage(transformer.targetPixelArray)
 }
 
 export {}
