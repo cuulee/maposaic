@@ -6,3 +6,11 @@ export type Size = {
 export type imagePoint = { x: number; y: number }
 
 export type RGBColor = { r: number; g: number; b: number }
+
+export type WorkerResponse = Uint8ClampedArray
+
+export type WorkerPayload = {
+  sourcePixelArray: Uint8Array
+  targetPixelArray: Uint8ClampedArray
+  size: Size
+}
