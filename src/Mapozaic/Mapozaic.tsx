@@ -70,7 +70,7 @@ const setMapboxDisplaySize = () => {
 const getMapboxPixelCount = (map: mapboxgl.Map) => {
   const mapboxCanvas = map.getCanvas()
   const gl = mapboxCanvas.getContext('webgl')
-  return (gl?.drawingBufferHeight ?? 0) * (gl?.drawingBufferHeight || 0)
+  return (gl?.drawingBufferWidth ?? 0) * (gl?.drawingBufferHeight || 0)
 }
 
 const computeTime: { pixelCount: number | null; milliseconds: number | null } = {

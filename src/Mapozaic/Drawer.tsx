@@ -102,12 +102,14 @@ const Drawer = ({
         </Tooltip>
       </Title>
       <div className="granularity">
-        <InputNumber min={1} max={10} step={0.1} value={localSizeFactor} onChange={onGranularityChange} />
-        {(remainingTime || estimatedTime) && (
-          <Badge className="granularity__time" count={<ClockCircleOutlined style={{ color: '#e53f67' }} />}>
-            <span className="granularity__time__box">{millisecondsToText(remainingTime || estimatedTime)}</span>
-          </Badge>
-        )}
+        <InputNumber
+          min={1}
+          max={10}
+          step={0.1}
+          value={localSizeFactor}
+          onChange={onGranularityChange}
+          style={{ width: '68px' }}
+        />
         <Button
           className="granularity__paint"
           shape="circle"
@@ -116,6 +118,11 @@ const Drawer = ({
         >
           <FormatPainterOutlined />
         </Button>
+        {(remainingTime || estimatedTime) && (
+          <Badge className="granularity__time" count={<ClockCircleOutlined style={{ color: '#e53f67' }} />}>
+            <span className="granularity__time__box">{millisecondsToText(remainingTime || estimatedTime)}</span>
+          </Badge>
+        )}
       </div>
       <Divider />
       <Radio.Group onChange={onStyleUrlChange} value={mapboxStyleURL}>
