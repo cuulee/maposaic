@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Drawer as AntDrawer, Radio, Divider, Button, InputNumber, Tooltip } from 'antd'
 import { RadioChangeEvent } from 'antd/lib/radio'
 import Title from 'antd/lib/typography/Title'
-import { InfoCircleOutlined } from '@ant-design/icons'
+import { FormatPainterOutlined, InfoCircleOutlined } from '@ant-design/icons'
+import { Badge } from 'antd'
+import { ClockCircleOutlined } from '@ant-design/icons'
 
-import { MAPBOX_STYLE_URL, INITIAL_SIZE_FACTOR } from './Mapozaic'
+import { MAPBOX_STYLE_URL } from './Mapozaic'
 import GeoSearch from './GeoSearchInput'
 import { MaposaicColors } from 'Colors/types'
 
@@ -17,6 +19,7 @@ export type DrawerPropsType = {
   setDrawerVisible: (visible: boolean) => void
   mapboxStyleURL: string
   changeMapStyle: (style: string) => void
+  sizeFactor: number
   setNewSizeFactor: (sizeFactor: number) => void
   flyTo: (center: [number, number]) => void
   currentCenter: [number, number]
@@ -25,6 +28,17 @@ export type DrawerPropsType = {
   openCanvasImage: () => void
   specificColorTransforms: SpecificColorTransforms
   setNewSpecificColorTransforms: (colors: SpecificColorTransforms) => void
+  remainingTime: number | null
+  estimatedTime: number | null
+  updateEstimatedTime: (sizeFactor: number) => void
+}
+
+const millisecondsToText = (millis: number | null) => {
+  const min = Math.floor((millis || 0) / 60000)
+  const ms = (millis || 0) % 60000
+  const s = Math.floor(ms / 1000)
+  const ds = Math.floor((ms % 1000) / 100)
+  return `${min > 0 ? `${min}:` : ''}${min && s < 10 ? `0${s}` : s}${min > 0 ? '' : `.${ds}s`}`
 }
 
 const Drawer = ({
@@ -32,6 +46,7 @@ const Drawer = ({
   setDrawerVisible,
   mapboxStyleURL,
   changeMapStyle,
+  sizeFactor,
   setNewSizeFactor,
   flyTo,
   currentCenter,
@@ -40,25 +55,25 @@ const Drawer = ({
   openCanvasImage,
   specificColorTransforms,
   setNewSpecificColorTransforms,
+  remainingTime,
+  estimatedTime,
+  updateEstimatedTime,
 }: DrawerPropsType) => {
   const onStyleUrlChange = (event: RadioChangeEvent) => {
     setDrawerVisible(false)
     changeMapStyle(event.target.value)
   }
-  const [localSizeFactor, setLocalSizeFactor] = useState(INITIAL_SIZE_FACTOR)
+  const [localSizeFactor, setLocalSizeFactor] = useState(sizeFactor)
 
-  useEffect(() => {
-    const chrono = setTimeout(() => setNewSizeFactor(localSizeFactor), 400)
-    return () => {
-      clearTimeout(chrono)
-    }
-    // eslint-disable-next-line
-  }, [localSizeFactor])
-
-  const onNumberInputChange = (value: number | undefined | string) => {
+  const onGranularityChange = (value: number | undefined | string) => {
     if (value !== undefined && typeof value !== 'string') {
+      updateEstimatedTime(value)
       setLocalSizeFactor(value)
     }
+  }
+
+  const applyGranularity = () => {
+    setNewSizeFactor(localSizeFactor)
   }
 
   return (
@@ -86,7 +101,22 @@ const Drawer = ({
           <InfoCircleOutlined />
         </Tooltip>
       </Title>
-      <InputNumber min={1} max={10} step={0.1} value={localSizeFactor} onChange={onNumberInputChange} />
+      <div className="granularity">
+        <InputNumber min={1} max={10} step={0.1} value={localSizeFactor} onChange={onGranularityChange} />
+        {(remainingTime || estimatedTime) && (
+          <Badge className="granularity__time" count={<ClockCircleOutlined style={{ color: '#e53f67' }} />}>
+            <span className="granularity__time__box">{millisecondsToText(remainingTime || estimatedTime)}</span>
+          </Badge>
+        )}
+        <Button
+          className="granularity__paint"
+          shape="circle"
+          disabled={sizeFactor === localSizeFactor}
+          onClick={applyGranularity}
+        >
+          <FormatPainterOutlined />
+        </Button>
+      </div>
       <Divider />
       <Radio.Group onChange={onStyleUrlChange} value={mapboxStyleURL}>
         <Radio value={MAPBOX_STYLE_URL.road}>Road boundaries</Radio>

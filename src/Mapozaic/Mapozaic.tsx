@@ -26,6 +26,7 @@ export const MAPBOX_STYLE_URL = {
   road: 'mapbox://styles/cartapuce/ck8vk01zo2e5w1ipmytroxgf4',
   water: 'mapbox://styles/cartapuce/ck8ynyj0x022h1hpmffi87im9',
   administrative: 'mapbox://styles/cartapuce/ck8vkvxjt27z71ila3b3jecka',
+  satellite: 'mapbox://styles/mapbox/satellite-v9',
   // regular: 'mapbox://styles/mapbox/streets-v11',
 }
 
@@ -66,9 +67,25 @@ const setMapboxDisplaySize = () => {
   mapboxWrapper.style.height = ''
 }
 
+const getMapboxPixelCount = (map: mapboxgl.Map) => {
+  const mapboxCanvas = map.getCanvas()
+  const gl = mapboxCanvas.getContext('webgl')
+  return (gl?.drawingBufferHeight ?? 0) * (gl?.drawingBufferHeight || 0)
+}
+
+const computeTime: { pixelCount: number | null; milliseconds: number | null } = {
+  pixelCount: null,
+  milliseconds: null,
+}
+
+let lastStartDate = new Date()
+
 const MapboxGLMap = (): JSX.Element => {
   const [map, setMap] = useState<mapboxgl.Map | null>(null)
   const mapContainer = useRef<HTMLDivElement | null>(null)
+
+  const [estimatedTime, setEstimatedTime] = useState<number | null>(null)
+  const [remainingTime, setRemainingTime] = useState<number | null>(null)
 
   const [mapboxStyleURL, setMapboxStyleURL] = useState(MAPBOX_STYLE_URL.road)
   const [maposaicColors, setMaposaicColors] = useState<MaposaicColors>(PresetColorName.Random)
@@ -124,6 +141,17 @@ const MapboxGLMap = (): JSX.Element => {
         maposaicContext.putImageData(imageData, 0, 0)
         toggleCanvasOpacity(false)
         setIsLoading(false)
+        setRemainingTime(0)
+
+        const pixelCount = Math.floor(e.data.pixels.length / 4)
+
+        if (pixelCount >= (computeTime.pixelCount ?? 0)) {
+          computeTime.pixelCount = Math.floor(e.data.pixels.length / 4)
+          computeTime.milliseconds = new Date().getTime() - lastStartDate.getTime()
+        }
+        if (estimatedTime === null) {
+          setEstimatedTime(computeTime.milliseconds)
+        }
       }
     }
 
@@ -155,6 +183,11 @@ const MapboxGLMap = (): JSX.Element => {
         return
       }
       paintWorker.terminate()
+
+      const pixelCount = getMapboxPixelCount(newMap)
+      setRemainingTime(Math.round(((computeTime.milliseconds || 0) * pixelCount) / (computeTime.pixelCount || 1)))
+
+      lastStartDate = new Date()
       paintWorker = new PaintWorker()
       paintMosaic(newMap)
       setCurrentCenter([newMap.getCenter().lng, newMap.getCenter().lat])
@@ -207,6 +240,28 @@ const MapboxGLMap = (): JSX.Element => {
     w.document.write(image.outerHTML)
   }
 
+  useEffect(() => {
+    if (!remainingTime || remainingTime <= 0) {
+      return
+    }
+
+    const interval = setInterval(() => {
+      setRemainingTime(Math.max(Math.round(remainingTime - 200), 0))
+    }, 200)
+    return () => clearInterval(interval)
+  }, [remainingTime])
+
+  const updateEstimatedTime = (pendingSizeFactor: number) => {
+    if (!map) {
+      return
+    }
+    const pixelCount = getMapboxPixelCount(map)
+    setEstimatedTime(
+      Math.round(((computeTime.milliseconds || 0) * pixelCount) / (computeTime.pixelCount || 1)) *
+        Math.pow(pendingSizeFactor / sizeFactor, 2),
+    )
+  }
+
   return (
     <div className="container">
       <canvas className="mosaic-canvas" id="maposaic-cvs" />
@@ -222,10 +277,14 @@ const MapboxGLMap = (): JSX.Element => {
           currentCenter={currentCenter}
           maposaicColors={maposaicColors}
           setNewMaposaicColors={setNewMaposaicColors}
+          sizeFactor={sizeFactor}
           setNewSizeFactor={setNewSizeFactor}
           openCanvasImage={openCanvasImage}
           specificColorTransforms={specificColorTransforms}
           setNewSpecificColorTransforms={setNewSpecificColorTransforms}
+          remainingTime={remainingTime}
+          estimatedTime={estimatedTime}
+          updateEstimatedTime={updateEstimatedTime}
         />
         <Button
           type="primary"
