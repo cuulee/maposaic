@@ -31,6 +31,7 @@ export type DrawerPropsType = {
   remainingTime: number | null
   estimatedTime: number | null
   updateEstimatedTime: (sizeFactor: number) => void
+  onPosterSizeChange: () => void
 }
 
 const millisecondsToText = (millis: number | null) => {
@@ -40,6 +41,8 @@ const millisecondsToText = (millis: number | null) => {
   const ds = Math.floor((ms % 1000) / 100)
   return `${min > 0 ? `${min}:` : ''}${min && s < 10 ? `0${s}` : s}${min > 0 ? '' : `.${ds}s`}`
 }
+
+const radioStyle = { display: 'flex', justifyContent: 'center', alignItems: 'center' }
 
 const Drawer = ({
   visible,
@@ -58,14 +61,16 @@ const Drawer = ({
   remainingTime,
   estimatedTime,
   updateEstimatedTime,
+  onPosterSizeChange,
 }: DrawerPropsType) => {
   const onStyleUrlChange = (event: RadioChangeEvent) => {
     setDrawerVisible(false)
     changeMapStyle(event.target.value)
   }
   const [localSizeFactor, setLocalSizeFactor] = useState(sizeFactor)
+  const [isLandscape, setIsLandscape] = useState<boolean | null>(null)
 
-  const onGranularityChange = (value: number | undefined | string) => {
+  const onScaleChange = (value: number | undefined | string) => {
     if (value !== undefined && typeof value !== 'string') {
       updateEstimatedTime(value)
       setLocalSizeFactor(value)
@@ -74,6 +79,11 @@ const Drawer = ({
 
   const applyGranularity = () => {
     setNewSizeFactor(localSizeFactor)
+  }
+
+  const handleOrientationChange = (e: RadioChangeEvent) => {
+    setIsLandscape(e.target.value)
+    onPosterSizeChange()
   }
 
   return (
@@ -96,22 +106,22 @@ const Drawer = ({
 
       <Divider />
       <Title level={4}>
-        Granularity{' '}
-        <Tooltip title="Increase size and... waiting time">
+        Scale
+        <Tooltip className="scale-tooltip" title="Increase size and... waiting time">
           <InfoCircleOutlined />
         </Tooltip>
       </Title>
-      <div className="granularity">
+      <div className="scale">
         <InputNumber
           min={1}
           max={10}
           step={0.1}
           value={localSizeFactor}
-          onChange={onGranularityChange}
+          onChange={onScaleChange}
           style={{ width: '68px' }}
         />
         <Button
-          className="granularity__paint"
+          className="scale__paint"
           shape="circle"
           disabled={sizeFactor === localSizeFactor}
           onClick={applyGranularity}
@@ -119,8 +129,8 @@ const Drawer = ({
           <FormatPainterOutlined />
         </Button>
         {(remainingTime || estimatedTime) && (
-          <Badge className="granularity__time" count={<ClockCircleOutlined style={{ color: '#e53f67' }} />}>
-            <span className="granularity__time__box">{millisecondsToText(remainingTime || estimatedTime)}</span>
+          <Badge className="scale__time" count={<ClockCircleOutlined style={{ color: '#e53f67' }} />}>
+            <span className="scale__time__box">{millisecondsToText(remainingTime || estimatedTime)}</span>
           </Badge>
         )}
       </div>
@@ -131,6 +141,30 @@ const Drawer = ({
         <Radio value={MAPBOX_STYLE_URL.administrative}>Administrative boundaries</Radio>
       </Radio.Group>
       <Divider />
+      <div>
+        <Radio.Group
+          style={{ display: 'flex', alignItems: 'center' }}
+          name="preset"
+          onChange={handleOrientationChange}
+          value={isLandscape}
+          size="small"
+        >
+          <Radio.Button style={{ width: '29px', height: '21px', ...radioStyle }} value={true}>
+            A
+          </Radio.Button>
+          <Radio.Button
+            style={{
+              width: '21px',
+              height: '29px',
+              marginLeft: '8px',
+              ...radioStyle,
+            }}
+            value={false}
+          >
+            A
+          </Radio.Button>
+        </Radio.Group>
+      </div>
       <Button className="open-button" onClick={openCanvasImage}>
         Open map image in new window
       </Button>
