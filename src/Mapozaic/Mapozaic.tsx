@@ -18,6 +18,12 @@ import { ROAD_SIMPLE_GREY, WATER_BLACK } from 'Colors/mapbox'
 import { ROAD_WHITE } from 'Colors/colors'
 import { SpecificColorTransforms } from 'Mapozaic/types'
 import { Size } from 'Canvas/types'
+import {
+  resizeMapsContainer,
+  setMapboxArtificialSize,
+  setMapboxDisplaySize,
+  toggleCanvasOpacity,
+} from 'Mapozaic/elementHelpers'
 
 // eslint-disable-next-line
 export const MAPBOX_TOKEN: string = process.env['REACT_APP_MAPBOX_TOKEN'] || ''
@@ -44,52 +50,7 @@ let paintWorker = new PaintWorker()
 let displayWidth = 0
 let displayHeight = 0
 
-const toggleCanvasOpacity = (isMapbox: boolean): void => {
-  const mapboxElement = document.getElementById('mapbox-wrapper')
-  const mosaicCanvas = document.getElementById('maposaic-canvas')
-  if (!mapboxElement || !mosaicCanvas) {
-    return
-  }
-  mapboxElement.style.opacity = isMapbox ? '1' : '0'
-  mosaicCanvas.style.opacity = isMapbox ? '0' : '1'
-}
-
-const setMapboxArtificialSize = (sizeFactor: number) => {
-  const mapboxWrapper = document.getElementById('mapbox-wrapper')
-  if (!mapboxWrapper) {
-    return
-  }
-  displayWidth = mapboxWrapper.offsetWidth // remember previous value
-  displayHeight = mapboxWrapper.offsetHeight
-  mapboxWrapper.style.width = (displayWidth * sizeFactor).toString() + 'px'
-  mapboxWrapper.style.height = (displayHeight * sizeFactor).toString() + 'px'
-}
-
-const setMapboxDisplaySize = () => {
-  const mapboxCanvas = document.getElementsByClassName('mapboxgl-canvas')[0] as HTMLElement
-  const mapboxWrapper = document.getElementById('mapbox-wrapper')
-  if (!mapboxCanvas || !mapboxWrapper) {
-    return
-  }
-  mapboxCanvas.style.width = displayWidth.toString() + 'px'
-  mapboxCanvas.style.height = displayHeight.toString() + 'px'
-  mapboxWrapper.style.width = displayWidth.toString() + 'px'
-  mapboxWrapper.style.height = displayHeight.toString() + 'px'
-}
-
-const resizeMapsContainer = (size: Size) => {
-  const container = document.getElementById('maps-container')
-  const mapboxWrapper = document.getElementById('mapbox-wrapper')
-  const mosaicCanvas = document.getElementById('maposaic-canvas')
-  if (!container || !mapboxWrapper || !mosaicCanvas) {
-    return
-  }
-  container.style.width = size.w.toString() + 'px'
-  container.style.height = size.h.toString() + 'px'
-  mapboxWrapper.style.width = size.w.toString() + 'px'
-  mapboxWrapper.style.height = size.h.toString() + 'px'
-  mosaicCanvas.style.width = size.w.toString() + 'px'
-  mosaicCanvas.style.height = size.h.toString() + 'px'
+const setDisplaySize = (size: Size) => {
   displayWidth = size.w
   displayHeight = size.h
 }
@@ -188,7 +149,7 @@ const MapboxGLMap = (): JSX.Element => {
     const center = map ? map.getCenter() : new mapboxgl.LngLat(2.338272, 48.858796)
     const zoom = map ? map.getZoom() : 12
 
-    setMapboxArtificialSize(sizeFactor)
+    setMapboxArtificialSize(sizeFactor, setDisplaySize)
 
     const newMap = new mapboxgl.Map({
       container: mapboxContainer.current ? mapboxContainer.current : '',
@@ -208,7 +169,7 @@ const MapboxGLMap = (): JSX.Element => {
     newMap.on('zoomstart', toggleCanvasOpacity)
 
     newMap.on('render', () => {
-      setMapboxDisplaySize()
+      setMapboxDisplaySize({ w: displayWidth, h: displayHeight })
       if (!newMap.loaded() || newMap.isMoving() || newMap.isZooming()) {
         return
       }
@@ -274,7 +235,7 @@ const MapboxGLMap = (): JSX.Element => {
     if (!map) {
       return
     }
-    const isLandscape = false
+    const isLandscape = true
     const formatRatio = 29.7 / 21
 
     const mapsContainer = document.getElementById('maps-container')
@@ -291,7 +252,7 @@ const MapboxGLMap = (): JSX.Element => {
       targetSize[smallerProperty] = mapsContainerSize[smallerProperty]
       targetSize[longerProperty] = Math.floor(mapsContainerSize[smallerProperty] * formatRatio)
     }
-    resizeMapsContainer(targetSize)
+    resizeMapsContainer(targetSize, setDisplaySize)
     setSizeRender(sizeRender + 1)
 
     const mapboxCanvas = map.getCanvas()
@@ -323,38 +284,40 @@ const MapboxGLMap = (): JSX.Element => {
   }
 
   return (
-    <div className="container" id="maps-container">
-      <canvas className="mosaic-canvas" id="maposaic-canvas" />
-      <div id="mapbox-wrapper" className="mapbox-wrapper" ref={(el) => (mapboxContainer.current = el)} />
-      <Spin spinning={isLoading} indicator={<img className="spinner" src={spinner} alt="spin" />} />
-      <div className="overmap">
-        <Drawer
-          visible={drawerVisible}
-          setDrawerVisible={setDrawerVisible}
-          changeMapStyle={changeMapStyle}
-          mapboxStyleURL={mapboxStyleURL}
-          flyTo={flyTo}
-          currentCenter={currentCenter}
-          maposaicColors={maposaicColors}
-          setNewMaposaicColors={setNewMaposaicColors}
-          sizeFactor={sizeFactor}
-          setNewSizeFactor={setNewSizeFactor}
-          openCanvasImage={openCanvasImage}
-          specificColorTransforms={specificColorTransforms}
-          setNewSpecificColorTransforms={setNewSpecificColorTransforms}
-          remainingTime={remainingTime}
-          estimatedTime={estimatedTime}
-          updateEstimatedTime={updateEstimatedTime}
-          onPosterSizeChange={onPosterSizeChange}
-        />
-        <Button
-          type="primary"
-          shape="circle"
-          onClick={() => {
-            setDrawerVisible(true)
-          }}
-          icon={<RightCircleFilled />}
-        />
+    <div className="wrapper">
+      <div className="container" id="maps-container">
+        <canvas className="mosaic-canvas" id="maposaic-canvas" />
+        <div id="mapbox-wrapper" className="mapbox-wrapper" ref={(el) => (mapboxContainer.current = el)} />
+        <Spin spinning={isLoading} indicator={<img className="spinner" src={spinner} alt="spin" />} />
+        <div className="overmap">
+          <Drawer
+            visible={drawerVisible}
+            setDrawerVisible={setDrawerVisible}
+            changeMapStyle={changeMapStyle}
+            mapboxStyleURL={mapboxStyleURL}
+            flyTo={flyTo}
+            currentCenter={currentCenter}
+            maposaicColors={maposaicColors}
+            setNewMaposaicColors={setNewMaposaicColors}
+            sizeFactor={sizeFactor}
+            setNewSizeFactor={setNewSizeFactor}
+            openCanvasImage={openCanvasImage}
+            specificColorTransforms={specificColorTransforms}
+            setNewSpecificColorTransforms={setNewSpecificColorTransforms}
+            remainingTime={remainingTime}
+            estimatedTime={estimatedTime}
+            updateEstimatedTime={updateEstimatedTime}
+            onPosterSizeChange={onPosterSizeChange}
+          />
+          <Button
+            type="primary"
+            shape="circle"
+            onClick={() => {
+              setDrawerVisible(true)
+            }}
+            icon={<RightCircleFilled />}
+          />
+        </div>
       </div>
     </div>
   )
