@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { Drawer as AntDrawer, Radio, Divider, Button, InputNumber, Tooltip } from 'antd'
+import React, { useEffect, useState } from 'react'
+import { Drawer as AntDrawer, Radio, Divider, Button, InputNumber, Tooltip, Select } from 'antd'
 import { RadioChangeEvent } from 'antd/lib/radio'
 import Title from 'antd/lib/typography/Title'
 import { FormatPainterOutlined, InfoCircleOutlined } from '@ant-design/icons'
@@ -12,7 +12,8 @@ import { MaposaicColors } from 'Colors/types'
 
 import './drawer.style.less'
 import ColorTabs from './ColorTabs'
-import { SpecificColorTransforms } from 'Mapozaic/types'
+import { OnPosterSizeChangePayload, SpecificColorTransforms } from 'Mapozaic/types'
+import { Format, FORMATS, FORMAT_SIZE } from 'constants/dimensions'
 
 export type DrawerPropsType = {
   visible: boolean
@@ -31,7 +32,7 @@ export type DrawerPropsType = {
   remainingTime: number | null
   estimatedTime: number | null
   updateEstimatedTime: (sizeFactor: number) => void
-  onPosterSizeChange: () => void
+  onPosterSizeChange: (p: OnPosterSizeChangePayload) => void
 }
 
 const millisecondsToText = (millis: number | null) => {
@@ -69,6 +70,9 @@ const Drawer = ({
   }
   const [localSizeFactor, setLocalSizeFactor] = useState(sizeFactor)
   const [isLandscape, setIsLandscape] = useState<boolean | null>(null)
+  const [format, setFormat] = useState<Format>(Format.A4)
+
+  useEffect(() => setLocalSizeFactor(sizeFactor), [sizeFactor])
 
   const onScaleChange = (value: number | undefined | string) => {
     if (value !== undefined && typeof value !== 'string') {
@@ -83,7 +87,20 @@ const Drawer = ({
 
   const handleOrientationChange = (e: RadioChangeEvent) => {
     setIsLandscape(e.target.value)
-    onPosterSizeChange()
+    onPosterSizeChange({
+      isLandscape: e.target.value,
+      pixelPerInchResolution: 300,
+      longerPropertyCMLength: FORMAT_SIZE[format],
+    })
+  }
+
+  const handleFormatChange = (format: Format) => {
+    setFormat(format)
+    onPosterSizeChange({
+      isLandscape: isLandscape ?? true,
+      pixelPerInchResolution: 300,
+      longerPropertyCMLength: FORMAT_SIZE[format],
+    })
   }
 
   return (
@@ -116,7 +133,7 @@ const Drawer = ({
           min={1}
           max={10}
           step={0.1}
-          value={localSizeFactor}
+          value={Math.round(localSizeFactor * 10) / 10}
           onChange={onScaleChange}
           style={{ width: '68px' }}
         />
@@ -135,19 +152,24 @@ const Drawer = ({
         )}
       </div>
       <Divider />
-      <Radio.Group onChange={onStyleUrlChange} value={mapboxStyleURL}>
-        <Radio value={MAPBOX_STYLE_URL.road}>Road boundaries</Radio>
-        <Radio value={MAPBOX_STYLE_URL.water}>Water boundaries</Radio>
-        <Radio value={MAPBOX_STYLE_URL.administrative}>Administrative boundaries</Radio>
-      </Radio.Group>
-      <Divider />
-      <div>
+      <Title level={4}>Poster</Title>
+      <div className="poster-options">
+        <Select value={format} onChange={handleFormatChange}>
+          {FORMATS.map((format) => {
+            return (
+              <Select.Option value={format} key={format}>
+                {format}
+              </Select.Option>
+            )
+          })}
+        </Select>
         <Radio.Group
           style={{ display: 'flex', alignItems: 'center' }}
           name="preset"
           onChange={handleOrientationChange}
           value={isLandscape}
           size="small"
+          className="poster-options__landscape"
         >
           <Radio.Button style={{ width: '29px', height: '21px', ...radioStyle }} value={true}>
             A
@@ -165,6 +187,14 @@ const Drawer = ({
           </Radio.Button>
         </Radio.Group>
       </div>
+      <Divider />
+      <Title level={4}>Contours</Title>
+      <Radio.Group onChange={onStyleUrlChange} value={mapboxStyleURL}>
+        <Radio value={MAPBOX_STYLE_URL.road}>Road boundaries</Radio>
+        <Radio value={MAPBOX_STYLE_URL.water}>Water boundaries</Radio>
+        <Radio value={MAPBOX_STYLE_URL.administrative}>Administrative boundaries</Radio>
+      </Radio.Group>
+      <Divider />
       <Button className="open-button" onClick={openCanvasImage}>
         Open map image in new window
       </Button>

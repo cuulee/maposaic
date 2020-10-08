@@ -16,7 +16,7 @@ import { MaposaicColors, PresetColorName } from 'Colors/types'
 import { getTargetSizeFromSourceSize } from 'Canvas/utils'
 import { ROAD_SIMPLE_GREY, WATER_BLACK } from 'Colors/mapbox'
 import { ROAD_WHITE } from 'Colors/colors'
-import { SpecificColorTransforms } from 'Mapozaic/types'
+import { OnPosterSizeChangePayload, SpecificColorTransforms } from 'Mapozaic/types'
 import { Size } from 'Canvas/types'
 import {
   resizeMapsContainer,
@@ -24,6 +24,7 @@ import {
   setMapboxDisplaySize,
   toggleCanvasOpacity,
 } from 'Mapozaic/elementHelpers'
+import { CM_PER_INCH, FORMAT_RATIO } from 'constants/dimensions'
 
 // eslint-disable-next-line
 export const MAPBOX_TOKEN: string = process.env['REACT_APP_MAPBOX_TOKEN'] || ''
@@ -37,8 +38,9 @@ export const MAPBOX_STYLE_URL = {
   // regular: 'mapbox://styles/mapbox/streets-v11',
 }
 
-export const INITIAL_SIZE_FACTOR = 1
+const INITIAL_SIZE_FACTOR = 1
 const DISPLAY_PIXEL_RATIO = 1
+let mapboxResolutionRatio: number | null = null
 
 // const TARGET_INCH_WIDTH = 10
 // const TARGET_DPI = 300
@@ -93,15 +95,19 @@ const MapboxGLMap = (): JSX.Element => {
       toggleCanvasOpacity(true)
       const mapboxCanvas = newMap.getCanvas()
       const gl = mapboxCanvas.getContext('webgl')
-      if (!gl || !gl.drawingBufferWidth) {
+      const mapboxWrapper = document.getElementById('mapbox-wrapper')
+      const maposaicCanvas = document.getElementById('maposaic-canvas') as HTMLCanvasElement
+
+      if (!gl || !gl.drawingBufferWidth || !maposaicCanvas) {
         console.log('pas de gl')
         return
       }
       const mapboxCanvasSize = { w: gl.drawingBufferWidth, h: gl.drawingBufferHeight }
       const maposaicCanvasSize = getTargetSizeFromSourceSize(mapboxCanvasSize, DISPLAY_PIXEL_RATIO)
-      const maposaicCanvas = document.getElementById('maposaic-canvas') as HTMLCanvasElement
-      if (!maposaicCanvas) {
-        return
+
+      if (null === mapboxResolutionRatio) {
+        // mapbox render with *2 resolution on some screens (like retina ones)
+        mapboxResolutionRatio = gl.drawingBufferWidth / (mapboxWrapper?.offsetWidth || 1)
       }
 
       maposaicCanvas.setAttribute('width', maposaicCanvasSize.w.toString())
@@ -140,9 +146,7 @@ const MapboxGLMap = (): JSX.Element => {
           computeTime.pixelCount = Math.floor(e.data.pixels.length / 4)
           computeTime.milliseconds = new Date().getTime() - lastStartDate.getTime()
         }
-        if (estimatedTime === null) {
-          setEstimatedTime(computeTime.milliseconds)
-        }
+        setEstimatedTime(computeTime.milliseconds)
       }
     }
 
@@ -231,34 +235,39 @@ const MapboxGLMap = (): JSX.Element => {
     w.document.write(image.outerHTML)
   }
 
-  const onPosterSizeChange = () => {
+  const onPosterSizeChange = ({
+    isLandscape,
+    pixelPerInchResolution,
+    longerPropertyCMLength,
+  }: OnPosterSizeChangePayload) => {
     if (!map) {
       return
     }
-    const isLandscape = true
-    const formatRatio = 29.7 / 21
 
-    const mapsContainer = document.getElementById('maps-container')
-    const mapsContainerSize = { w: mapsContainer?.offsetWidth || 0, h: mapsContainer?.offsetHeight || 0 }
+    const rootWrapper = document.getElementById('root-wrapper')
+    const mapsContainerSize = { w: rootWrapper?.offsetWidth || 0, h: rootWrapper?.offsetHeight || 0 }
 
     const longerProperty = isLandscape ? 'w' : 'h'
     const smallerProperty = longerProperty === 'h' ? 'w' : 'h'
 
     const targetSize = {
-      [smallerProperty]: Math.floor(mapsContainerSize[longerProperty] / formatRatio),
+      [smallerProperty]: Math.floor(mapsContainerSize[longerProperty] / FORMAT_RATIO),
       [longerProperty]: mapsContainerSize[longerProperty],
     } as Size
+
     if (targetSize[smallerProperty] > mapsContainerSize[smallerProperty]) {
       targetSize[smallerProperty] = mapsContainerSize[smallerProperty]
-      targetSize[longerProperty] = Math.floor(mapsContainerSize[smallerProperty] * formatRatio)
+      targetSize[longerProperty] = Math.floor(mapsContainerSize[smallerProperty] * FORMAT_RATIO)
     }
+
+    setIsLoading(true)
     resizeMapsContainer(targetSize, setDisplaySize)
     setSizeRender(sizeRender + 1)
 
-    const mapboxCanvas = map.getCanvas()
-    const gl = mapboxCanvas.getContext('webgl')
-
-    return (gl?.drawingBufferWidth ?? 0) * (gl?.drawingBufferHeight || 0)
+    const target1DPixelCount = (longerPropertyCMLength / CM_PER_INCH) * pixelPerInchResolution
+    const current1DPixelCount = targetSize[longerProperty] * (mapboxResolutionRatio || 1)
+    const newSizeFactor = target1DPixelCount / current1DPixelCount
+    setSizeFactor(newSizeFactor)
   }
 
   useEffect(() => {
@@ -284,7 +293,7 @@ const MapboxGLMap = (): JSX.Element => {
   }
 
   return (
-    <div className="wrapper">
+    <div className="root-wrapper" id="root-wrapper">
       <div className="container" id="maps-container">
         <canvas className="mosaic-canvas" id="maposaic-canvas" />
         <div id="mapbox-wrapper" className="mapbox-wrapper" ref={(el) => (mapboxContainer.current = el)} />

@@ -12,3 +12,9 @@ export type PaintWorkerData = {
 }
 
 export type SpecificColorTransforms = Record<string, { color: string | null; name: string; isEditable: boolean }>
+
+export type OnPosterSizeChangePayload = {
+  isLandscape: boolean
+  pixelPerInchResolution: number
+  longerPropertyCMLength: number
+}
