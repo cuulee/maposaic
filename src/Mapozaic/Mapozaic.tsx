@@ -141,12 +141,12 @@ const MapboxGLMap = (): JSX.Element => {
         setRemainingTime(0)
 
         const pixelCount = Math.floor(e.data.pixels.length / 4)
-
+        const duration = new Date().getTime() - lastStartDate.getTime()
         if (pixelCount >= (computeTime.pixelCount ?? 0)) {
           computeTime.pixelCount = Math.floor(e.data.pixels.length / 4)
-          computeTime.milliseconds = new Date().getTime() - lastStartDate.getTime()
+          computeTime.milliseconds = duration
         }
-        setEstimatedTime(computeTime.milliseconds)
+        setEstimatedTime(duration)
       }
     }
 
