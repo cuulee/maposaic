@@ -19,4 +19,4 @@ export const FORMAT_SIZE = {
   [Format.A0]: 118.9,
 }
 
-export const FORMATS = [Format.A4, Format.A3, Format.A2, Format.A1]
+export const FORMATS = [Format.A4, Format.A3, Format.A2, Format.A1, Format.A0]
