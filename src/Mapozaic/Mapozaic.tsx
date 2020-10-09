@@ -294,7 +294,7 @@ const MapboxGLMap = (): JSX.Element => {
 
   return (
     <div className="root-wrapper" id="root-wrapper">
-      <div className="container" id="maps-container">
+      <div className="maps-container" id="maps-container">
         <canvas className="mosaic-canvas" id="maposaic-canvas" />
         <div id="mapbox-wrapper" className="mapbox-wrapper" ref={(el) => (mapboxContainer.current = el)} />
         <Spin spinning={isLoading} indicator={<img className="spinner" src={spinner} alt="spin" />} />

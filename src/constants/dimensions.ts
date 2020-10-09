@@ -1,5 +1,3 @@
-import Form from 'antd/lib/form/Form'
-
 export const CM_PER_INCH = 2.54
 export const FORMAT_RATIO = 29.7 / 21
 

@@ -96,11 +96,13 @@ const Drawer = ({
 
   const handleFormatChange = (format: Format) => {
     setFormat(format)
-    onPosterSizeChange({
-      isLandscape: isLandscape ?? true,
-      pixelPerInchResolution: 300,
-      longerPropertyCMLength: FORMAT_SIZE[format],
-    })
+    if (isLandscape !== null) {
+      onPosterSizeChange({
+        isLandscape: isLandscape,
+        pixelPerInchResolution: 300,
+        longerPropertyCMLength: FORMAT_SIZE[format],
+      })
+    }
   }
 
   return (
@@ -178,7 +180,7 @@ const Drawer = ({
             style={{
               width: '21px',
               height: '29px',
-              marginLeft: '8px',
+              marginLeft: '12px',
               ...radioStyle,
             }}
             value={false}
