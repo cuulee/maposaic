@@ -1,8 +1,9 @@
 import React from 'react'
 import Mapozaic from 'Mapozaic/Mapozaic'
+import Conf from 'Conf42/CanvasDemo'
 
 function App() {
-  return <Mapozaic />
+  return <Conf />
 }
 
 export default App
