@@ -1,10 +1,10 @@
-import { Size, imagePoint, RGBColor } from 'Conf42/types'
+import { Size, imagePoint, RGBColor } from 'NantesJS/types'
 import {
   getSourcePixelIndexFromTargetPixelIndex,
   getAdjacentPoints,
   getPointFromPixelIndex,
   getPixelIndexFromPoint,
-} from 'Conf42/conf42.utils'
+} from 'NantesJS/nantesJs.utils'
 
 export class CanvasDataTransformer {
   sourcePixelArray: Uint8Array
