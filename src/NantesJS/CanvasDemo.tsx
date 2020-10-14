@@ -4,10 +4,14 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 import { Spin } from 'antd'
 import spinner from 'assets/spinner.png'
 
-import 'Conf42/conf42.style.less'
-import { getRandomNumberBetween, MAPBOX_TOKEN } from 'Conf42/conf42.utils'
+import 'NantesJS/nantesJs.style.less'
+import { getRandomNumberBetween, MAPBOX_TOKEN } from 'NantesJS/nantesJs.utils'
 
 mapboxgl.accessToken = MAPBOX_TOKEN
+
+// eslint-disable-next-line
+import Worker from 'worker-loader!./nantesJs.worker'
+let worker = new Worker()
 
 export const MAPBOX_STYLE_URL = {
   road: 'mapbox://styles/cartapuce/ck8vk01zo2e5w1ipmytroxgf4',
@@ -30,7 +34,7 @@ const CanvasDemo = (): JSX.Element => {
 
     const map = new mapboxgl.Map({
       container: mapContainer.current ? mapContainer.current : '',
-      style: MAPBOX_STYLE_URL.road,
+      style: MAPBOX_STYLE_URL.satellite,
       zoom: getRandomNumberBetween(0, 20),
       center: new mapboxgl.LngLat(getRandomNumberBetween(-1, 14), getRandomNumberBetween(40, 50)),
     })
@@ -39,6 +43,8 @@ const CanvasDemo = (): JSX.Element => {
       if (!map.loaded() || map.isMoving() || map.isZooming()) {
         return
       }
+      worker.terminate()
+      worker = new Worker()
       onRender(map)
     })
     return () => {

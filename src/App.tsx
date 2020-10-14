@@ -1,6 +1,5 @@
 import React from 'react'
-import Mapozaic from 'Mapozaic/Mapozaic'
-import Conf from 'Conf42/CanvasDemo'
+import Conf from 'NantesJS/CanvasDemo'
 
 function App() {
   return <Conf />
