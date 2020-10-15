@@ -9,10 +9,6 @@ import { getRandomNumberBetween, MAPBOX_TOKEN } from 'NantesJS/nantesJs.utils'
 
 mapboxgl.accessToken = MAPBOX_TOKEN
 
-// eslint-disable-next-line
-import Worker from 'worker-loader!./nantesJs.worker'
-let worker = new Worker()
-
 export const MAPBOX_STYLE_URL = {
   road: 'mapbox://styles/cartapuce/ck8vk01zo2e5w1ipmytroxgf4',
   water: 'mapbox://styles/cartapuce/ck8ynyj0x022h1hpmffi87im9',
@@ -43,8 +39,7 @@ const CanvasDemo = (): JSX.Element => {
       if (!map.loaded() || map.isMoving() || map.isZooming()) {
         return
       }
-      worker.terminate()
-      worker = new Worker()
+
       onRender(map)
     })
     return () => {
