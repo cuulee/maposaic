@@ -96,13 +96,14 @@ const Drawer = ({
 
   const handleFormatChange = (format: Format) => {
     setFormat(format)
-    if (isLandscape !== null) {
-      onPosterSizeChange({
-        isLandscape: isLandscape,
-        pixelPerInchResolution: 300,
-        longerPropertyCMLength: FORMAT_SIZE[format],
-      })
+    if (null === isLandscape) {
+      setIsLandscape(true)
     }
+    onPosterSizeChange({
+      isLandscape: isLandscape ?? true,
+      pixelPerInchResolution: 300,
+      longerPropertyCMLength: FORMAT_SIZE[format],
+    })
   }
 
   return (
@@ -156,7 +157,7 @@ const Drawer = ({
       <Divider />
       <Title level={4}>Poster</Title>
       <div className="poster-options">
-        <Select value={format} onChange={handleFormatChange}>
+        <Select value={format} onSelect={handleFormatChange}>
           {FORMATS.map((format) => {
             return (
               <Select.Option value={format} key={format}>
