@@ -194,7 +194,7 @@ const ColorTabs = ({
                   <div className="custom-palette-colors">
                     {palette.map((hexColor) => {
                       return (
-                        <div key="hexColor" className="custom-palette-color-container">
+                        <div key={hexColor} className="custom-palette-color-container">
                           <div className="custom-palette-color" style={{ backgroundColor: hexColor }} />
                         </div>
                       )
