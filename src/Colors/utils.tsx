@@ -34,18 +34,18 @@ export const createColor = (colors: MaposaicColors) => {
 
 export const transformInitialColor = (
   initialColor: RGBColor,
-  colors: MaposaicColors,
+  mainColor: MaposaicColors,
   specificColorTransforms: SpecificColorTransforms,
 ) => {
   const initialColorHex = rgbToHex(initialColor)
   if (initialColorHex in specificColorTransforms) {
-    const transform = specificColorTransforms[initialColorHex].color
-    if (transform) {
-      return createColor(transform)
+    const specificColor = specificColorTransforms[initialColorHex].color
+    if (specificColor) {
+      return createColor(specificColor)
     }
   }
 
-  return createColor(colors)
+  return createColor(mainColor)
 }
 
 export const isColorSimilar = (color1: RGBColor, color2: RGBColor, similarColorTolerance: number): boolean => {
@@ -54,4 +54,29 @@ export const isColorSimilar = (color1: RGBColor, color2: RGBColor, similarColorT
     Math.abs(color1.g - color2.g) < similarColorTolerance &&
     Math.abs(color1.b - color2.b) < similarColorTolerance
   )
+}
+
+export const getMainColorsWithoutSpecific = (
+  mainColors: MaposaicColors,
+  specificColorTransforms: SpecificColorTransforms,
+) => {
+  if (typeof mainColors !== 'object') {
+    return mainColors
+  }
+  const specificColors = new Set()
+  for (let specificColor in specificColorTransforms) {
+    if (specificColorTransforms[specificColor].color) {
+      specificColors.add(specificColorTransforms[specificColor].color)
+    }
+  }
+
+  const colors = []
+
+  for (let color of mainColors) {
+    if (!specificColors.has(color)) {
+      colors.push(color)
+    }
+  }
+
+  return colors
 }

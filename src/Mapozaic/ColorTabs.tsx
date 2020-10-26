@@ -24,12 +24,12 @@ const ColorTabs = ({
   setNewSpecificColorTransforms: (colors: SpecificColorTransforms) => void
 }) => {
   const [shadingColor, setShadingColor] = useState<ShadingColor>(PresetColorName.Random)
-  const [customShadingColor, setCustomShadingColor] = useState('#3C22C3')
+  const [customShadingColor, setCustomShadingColor] = useState('#3c22c3')
   const [presetPaletteIndex, setPresetPaletteIndex] = useState({
     [PaletteOrigin.Coolors]: 0,
     [PaletteOrigin.ColorHunt]: 0,
   })
-  const [customPaletteColors, setCustomPaletteColors] = useState<string[]>(['#F3D2A6', '#13DFF6'])
+  const [customPaletteColors, setCustomPaletteColors] = useState<string[]>(['#f3d2a6', '#13dff6'])
   const [paletteOrigin, setPaletteOrigin] = useState<PaletteOrigin>(PaletteOrigin.Coolors)
   const [specificColorPicks, setSpecificColorPicks] = useState<Record<string, string>>({})
 
@@ -54,9 +54,9 @@ const ColorTabs = ({
   }
 
   const handleCustomShadingColorChangeComplete = (color: ReactColorResult) => {
-    setCustomShadingColor(color.hex)
+    setCustomShadingColor(color.hex.toLocaleLowerCase())
     setShadingColor('customShading')
-    setNewMaposaicColors(generate(color.hex))
+    setNewMaposaicColors(generate(color.hex.toLocaleLowerCase()))
   }
 
   const handlePaletteOriginChange = (e: RadioChangeEvent) => {
@@ -73,7 +73,7 @@ const ColorTabs = ({
       ...customPaletteColors.slice(0, value),
       ...Array.from(
         { length: value - customPaletteColors.length },
-        () => customPaletteColors[customPaletteColors.length - 1] || '#AAAAAA',
+        () => customPaletteColors[customPaletteColors.length - 1] || '#aaaaaa',
       ),
     ]
 
@@ -97,7 +97,7 @@ const ColorTabs = ({
 
   const onCustomPalettePickerChange = (color: ColorResult, index: number) => {
     const newPalette = [...customPaletteColors]
-    newPalette[index] = color.hex
+    newPalette[index] = color.hex.toLocaleLowerCase()
     setCustomPaletteColors(newPalette)
   }
 
@@ -121,14 +121,14 @@ const ColorTabs = ({
 
   const onSpecificColorPickerChange = (color: ColorResult, colorKey: string) => {
     const newSpecificColorPicks = { ...specificColorPicks }
-    newSpecificColorPicks[colorKey] = color.hex
+    newSpecificColorPicks[colorKey] = color.hex.toLocaleLowerCase()
     setSpecificColorPicks(newSpecificColorPicks)
   }
 
   const onSpecificColorPickerChangeComplete = (color: ColorResult, colorKey: string) => {
     onSpecificColorPickerChange(color, colorKey)
     const newColorTransform = { ...specificColorTransforms }
-    newColorTransform[colorKey].color = color.hex
+    newColorTransform[colorKey].color = color.hex.toLocaleLowerCase()
     setNewSpecificColorTransforms(newColorTransform)
   }
 
