@@ -33,8 +33,8 @@ export const AntColors = {
 }
 
 export const PRESET_PALETTES: { [key in PaletteOrigin]: { name: string; palettes: string[][] } } = {
-  [PaletteOrigin.Coolors]: { name: 'Coolors', palettes: coolors },
-  [PaletteOrigin.ColorHunt]: { name: 'Color Hunt', palettes: colorHunt },
+  [PaletteOrigin.Coolors]: { name: 'x5', palettes: coolors },
+  [PaletteOrigin.ColorHunt]: { name: 'x4', palettes: colorHunt },
 }
 
 export const ROAD_WHITE = '#ffffff'
