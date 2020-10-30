@@ -17,6 +17,7 @@
     "antd": "^4.1.2",
     "babel-plugin-import": "^1.13.0",
     "customize-cra": "^0.9.1",
+    "firebase": "^8.0.0",
     "less": "^3.11.1",
     "less-loader": "^5.0.0",
     "mapbox-gl": "^1.11.0",
