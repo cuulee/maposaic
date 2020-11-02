@@ -25,6 +25,7 @@ import {
   toggleCanvasOpacity,
 } from 'Mapozaic/elementHelpers'
 import { CM_PER_INCH, FORMAT_RATIO } from 'constants/dimensions'
+import CloudUpload from 'CloudUpload/CloudUpload'
 
 // eslint-disable-next-line
 export const MAPBOX_TOKEN: string = process.env['REACT_APP_MAPBOX_TOKEN'] || ''
@@ -326,6 +327,7 @@ const MapboxGLMap = (): JSX.Element => {
             }}
             icon={<RightCircleFilled />}
           />
+          <CloudUpload />
         </div>
       </div>
     </div>
