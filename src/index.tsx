@@ -6,6 +6,7 @@ import * as serviceWorker from './serviceWorker'
 import firebase from 'firebase/app'
 import 'firebase/firestore'
 import 'firebase/analytics'
+import 'firebase/storage'
 
 const firebaseConfig = {
   apiKey: 'AIzaSyAuounsVwHYGk-hZ_0EBsLi0aQLhYepYJk',
@@ -19,8 +20,9 @@ const firebaseConfig = {
 }
 
 firebase.initializeApp(firebaseConfig)
-export const db = firebase.firestore()
 firebase.analytics()
+export const db = firebase.firestore()
+export const firestore = firebase.storage()
 
 ReactDOM.render(
   <React.StrictMode>

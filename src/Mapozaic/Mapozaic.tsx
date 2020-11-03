@@ -11,7 +11,7 @@ import Drawer from './Drawer'
 // eslint-disable-next-line
 import PaintWorker from 'worker-loader!./paint.worker'
 
-import './style.css'
+import 'Mapozaic/style.less'
 import { MaposaicColors, PresetColorName } from 'Colors/types'
 import { getTargetSizeFromSourceSize } from 'Canvas/utils'
 import { ROAD_SIMPLE_GREY, WATER_BLACK } from 'Colors/mapbox'
@@ -319,15 +319,18 @@ const MapboxGLMap = (): JSX.Element => {
             updateEstimatedTime={updateEstimatedTime}
             onPosterSizeChange={onPosterSizeChange}
           />
-          <Button
-            type="primary"
-            shape="circle"
-            onClick={() => {
-              setDrawerVisible(true)
-            }}
-            icon={<RightCircleFilled />}
-          />
-          <CloudUpload />
+          <div className="overmap__actions">
+            <Button
+              className="overmap__actions__button"
+              type="primary"
+              shape="circle"
+              onClick={() => {
+                setDrawerVisible(true)
+              }}
+              icon={<RightCircleFilled />}
+            />
+            <CloudUpload className="overmap__actions__button" isDisabled={isLoading} />
+          </div>
         </div>
       </div>
     </div>
