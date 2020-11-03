@@ -1,4 +1,4 @@
-import { Button, Modal, Progress } from 'antd'
+import { Button, Modal, Progress, Tooltip } from 'antd'
 import React, { useState } from 'react'
 import firebase from 'firebase/app'
 
@@ -8,7 +8,7 @@ import { ProgressProps } from 'antd/lib/progress'
 
 enum UploadStatus {
   Error = 'error',
-  Cancelled = 'cancelled',
+  Canceled = 'canceled',
   Running = 'running',
   Success = 'success',
 }
@@ -17,7 +17,7 @@ export type TaskState = UploadStatus | null
 
 const ProgressStatus: { [key in UploadStatus]: ProgressProps['status'] } = {
   [UploadStatus.Error]: 'exception',
-  [UploadStatus.Cancelled]: 'exception',
+  [UploadStatus.Canceled]: 'exception',
   [UploadStatus.Running]: 'active',
   [UploadStatus.Success]: 'success',
 }
@@ -26,8 +26,8 @@ const StatusMessage = ({ taskState, downloadUrl }: { taskState: TaskState; downl
   if (!taskState) {
     return <div>No upload in progress</div>
   }
-  if (taskState === UploadStatus.Cancelled) {
-    return <div>Upload cancelled</div>
+  if (taskState === UploadStatus.Canceled) {
+    return <div>Upload canceled</div>
   }
   if (taskState === UploadStatus.Running) {
     return <div>Uploading picture...</div>
@@ -52,7 +52,10 @@ const CloudUpload = ({ isDisabled, className }: { isDisabled: boolean; className
   const [uploadTask, setUploadTask] = useState<null | firebase.storage.UploadTask>(null)
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null)
 
-  const onError = () => {
+  const onError = (error?: firebase.storage.FirebaseStorageError) => {
+    if (error && error.code === 'storage/canceled') {
+      setTaskState(UploadStatus.Canceled)
+    }
     setTaskState(UploadStatus.Error)
   }
 
@@ -74,6 +77,7 @@ const CloudUpload = ({ isDisabled, className }: { isDisabled: boolean; className
     if (!mosaicElement) {
       return
     }
+    setProgress(0)
     mosaicElement.toBlob((blob) => {
       console.log('size', blob?.size)
       uploadBlob({ blob, onError: onError, onSnapshot, onComplete, setUploadTask })
@@ -86,7 +90,7 @@ const CloudUpload = ({ isDisabled, className }: { isDisabled: boolean; className
 
   const onModalCancel = () => {
     cancelUpload()
-    setModalVisible(false)
+    // setModalVisible(false)
   }
 
   const cancelUpload = () => {
@@ -95,19 +99,21 @@ const CloudUpload = ({ isDisabled, className }: { isDisabled: boolean; className
       [firebase.storage.TaskState.RUNNING, firebase.storage.TaskState.PAUSED].includes(taskState ?? '')
     ) {
       uploadTask.cancel()
-      setTaskState(UploadStatus.Cancelled)
+      setTaskState(UploadStatus.Canceled)
     }
   }
 
   return (
     <div className={className}>
-      <Button
-        disabled={isDisabled}
-        type="default"
-        shape="circle"
-        onClick={onUploadClick}
-        icon={<CloudUploadOutlined />}
-      />
+      <Tooltip title="Upload image in gallery" mouseEnterDelay={0.4}>
+        <Button
+          disabled={isDisabled}
+          type="default"
+          shape="circle"
+          onClick={onUploadClick}
+          icon={<CloudUploadOutlined />}
+        />
+      </Tooltip>
       <Modal visible={modalVisible} onCancel={onModalCancel} onOk={onModalOk}>
         <StatusMessage downloadUrl={downloadUrl} taskState={taskState} />
         {taskState && (

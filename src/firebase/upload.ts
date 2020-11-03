@@ -10,7 +10,7 @@ const uploadBlob = async ({
 }: {
   blob: Blob | null
   onSnapshot: (snapshot: firebase.storage.UploadTaskSnapshot) => void
-  onError: () => void
+  onError: (error?: firebase.storage.FirebaseStorageError) => void
   onComplete: (downloadURL: string) => void
   setUploadTask: (uploadTask: firebase.storage.UploadTask) => void
 }) => {
@@ -28,14 +28,13 @@ const uploadBlob = async ({
       onSnapshot(snapshot)
     },
     (error) => {
-      console.log('err', error)
-      onError()
+      onError(error)
     },
     async () => {
       try {
         const downloadURL = await uploadTask.snapshot.ref.getDownloadURL()
         onComplete(downloadURL)
-      } catch {
+      } catch (e) {
         onError()
       }
     },
