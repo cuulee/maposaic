@@ -41,14 +41,8 @@ export const MAPBOX_STYLE_URL = {
 
 const INITIAL_SIZE_FACTOR = 1
 const DISPLAY_PIXEL_RATIO = 1
+
 let mapboxResolutionRatio: number | null = null
-
-// const TARGET_INCH_WIDTH = 10
-// const TARGET_DPI = 300
-// const TARGET_PIXEL_WIDTH = TARGET_DPI * TARGET_INCH_WIDTH
-// const MAPBOX_PIXEL_FACTOR = 2
-// const ARTIFICIAL_MAPBOX_WIDTH = TARGET_PIXEL_WIDTH / MAPBOX_PIXEL_FACTOR
-
 let paintWorker = new PaintWorker()
 let displayWidth = 0
 let displayHeight = 0

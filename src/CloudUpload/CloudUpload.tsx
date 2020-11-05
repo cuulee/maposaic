@@ -1,10 +1,12 @@
-import { Button, Modal, Progress, Tooltip } from 'antd'
+import { Button, Input, Modal, Progress, Tooltip } from 'antd'
 import React, { useState } from 'react'
 import firebase from 'firebase/app'
 
-import { CloudUploadOutlined } from '@ant-design/icons'
+import { CloudUploadOutlined, SendOutlined } from '@ant-design/icons'
 import uploadBlob from 'firebase/upload'
 import { ProgressProps } from 'antd/lib/progress'
+
+import 'CloudUpload/style.less'
 
 enum UploadStatus {
   Error = 'error',
@@ -46,11 +48,12 @@ const StatusMessage = ({ taskState, downloadUrl }: { taskState: TaskState; downl
 }
 
 const CloudUpload = ({ isDisabled, className }: { isDisabled: boolean; className?: string }) => {
-  const [modalVisible, setModalVisible] = useState(false)
+  const [modalVisible, setModalVisible] = useState(true)
   const [progress, setProgress] = useState(0)
   const [taskState, setTaskState] = useState<TaskState>(null)
   const [uploadTask, setUploadTask] = useState<null | firebase.storage.UploadTask>(null)
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null)
+  const [pictureName, setPictureName] = useState('')
 
   const onError = (error?: firebase.storage.FirebaseStorageError) => {
     if (error && error.code === 'storage/canceled') {
@@ -79,7 +82,6 @@ const CloudUpload = ({ isDisabled, className }: { isDisabled: boolean; className
     }
     setProgress(0)
     mosaicElement.toBlob((blob) => {
-      console.log('size', blob?.size)
       uploadBlob({ blob, onError: onError, onSnapshot, onComplete, setUploadTask })
     })
   }
@@ -105,7 +107,7 @@ const CloudUpload = ({ isDisabled, className }: { isDisabled: boolean; className
 
   return (
     <div className={className}>
-      <Tooltip title="Upload image in gallery" mouseEnterDelay={0.4}>
+      <Tooltip title="Upload picture to gallery" mouseEnterDelay={0.4}>
         <Button
           disabled={isDisabled}
           type="default"
@@ -117,12 +119,34 @@ const CloudUpload = ({ isDisabled, className }: { isDisabled: boolean; className
       <Modal visible={modalVisible} onCancel={onModalCancel} onOk={onModalOk}>
         <StatusMessage downloadUrl={downloadUrl} taskState={taskState} />
         {taskState && (
-          <Progress
-            percent={Math.round(progress)}
-            size="small"
-            status={taskState ? ProgressStatus[taskState] : undefined}
-          />
+          <React.Fragment>
+            <Progress
+              percent={Math.round(progress)}
+              size="small"
+              status={taskState ? ProgressStatus[taskState] : undefined}
+            />
+          </React.Fragment>
         )}
+        <div className="form">
+          <div className="form__title">Optional</div>
+          <div className="form__field">
+            <Input
+              className="form__field__input"
+              placeholder="Picture name"
+              value={pictureName}
+              onChange={(e) => setPictureName(e.target.value)}
+            />
+            <Button
+              shape="circle"
+              icon={<SendOutlined style={{ fontSize: 10 }} />}
+              className="form__field__submit"
+              type="primary"
+              loading={false}
+              size="small"
+              onClick={() => {}}
+            />
+          </div>
+        </div>
       </Modal>
     </div>
   )
