@@ -14,6 +14,7 @@ import './drawer.style.less'
 import ColorTabs from './ColorTabs'
 import { OnPosterSizeChangePayload, SpecificColorTransforms } from 'Mapozaic/types'
 import { Format, FORMATS, FORMAT_SIZE } from 'constants/dimensions'
+import { THEME_COLOR_PURPLE } from 'constants/colors'
 
 export type DrawerPropsType = {
   visible: boolean
@@ -149,7 +150,7 @@ const Drawer = ({
           <FormatPainterOutlined />
         </Button>
         {(remainingTime || estimatedTime) && (
-          <Badge className="scale__time" count={<ClockCircleOutlined style={{ color: '#e53f67' }} />}>
+          <Badge className="scale__time" count={<ClockCircleOutlined style={{ color: THEME_COLOR_PURPLE }} />}>
             <span className="scale__time__box">{millisecondsToText(remainingTime || estimatedTime)}</span>
           </Badge>
         )}

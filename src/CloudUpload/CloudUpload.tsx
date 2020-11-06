@@ -2,11 +2,12 @@ import { Button, Input, Modal, Progress, Tooltip } from 'antd'
 import React, { useCallback, useEffect, useState } from 'react'
 import firebase from 'firebase/app'
 
-import { CloudUploadOutlined, SendOutlined } from '@ant-design/icons'
+import { CheckCircleTwoTone, CloudUploadOutlined, LoadingOutlined, SendOutlined } from '@ant-design/icons'
 import { postOrUpdatePicturesDocument, uploadBlob } from 'firebase/services'
 import { ProgressProps } from 'antd/lib/progress'
 
 import 'CloudUpload/style.less'
+import { THEME_COLOR_PURPLE, DISABLED_COLOR, SUCCESS_COLOR } from 'constants/colors'
 
 enum UploadStatus {
   Error = 'error',
@@ -54,8 +55,8 @@ const CloudUpload = ({ isDisabled, className }: { isDisabled: boolean; className
   const [uploadTask, setUploadTask] = useState<null | firebase.storage.UploadTask>(null)
   const [downloadURL, setDownloadURL] = useState<string | null>(null)
   const [pictureName, setPictureName] = useState('')
-  const [hasFormChanged, setHasFormChanged] = useState(false)
   const [filePath, setFilePath] = useState<null | string>(null)
+  const [isFormUploaded, setIsFormUploaded] = useState(false)
   const [isUploadingForm, setIsUploadingForm] = useState(false)
   const [pictureDocumentId, setPictureDocumentId] = useState<string | null>(null)
 
@@ -143,29 +144,33 @@ const CloudUpload = ({ isDisabled, className }: { isDisabled: boolean; className
   }
 
   const cancelUpload = () => {
-    if (taskState && [firebase.storage.TaskState.RUNNING, firebase.storage.TaskState.PAUSED].includes(taskState)) {
-      // uploadTask.cancel()
+    if (
+      taskState &&
+      [firebase.storage.TaskState.RUNNING, firebase.storage.TaskState.PAUSED].includes(taskState) &&
+      uploadTask
+    ) {
+      uploadTask.cancel()
       setTaskState(UploadStatus.Canceled)
     }
   }
 
-  useEffect(() => setHasFormChanged(true), [pictureName])
+  useEffect(() => setIsFormUploaded(false), [pictureName])
 
   const isFormSubmitDisabled =
     !pictureName.length ||
     !taskState ||
     ![UploadStatus.Running, UploadStatus.Success].includes(taskState) ||
-    !hasFormChanged
+    isFormUploaded
 
   const onFormSubmit = async () => {
     if (isFormSubmitDisabled) {
       return
     }
     setIsUploadingForm(true)
-    setHasFormChanged(false)
     const documentId = await postOrUpdatePicturesDocument({ pictureName, documentId: pictureDocumentId })
     updateDocumentId(documentId)
     setIsUploadingForm(false)
+    setIsFormUploaded(true)
   }
 
   const updateDocumentId = (newDocumentId: string | null) => {
@@ -176,6 +181,22 @@ const CloudUpload = ({ isDisabled, className }: { isDisabled: boolean; className
       console.log('doc id', newDocumentId)
       setPictureDocumentId(newDocumentId)
     }
+  }
+
+  const InputSuffix = ({ className }: { className?: string }) => {
+    if (isUploadingForm) {
+      return <LoadingOutlined spin className={className} style={{ color: THEME_COLOR_PURPLE }} />
+    }
+    if (isFormUploaded) {
+      return <CheckCircleTwoTone className={className} twoToneColor={SUCCESS_COLOR} />
+    }
+    return (
+      <SendOutlined
+        className={className}
+        onClick={isFormSubmitDisabled ? undefined : onFormSubmit}
+        style={{ color: isFormSubmitDisabled ? DISABLED_COLOR : THEME_COLOR_PURPLE }}
+      />
+    )
   }
 
   return (
@@ -203,17 +224,12 @@ const CloudUpload = ({ isDisabled, className }: { isDisabled: boolean; className
         <div className="form">
           <div className="form__title">Optional</div>
           <div className="form__field">
-            <Input placeholder="Picture name" value={pictureName} onChange={(e) => setPictureName(e.target.value)} />
-            <Button
-              shape="circle"
-              icon={<SendOutlined style={{ fontSize: 10 }} />}
-              className="form__field__submit"
-              type="primary"
-              loading={isUploadingForm}
-              size="small"
-              disabled={isFormSubmitDisabled}
-              style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
-              onClick={onFormSubmit}
+            <Input
+              placeholder="Picture name"
+              value={pictureName}
+              onChange={(e) => setPictureName(e.target.value)}
+              suffix={<InputSuffix />}
+              onPressEnter={onFormSubmit}
             />
           </div>
         </div>
