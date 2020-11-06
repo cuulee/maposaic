@@ -1,9 +1,13 @@
 .gallery {
-  max-width: 300px;
+  padding: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 0fr));
+  grid-gap: 16px;
   &__picture {
-    margin-top: 16px;
-    &__prop {
-      display: flex;
+    &__image-wrapper {
+      width: 250px;
+      height: 250px;
+      overflow: hidden;
     }
   }
 }
