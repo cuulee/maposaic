@@ -1,13 +1,13 @@
-import { Button, Input, Modal, Progress, Tooltip } from 'antd'
 import React, { useCallback, useEffect, useState } from 'react'
-import firebase from 'firebase/app'
-
+import { Button, Input, Modal, Progress, Tooltip } from 'antd'
 import { CheckCircleTwoTone, CloudUploadOutlined, LoadingOutlined, SendOutlined } from '@ant-design/icons'
-import { postOrUpdatePicturesDocument, uploadBlob } from 'firebase/services'
 import { ProgressProps } from 'antd/lib/progress'
+import firebase from 'firebase/app'
+import { postOrUpdatePicturesDocument, uploadBlob } from 'firebase/services'
 
-import 'CloudUpload/style.less'
 import { THEME_COLOR_PURPLE, DISABLED_COLOR, SUCCESS_COLOR } from 'constants/colors'
+import link from 'assets/link.svg'
+import 'CloudUpload/style.less'
 
 enum UploadStatus {
   Error = 'error',
@@ -41,7 +41,10 @@ const StatusMessage = ({ taskState, downloadURL }: { taskState: TaskState; downl
   if (taskState === UploadStatus.Success) {
     return (
       <div>
-        Picture uploaded ! <a href={downloadURL}>show</a>
+        Picture uploaded !{' '}
+        <a target="_blank" rel="noopener noreferrer" href={downloadURL}>
+          show <img alt="" width="14px" src={link} />
+        </a>
       </div>
     )
   }
@@ -49,7 +52,7 @@ const StatusMessage = ({ taskState, downloadURL }: { taskState: TaskState; downl
 }
 
 const CloudUpload = ({ isDisabled, className }: { isDisabled: boolean; className?: string }) => {
-  const [modalVisible, setModalVisible] = useState(true)
+  const [modalVisible, setModalVisible] = useState(false)
   const [progress, setProgress] = useState(0)
   const [taskState, setTaskState] = useState<TaskState>(null)
   const [uploadTask, setUploadTask] = useState<null | firebase.storage.UploadTask>(null)
@@ -140,7 +143,7 @@ const CloudUpload = ({ isDisabled, className }: { isDisabled: boolean; className
 
   const onModalCancel = () => {
     cancelUpload()
-    // setModalVisible(false)
+    setModalVisible(false)
   }
 
   const cancelUpload = () => {
@@ -175,10 +178,8 @@ const CloudUpload = ({ isDisabled, className }: { isDisabled: boolean; className
 
   const updateDocumentId = (newDocumentId: string | null) => {
     if (!newDocumentId) {
-      console.log('error on save')
     }
     if (!pictureDocumentId && newDocumentId) {
-      console.log('doc id', newDocumentId)
       setPictureDocumentId(newDocumentId)
     }
   }
