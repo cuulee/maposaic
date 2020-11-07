@@ -2,12 +2,19 @@
   padding: 16px;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 0fr));
-  grid-gap: 16px;
+  row-gap: 8px;
+  column-gap: 16px;
+
   &__picture {
-    &__image-wrapper {
+    &__image {
       width: 250px;
       height: 250px;
+      object-fit: cover;
+    }
+    &__name {
       overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }
   }
 }

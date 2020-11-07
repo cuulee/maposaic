@@ -48,10 +48,8 @@ const Gallery = () => {
       {pictures.map((pic) => {
         return (
           <div className="gallery__picture" key={pic.id}>
-            <div className="gallery__picture__image-wrapper">
-              <img className="gallery__picture__image" width="250px" src={pic.downloadURL} />
-            </div>
-            <div>{pic.pictureName || 'no name'}</div>
+            <img className="gallery__picture__image" src={pic.downloadURL} />
+            <div className="gallery__picture__name">{pic.pictureName || 'no name'}</div>
           </div>
         )
       })}
