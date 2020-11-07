@@ -139,6 +139,9 @@ const CloudUpload = ({ isDisabled, className }: { isDisabled: boolean; className
   }, [uploadTask, memoizedOnComplete, filePath])
 
   const onModalOk = () => {
+    if (!isFormSubmitDisabled && !isFormUploaded) {
+      submitForm()
+    }
     setModalVisible(false)
   }
 
@@ -166,7 +169,7 @@ const CloudUpload = ({ isDisabled, className }: { isDisabled: boolean; className
     ![UploadStatus.Running, UploadStatus.Success].includes(taskState) ||
     isFormUploaded
 
-  const onFormSubmit = async () => {
+  const submitForm = async () => {
     if (isFormSubmitDisabled) {
       return
     }
@@ -195,7 +198,7 @@ const CloudUpload = ({ isDisabled, className }: { isDisabled: boolean; className
     return (
       <SendOutlined
         className={className}
-        onClick={isFormSubmitDisabled ? undefined : onFormSubmit}
+        onClick={isFormSubmitDisabled ? undefined : submitForm}
         style={{ color: isFormSubmitDisabled ? DISABLED_COLOR : PRIMARY_COLOR }}
       />
     )
@@ -231,7 +234,7 @@ const CloudUpload = ({ isDisabled, className }: { isDisabled: boolean; className
               value={pictureName}
               onChange={(e) => setPictureName(e.target.value)}
               suffix={<InputSuffix />}
-              onPressEnter={onFormSubmit}
+              onPressEnter={submitForm}
             />
           </div>
         </div>
