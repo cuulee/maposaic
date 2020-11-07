@@ -52,7 +52,17 @@ const StatusMessage = ({ taskState, downloadURL }: { taskState: TaskState; downl
   return <div>Upload failed</div>
 }
 
-const CloudUpload = ({ isDisabled, className }: { isDisabled: boolean; className?: string }) => {
+const CloudUpload = ({
+  isDisabled,
+  className,
+  mapCenter,
+  mapZoom,
+}: {
+  isDisabled: boolean
+  className?: string
+  mapCenter?: mapboxgl.LngLat
+  mapZoom?: number
+}) => {
   const [modalVisible, setModalVisible] = useState(false)
   const [progress, setProgress] = useState(0)
   const [taskState, setTaskState] = useState<TaskState>(null)
@@ -98,7 +108,15 @@ const CloudUpload = ({ isDisabled, className }: { isDisabled: boolean; className
   }
 
   const onComplete = async ({ downloadURL, filePath }: { downloadURL: string; filePath: string }) => {
-    const documentId = await postOrUpdatePicturesDocument({ downloadURL, documentId: pictureDocumentId, filePath })
+    const documentId = await postOrUpdatePicturesDocument({
+      documentId: pictureDocumentId,
+      payload: {
+        downloadURL,
+        filePath,
+        mapCenter: mapCenter?.toArray(),
+        mapZoom: mapZoom,
+      },
+    })
     updateDocumentId(documentId)
     if (documentId) {
       setTaskState(UploadStatus.Success)
@@ -174,7 +192,7 @@ const CloudUpload = ({ isDisabled, className }: { isDisabled: boolean; className
       return
     }
     setIsUploadingForm(true)
-    const documentId = await postOrUpdatePicturesDocument({ pictureName, documentId: pictureDocumentId })
+    const documentId = await postOrUpdatePicturesDocument({ documentId: pictureDocumentId, payload: { pictureName } })
     updateDocumentId(documentId)
     setIsUploadingForm(false)
     setIsFormUploaded(true)

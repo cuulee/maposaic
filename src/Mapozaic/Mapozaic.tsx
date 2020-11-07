@@ -328,7 +328,12 @@ const MapboxGLMap = (): JSX.Element => {
                 icon={<RightCircleFilled />}
               />
             </Tooltip>
-            <CloudUpload className="overmap__actions__button" isDisabled={isLoading} />
+            <CloudUpload
+              mapZoom={map?.getZoom()}
+              mapCenter={map?.getCenter()}
+              className="overmap__actions__button"
+              isDisabled={isLoading}
+            />
             <Tooltip title="Visit gallery" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
               <Button
                 className="overmap__actions__button"

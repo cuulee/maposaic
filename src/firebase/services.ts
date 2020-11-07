@@ -13,31 +13,18 @@ export const uploadBlob = ({ blob }: { blob: Blob }) => {
 }
 
 export const postOrUpdatePicturesDocument = async ({
-  downloadURL,
   documentId,
-  pictureName,
-  filePath,
+  payload,
 }: {
   documentId: string | null
-  downloadURL?: string
-  pictureName?: string
-  filePath?: string
+  payload: Record<string, any>
 }) => {
   // undefined value in payload is not accepted by firestore
-  const payload: PostOrUpdatePictureDocumentPayload = {}
-  if (downloadURL) {
-    payload.downloadURL = downloadURL
-  }
-  if (pictureName) {
-    payload.pictureName = pictureName
-  }
-  if (filePath) {
-    payload.filePath = filePath
-  }
+  const sanethizedPayload = sanethizePayload(payload)
 
   if (documentId) {
     const docRef = await db.collection(PICTURE_COLLECTION_ID).doc(documentId)
-    docRef.update(payload)
+    docRef.update(sanethizedPayload)
 
     return documentId
   }
@@ -45,7 +32,7 @@ export const postOrUpdatePicturesDocument = async ({
   try {
     const response = await db
       .collection(PICTURE_COLLECTION_ID)
-      .add({ ...payload, timestamp: firebase.firestore.FieldValue.serverTimestamp() })
+      .add({ ...sanethizedPayload, timestamp: firebase.firestore.FieldValue.serverTimestamp() })
     return response.id
   } catch (e) {
     return null
@@ -53,7 +40,20 @@ export const postOrUpdatePicturesDocument = async ({
 }
 
 type PostOrUpdatePictureDocumentPayload = {
-  downloadURL?: string
-  pictureName?: string
-  filePath?: string
+  downloadURL: string
+  pictureName: string
+  filePath: string
+  mapCenter: number[]
+}
+
+const sanethizePayload = (payload: any) => {
+  const res: any = {}
+  Object.keys(payload).forEach((key) => {
+    const value = payload[key]
+    if (value) {
+      res[key] = value
+    }
+  })
+
+  return res
 }
