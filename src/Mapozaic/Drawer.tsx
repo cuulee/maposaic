@@ -14,7 +14,7 @@ import './drawer.style.less'
 import ColorTabs from './ColorTabs'
 import { OnPosterSizeChangePayload, SpecificColorTransforms } from 'Mapozaic/types'
 import { Format, FORMATS, FORMAT_SIZE } from 'constants/dimensions'
-import { THEME_COLOR_PURPLE } from 'constants/colors'
+import { PRIMARY_COLOR } from 'constants/colors'
 
 export type DrawerPropsType = {
   visible: boolean
@@ -126,36 +126,6 @@ const Drawer = ({
       />
 
       <Divider />
-      <Title level={4}>
-        Scale
-        <Tooltip className="scale-tooltip" title="Increase size and... waiting time">
-          <InfoCircleOutlined />
-        </Tooltip>
-      </Title>
-      <div className="scale">
-        <InputNumber
-          min={1}
-          max={10}
-          step={0.1}
-          value={Math.round(localSizeFactor * 10) / 10}
-          onChange={onScaleChange}
-          style={{ width: '68px' }}
-        />
-        <Button
-          className="scale__paint"
-          shape="circle"
-          disabled={sizeFactor === localSizeFactor}
-          onClick={applyGranularity}
-        >
-          <FormatPainterOutlined />
-        </Button>
-        {(remainingTime || estimatedTime) && (
-          <Badge className="scale__time" count={<ClockCircleOutlined style={{ color: THEME_COLOR_PURPLE }} />}>
-            <span className="scale__time__box">{millisecondsToText(remainingTime || estimatedTime)}</span>
-          </Badge>
-        )}
-      </div>
-      <Divider />
       <Title level={4}>Poster</Title>
       <div className="poster-options">
         <Select value={format} onSelect={handleFormatChange}>
@@ -190,6 +160,37 @@ const Drawer = ({
             A
           </Radio.Button>
         </Radio.Group>
+      </div>
+      <Divider />
+
+      <Title level={4}>
+        Scale
+        <Tooltip className="scale-tooltip" title="Increase size and... waiting time">
+          <InfoCircleOutlined />
+        </Tooltip>
+      </Title>
+      <div className="scale">
+        <InputNumber
+          min={1}
+          max={10}
+          step={0.1}
+          value={Math.round(localSizeFactor * 10) / 10}
+          onChange={onScaleChange}
+          style={{ width: '68px' }}
+        />
+        <Button
+          className="scale__paint"
+          shape="circle"
+          disabled={sizeFactor === localSizeFactor}
+          onClick={applyGranularity}
+        >
+          <FormatPainterOutlined />
+        </Button>
+        {(remainingTime || estimatedTime) && (
+          <Badge className="scale__time" count={<ClockCircleOutlined style={{ color: PRIMARY_COLOR }} />}>
+            <span className="scale__time__box">{millisecondsToText(remainingTime || estimatedTime)}</span>
+          </Badge>
+        )}
       </div>
       <Divider />
       <Title level={4}>Contours</Title>

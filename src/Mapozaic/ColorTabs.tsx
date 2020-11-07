@@ -4,7 +4,7 @@ import { RadioChangeEvent } from 'antd/lib/radio'
 import { ChromePicker, ColorResult as ReactColorResult, ColorResult } from 'react-color'
 import { generate } from '@ant-design/colors'
 
-import { THEME_COLOR_PURPLE } from 'constants/colors'
+import { PRIMARY_COLOR } from 'constants/colors'
 import { AntColors, PRESET_PALETTES } from 'Colors/colors'
 import { MaposaicColors, PresetColorName, PaletteOrigin, ShadingColor } from 'Colors/types'
 import './colorTabs.style.less'
@@ -158,9 +158,7 @@ const ColorTabs = ({
           >
             <Button
               style={
-                shadingColor === 'customShading'
-                  ? { borderColor: THEME_COLOR_PURPLE, color: THEME_COLOR_PURPLE }
-                  : undefined
+                shadingColor === 'customShading' ? { borderColor: PRIMARY_COLOR, color: PRIMARY_COLOR } : undefined
               }
               onClick={handleCustomShadingClick}
               className="shading-custom-button"

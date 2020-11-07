@@ -5,9 +5,10 @@ import { ProgressProps } from 'antd/lib/progress'
 import firebase from 'firebase/app'
 import { postOrUpdatePicturesDocument, uploadBlob } from 'firebase/services'
 
-import { THEME_COLOR_PURPLE, DISABLED_COLOR, SUCCESS_COLOR } from 'constants/colors'
+import { PRIMARY_COLOR, DISABLED_COLOR, SUCCESS_COLOR } from 'constants/colors'
 import link from 'assets/link.svg'
 import 'CloudUpload/style.less'
+import { TOOLTIP_ENTER_DELAY } from 'constants/ux'
 
 enum UploadStatus {
   Error = 'error',
@@ -186,7 +187,7 @@ const CloudUpload = ({ isDisabled, className }: { isDisabled: boolean; className
 
   const InputSuffix = ({ className }: { className?: string }) => {
     if (isUploadingForm) {
-      return <LoadingOutlined spin className={className} style={{ color: THEME_COLOR_PURPLE }} />
+      return <LoadingOutlined spin className={className} style={{ color: PRIMARY_COLOR }} />
     }
     if (isFormUploaded) {
       return <CheckCircleTwoTone className={className} twoToneColor={SUCCESS_COLOR} />
@@ -195,14 +196,14 @@ const CloudUpload = ({ isDisabled, className }: { isDisabled: boolean; className
       <SendOutlined
         className={className}
         onClick={isFormSubmitDisabled ? undefined : onFormSubmit}
-        style={{ color: isFormSubmitDisabled ? DISABLED_COLOR : THEME_COLOR_PURPLE }}
+        style={{ color: isFormSubmitDisabled ? DISABLED_COLOR : PRIMARY_COLOR }}
       />
     )
   }
 
   return (
     <div className={className}>
-      <Tooltip title="Upload picture to gallery" mouseEnterDelay={0.4}>
+      <Tooltip title="Upload picture to gallery" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
         <Button
           disabled={isDisabled}
           type="default"

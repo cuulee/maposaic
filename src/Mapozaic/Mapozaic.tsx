@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
-import { Button } from 'antd'
-import { RightCircleFilled } from '@ant-design/icons'
+import { Button, Tooltip } from 'antd'
+import { PictureOutlined, RightCircleFilled } from '@ant-design/icons'
+import { useHistory } from 'react-router-dom'
 import { Spin } from 'antd'
-import spinner from '../assets/spinner.png'
+import spinner from 'assets/spinner.png'
 
 import Drawer from './Drawer'
 
@@ -26,6 +27,7 @@ import {
 } from 'Mapozaic/elementHelpers'
 import { CM_PER_INCH, FORMAT_RATIO } from 'constants/dimensions'
 import CloudUpload from 'CloudUpload/CloudUpload'
+import { TOOLTIP_ENTER_DELAY } from 'constants/ux'
 
 // eslint-disable-next-line
 export const MAPBOX_TOKEN: string = process.env['REACT_APP_MAPBOX_TOKEN'] || ''
@@ -66,6 +68,7 @@ const computeTime: { pixelCount: number | null; milliseconds: number | null } = 
 let lastStartDate = new Date()
 
 const MapboxGLMap = (): JSX.Element => {
+  const history = useHistory()
   const [map, setMap] = useState<mapboxgl.Map | null>(null)
   const mapboxContainer = useRef<HTMLDivElement | null>(null)
 
@@ -314,16 +317,29 @@ const MapboxGLMap = (): JSX.Element => {
             onPosterSizeChange={onPosterSizeChange}
           />
           <div className="overmap__actions">
-            <Button
-              className="overmap__actions__button"
-              type="primary"
-              shape="circle"
-              onClick={() => {
-                setDrawerVisible(true)
-              }}
-              icon={<RightCircleFilled />}
-            />
+            <Tooltip title="Settings" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
+              <Button
+                className="overmap__actions__button"
+                type="primary"
+                shape="circle"
+                onClick={() => {
+                  setDrawerVisible(true)
+                }}
+                icon={<RightCircleFilled />}
+              />
+            </Tooltip>
             <CloudUpload className="overmap__actions__button" isDisabled={isLoading} />
+            <Tooltip title="Visit gallery" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
+              <Button
+                className="overmap__actions__button"
+                type="default"
+                shape="circle"
+                onClick={() => {
+                  history.push('/gallery')
+                }}
+                icon={<PictureOutlined />}
+              />
+            </Tooltip>
           </div>
         </div>
       </div>
