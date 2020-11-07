@@ -1,10 +1,11 @@
 import { db, firestore } from 'index'
 import firebase from 'firebase/app'
+import { v4 as uuidv4 } from 'uuid'
 
 const PICTURE_COLLECTION_ID = 'pictures'
 
 export const uploadBlob = ({ blob }: { blob: Blob }) => {
-  const filePath = 'maposaic_pictures/' + Math.floor(Math.random() * 1000000)
+  const filePath = 'maposaic_pictures/' + uuidv4()
   const storageRef = firestore.ref(filePath)
   const uploadTask = storageRef.put(blob)
 
