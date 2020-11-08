@@ -6,6 +6,7 @@ import Title from 'antd/lib/typography/Title'
 import { Divider, Modal } from 'antd'
 
 import { Link } from 'react-router-dom'
+import { LeftCircleOutlined, RightCircleOutlined } from '@ant-design/icons'
 
 type ApiPicture = {
   pictureName?: string
@@ -52,6 +53,13 @@ const Gallery = () => {
     fetchData()
   }, [])
 
+  const ModalFooter = [
+    <LeftCircleOutlined onClick={() => displayedIndex && setDisplayedIndex(displayedIndex - 1)} />,
+    <RightCircleOutlined
+      onClick={() => displayedIndex && setDisplayedIndex(displayedIndex + 1 < pictures.length ? displayedIndex + 1 : 0)}
+    />,
+  ]
+
   return (
     <div className="gallery">
       <Title level={2}>Gallery</Title>
@@ -76,13 +84,17 @@ const Gallery = () => {
         visible={displayedIndex !== null}
         onCancel={() => setDisplayedIndex(null)}
         bodyStyle={{ height: '68vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+        footer={null}
       >
         {displayedIndex !== null && pictures.length > displayedIndex && displayedIndex >= 0 && (
-          <img
-            className="modal__picture"
-            alt={`pic-${displayedName(pictures[displayedIndex].pictureName)}`}
-            src={pictures[displayedIndex].downloadURL}
-          />
+          <div className="modal-content">
+            <img
+              className="modal-content__picture"
+              alt={`pic-${displayedName(pictures[displayedIndex].pictureName)}`}
+              src={pictures[displayedIndex].downloadURL}
+            />
+            <div className="modal-content__name">{displayedName(pictures[displayedIndex].pictureName)}</div>
+          </div>
         )}
       </Modal>
     </div>
