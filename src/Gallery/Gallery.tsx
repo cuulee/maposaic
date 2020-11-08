@@ -6,7 +6,6 @@ import Title from 'antd/lib/typography/Title'
 import { Divider, Modal } from 'antd'
 
 import { Link } from 'react-router-dom'
-import { LeftCircleOutlined, RightCircleOutlined } from '@ant-design/icons'
 
 type ApiPicture = {
   pictureName?: string
@@ -27,6 +26,7 @@ const displayedName = (name: string | undefined): string => {
 const Gallery = () => {
   const [pictures, setPictures] = useState<Picture[]>([])
   const [displayedIndex, setDisplayedIndex] = useState<number | null>(null)
+  const [isModalVisible, setIsModalVisible] = useState(false)
 
   const fetchData = async () => {
     try {
@@ -53,13 +53,6 @@ const Gallery = () => {
     fetchData()
   }, [])
 
-  const ModalFooter = [
-    <LeftCircleOutlined onClick={() => displayedIndex && setDisplayedIndex(displayedIndex - 1)} />,
-    <RightCircleOutlined
-      onClick={() => displayedIndex && setDisplayedIndex(displayedIndex + 1 < pictures.length ? displayedIndex + 1 : 0)}
-    />,
-  ]
-
   return (
     <div className="gallery">
       <Title level={2}>Gallery</Title>
@@ -68,7 +61,14 @@ const Gallery = () => {
       <div className="gallery__pictures">
         {pictures.map((pic, index) => {
           return (
-            <div onClick={() => setDisplayedIndex(index)} className="gallery__picture" key={pic.id}>
+            <div
+              onClick={() => {
+                setDisplayedIndex(index)
+                setIsModalVisible(true)
+              }}
+              className="gallery__picture"
+              key={pic.id}
+            >
               <img
                 className="gallery__picture__image"
                 alt={`pic-${displayedName(pic.pictureName)}`}
@@ -81,10 +81,11 @@ const Gallery = () => {
       </div>
       <Modal
         closable={false}
-        visible={displayedIndex !== null}
-        onCancel={() => setDisplayedIndex(null)}
+        visible={isModalVisible}
+        onCancel={() => setIsModalVisible(false)}
         bodyStyle={{ height: '68vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
         footer={null}
+        width="fit-content"
       >
         {displayedIndex !== null && pictures.length > displayedIndex && displayedIndex >= 0 && (
           <div className="modal-content">
