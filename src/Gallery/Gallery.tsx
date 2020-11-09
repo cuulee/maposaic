@@ -6,6 +6,7 @@ import Title from 'antd/lib/typography/Title'
 import { Divider, Modal } from 'antd'
 
 import { Link } from 'react-router-dom'
+import { LeftOutlined, RightOutlined } from '@ant-design/icons'
 
 type ApiPicture = {
   pictureName?: string
@@ -83,8 +84,9 @@ const Gallery = () => {
         closable={false}
         visible={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
-        bodyStyle={{ height: '68vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+        bodyStyle={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
         footer={null}
+        style={{ maxWidth: '90vw', paddingBottom: '0', top: 0 }}
         width="fit-content"
       >
         {displayedIndex !== null && pictures.length > displayedIndex && displayedIndex >= 0 && (
@@ -94,7 +96,19 @@ const Gallery = () => {
               alt={`pic-${displayedName(pictures[displayedIndex].pictureName)}`}
               src={pictures[displayedIndex].downloadURL}
             />
-            <div className="modal-content__name">{displayedName(pictures[displayedIndex].pictureName)}</div>
+            <div className="modal-content__nav">
+              <LeftOutlined
+                onClick={() => (displayedIndex ? setDisplayedIndex(displayedIndex - 1) : setDisplayedIndex(0))}
+              />
+              <div className="modal-content__name">{displayedName(pictures[displayedIndex].pictureName)}</div>
+              <RightOutlined
+                onClick={() =>
+                  displayedIndex !== null && displayedIndex + 1 < pictures.length
+                    ? setDisplayedIndex(displayedIndex + 1)
+                    : setDisplayedIndex(0)
+                }
+              />
+            </div>
           </div>
         )}
       </Modal>
