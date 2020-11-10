@@ -46,13 +46,6 @@ const DISPLAY_PIXEL_RATIO = 1
 
 let mapboxResolutionRatio: number | null = null
 let paintWorker = new PaintWorker()
-let displayWidth = 0
-let displayHeight = 0
-
-const setDisplaySize = (size: Size) => {
-  displayWidth = size.w
-  displayHeight = size.h
-}
 
 const getMapboxPixelCount = (map: mapboxgl.Map) => {
   const mapboxCanvas = map.getCanvas()
@@ -151,7 +144,7 @@ const MapboxGLMap = (): JSX.Element => {
     const center = map ? map.getCenter() : new mapboxgl.LngLat(2.338272, 48.858796)
     const zoom = map ? map.getZoom() : 12
 
-    setMapboxArtificialSize(sizeFactor, setDisplaySize)
+    setMapboxArtificialSize(sizeFactor)
 
     const newMap = new mapboxgl.Map({
       container: mapboxContainer.current ? mapboxContainer.current : '',
@@ -171,7 +164,7 @@ const MapboxGLMap = (): JSX.Element => {
     newMap.on('zoomstart', toggleCanvasOpacity)
 
     newMap.on('render', () => {
-      setMapboxDisplaySize({ w: displayWidth, h: displayHeight })
+      setMapboxDisplaySize()
       if (!newMap.loaded() || newMap.isMoving() || newMap.isZooming()) {
         return
       }
@@ -259,7 +252,7 @@ const MapboxGLMap = (): JSX.Element => {
     }
 
     setIsLoading(true)
-    resizeMapsContainer(targetSize, setDisplaySize)
+    resizeMapsContainer(targetSize)
     setSizeRender(sizeRender + 1)
 
     const target1DPixelCount = (longerPropertyCMLength / CM_PER_INCH) * pixelPerInchResolution
