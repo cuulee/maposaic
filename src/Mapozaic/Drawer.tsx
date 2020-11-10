@@ -180,11 +180,11 @@ const Drawer = ({
         />
         <Button
           className="scale__paint"
-          shape="circle"
           disabled={sizeFactor === localSizeFactor}
           onClick={applyGranularity}
+          icon={<FormatPainterOutlined />}
         >
-          <FormatPainterOutlined />
+          Apply
         </Button>
         {(remainingTime || estimatedTime) && (
           <Badge className="scale__time" count={<ClockCircleOutlined style={{ color: PRIMARY_COLOR }} />}>
