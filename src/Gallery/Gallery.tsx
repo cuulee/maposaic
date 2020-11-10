@@ -55,6 +55,26 @@ const Gallery = () => {
     fetchData()
   }, [])
 
+  const incrementPictureIndex = (increment: -1 | 1) => {
+    if (null === displayedIndex) {
+      return
+    }
+    setDisplayedIndex(Math.min(Math.max(0, displayedIndex + increment), pictures.length - 1))
+  }
+
+  const onKeyDown = ({ key }: { key: string }) => {
+    if (key === 'ArrowLeft') {
+      incrementPictureIndex(-1)
+    } else if (key === 'ArrowRight') {
+      incrementPictureIndex(1)
+    }
+  }
+
+  useEffect(() => {
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  })
+
   return (
     <div className="gallery">
       <Title level={2}>Gallery</Title>
@@ -107,18 +127,14 @@ const Gallery = () => {
         <LeftOutlined
           className="gallery__arrow gallery__arrow--left"
           style={{ fontSize: '28px', color: DISABLED_COLOR }}
-          onClick={() => (displayedIndex ? setDisplayedIndex(displayedIndex - 1) : setDisplayedIndex(0))}
+          onClick={() => incrementPictureIndex(-1)}
         />
       )}
       {isModalVisible && displayedIndex !== null && displayedIndex + 1 < pictures.length && (
         <RightOutlined
           className="gallery__arrow gallery__arrow--right"
           style={{ fontSize: '28px', color: DISABLED_COLOR }}
-          onClick={() =>
-            displayedIndex !== null && displayedIndex + 1 < pictures.length
-              ? setDisplayedIndex(displayedIndex + 1)
-              : setDisplayedIndex(0)
-          }
+          onClick={() => incrementPictureIndex(1)}
         />
       )}
     </div>
