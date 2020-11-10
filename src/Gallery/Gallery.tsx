@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 import 'Gallery/style.less'
 import Title from 'antd/lib/typography/Title'
 import { Divider, Modal } from 'antd'
+import { DISABLED_COLOR } from 'constants/colors'
 
 import { Link } from 'react-router-dom'
 import { LeftOutlined, RightOutlined } from '@ant-design/icons'
@@ -97,21 +98,29 @@ const Gallery = () => {
               src={pictures[displayedIndex].downloadURL}
             />
             <div className="modal-content__nav">
-              <LeftOutlined
-                onClick={() => (displayedIndex ? setDisplayedIndex(displayedIndex - 1) : setDisplayedIndex(0))}
-              />
               <div className="modal-content__name">{displayedName(pictures[displayedIndex].pictureName)}</div>
-              <RightOutlined
-                onClick={() =>
-                  displayedIndex !== null && displayedIndex + 1 < pictures.length
-                    ? setDisplayedIndex(displayedIndex + 1)
-                    : setDisplayedIndex(0)
-                }
-              />
             </div>
           </div>
         )}
       </Modal>
+      {isModalVisible && displayedIndex && displayedIndex > 0 && (
+        <LeftOutlined
+          className="gallery__arrow gallery__arrow--left"
+          style={{ fontSize: '28px', color: DISABLED_COLOR }}
+          onClick={() => (displayedIndex ? setDisplayedIndex(displayedIndex - 1) : setDisplayedIndex(0))}
+        />
+      )}
+      {isModalVisible && displayedIndex !== null && displayedIndex + 1 < pictures.length && (
+        <RightOutlined
+          className="gallery__arrow gallery__arrow--right"
+          style={{ fontSize: '28px', color: DISABLED_COLOR }}
+          onClick={() =>
+            displayedIndex !== null && displayedIndex + 1 < pictures.length
+              ? setDisplayedIndex(displayedIndex + 1)
+              : setDisplayedIndex(0)
+          }
+        />
+      )}
     </div>
   )
 }

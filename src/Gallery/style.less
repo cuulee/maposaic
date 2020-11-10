@@ -1,5 +1,8 @@
+@galler-padding: 16px;
+
 .gallery {
-  padding: 16px;
+  padding: @galler-padding;
+  position: relative;
   &__subtitle {
     display: flex;
     align-items: center;
@@ -30,6 +33,17 @@
       }
     }
   }
+  &__arrow {
+    position: fixed;
+    top: 50%;
+    z-index: 1001;
+    &--left {
+      left: 8px;
+    }
+    &--right {
+      right: 8px;
+    }
+  }
 }
 .modal-content {
   width: 100%;
@@ -43,11 +57,10 @@
     max-height: 70vh;
   }
   &__nav {
-    margin-top: 16px;
     margin-top: 8px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     width: 100%;
   }
 }
