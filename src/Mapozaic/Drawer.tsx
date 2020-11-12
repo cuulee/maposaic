@@ -193,11 +193,12 @@ const Drawer = ({
         )}
       </div>
       <Divider />
-      <Title level={4}>Contours</Title>
+      <Title level={4}>Background</Title>
       <Radio.Group onChange={onStyleUrlChange} value={mapboxStyleURL}>
-        <Radio value={MAPBOX_STYLE_URL.road}>Road boundaries</Radio>
-        <Radio value={MAPBOX_STYLE_URL.water}>Water boundaries</Radio>
-        <Radio value={MAPBOX_STYLE_URL.administrative}>Administrative boundaries</Radio>
+        <Radio value={MAPBOX_STYLE_URL.relief}>Relief</Radio>
+        <Radio value={MAPBOX_STYLE_URL.road}>Road only</Radio>
+        <Radio value={MAPBOX_STYLE_URL.water}>Water only</Radio>
+        <Radio value={MAPBOX_STYLE_URL.administrative}>Administrative</Radio>
       </Radio.Group>
       <Divider />
       <Button className="open-button" onClick={openCanvasImage}>

@@ -18,3 +18,17 @@ export type OnPosterSizeChangePayload = {
   pixelPerInchResolution: number
   longerPropertyCMLength: number
 }
+
+export type GeoData = {
+  geodata: {
+    nearest: {
+      latt: number[]
+      longt: number[]
+      elevation: number[]
+      timezone: string[]
+      city: string[]
+      name: string[]
+      prov: string[]
+    }[]
+  }
+}

@@ -6,6 +6,7 @@ import { PictureOutlined, RightCircleFilled } from '@ant-design/icons'
 import { useHistory } from 'react-router-dom'
 import { Spin } from 'antd'
 import spinner from 'assets/spinner.png'
+import dice from 'assets/dice.svg'
 
 import Drawer from './Drawer'
 
@@ -15,9 +16,9 @@ import PaintWorker from 'worker-loader!./paint.worker'
 import 'Mapozaic/style.less'
 import { MaposaicColors, PresetColorName } from 'Colors/types'
 import { getTargetSizeFromSourceSize } from 'Canvas/utils'
-import { ROAD_SIMPLE_GREY, WATER_BLACK } from 'Colors/mapbox'
+import { ROAD_SIMPLE_WHITE, WATER_CYAN } from 'Colors/mapbox'
 import { ROAD_WHITE } from 'Colors/colors'
-import { OnPosterSizeChangePayload, SpecificColorTransforms } from 'Mapozaic/types'
+import { GeoData, OnPosterSizeChangePayload, SpecificColorTransforms } from 'Mapozaic/types'
 import { Size } from 'Canvas/types'
 import {
   resizeMapsContainer,
@@ -37,8 +38,9 @@ export const MAPBOX_STYLE_URL = {
   road: 'mapbox://styles/cartapuce/ck8vk01zo2e5w1ipmytroxgf4',
   water: 'mapbox://styles/cartapuce/ck8ynyj0x022h1hpmffi87im9',
   administrative: 'mapbox://styles/cartapuce/ck8vkvxjt27z71ila3b3jecka',
+  relief: 'mapbox://styles/cartapuce/ckhf6cuex07dd19piqg029oka',
   satellite: 'mapbox://styles/mapbox/satellite-v9',
-  // regular: 'mapbox://styles/mapbox/streets-v11',
+  regular: 'mapbox://styles/mapbox/streets-v11',
 }
 
 const INITIAL_SIZE_FACTOR = 1
@@ -60,6 +62,11 @@ const computeTime: { pixelCount: number | null; milliseconds: number | null } = 
 
 let lastStartDate = new Date()
 
+const getRandomZoom = () => {
+  // mapbox zoom range : 0 (most zoom out) - 22
+  return Math.random() * 13 + 3
+}
+
 const MapboxGLMap = (): JSX.Element => {
   const history = useHistory()
   const [map, setMap] = useState<mapboxgl.Map | null>(null)
@@ -68,7 +75,7 @@ const MapboxGLMap = (): JSX.Element => {
   const [estimatedTime, setEstimatedTime] = useState<number | null>(null)
   const [remainingTime, setRemainingTime] = useState<number | null>(null)
 
-  const [mapboxStyleURL, setMapboxStyleURL] = useState(MAPBOX_STYLE_URL.road)
+  const [mapboxStyleURL, setMapboxStyleURL] = useState(MAPBOX_STYLE_URL.relief)
   const [maposaicColors, setMaposaicColors] = useState<MaposaicColors>(PresetColorName.Random)
 
   const [isLoading, setIsLoading] = useState(true)
@@ -76,9 +83,36 @@ const MapboxGLMap = (): JSX.Element => {
   const [sizeRender, setSizeRender] = useState(0)
   const [sizeFactor, setSizeFactor] = useState(INITIAL_SIZE_FACTOR)
   const [specificColorTransforms, setSpecificColorTransforms] = useState<SpecificColorTransforms>({
-    [ROAD_SIMPLE_GREY]: { color: ROAD_WHITE, isEditable: true, name: 'roads' },
-    [WATER_BLACK]: { color: null, isEditable: true, name: 'water' },
+    [ROAD_SIMPLE_WHITE]: { color: ROAD_WHITE, isEditable: true, name: 'roads' },
+    [WATER_CYAN]: { color: null, isEditable: true, name: 'water' },
   })
+
+  const [randomLngLat, setRandomLngLat] = useState<null | mapboxgl.LngLat>(null)
+  const [randomZoom, setRandomZoom] = useState(getRandomZoom())
+  const [areCoordsRandom, setAreCoordsRandom] = useState(true)
+
+  const fetchGeoRandom = async () => {
+    try {
+      const response = await fetch('https://us-central1-maposaic-99785.cloudfunctions.net/fetch3Geonames')
+      const data: GeoData = await response.json()
+      setRandomLngLat(
+        new mapboxgl.LngLat(
+          data.geodata.nearest[0]?.longt[0] ?? 2.338272,
+          data.geodata.nearest[0]?.latt[0] ?? 48.858796,
+        ),
+      )
+      console.log('zoom', randomZoom)
+      console.log('city', data.geodata.nearest[0]?.city)
+      console.log('timezon', data.geodata.nearest[0]?.timezone)
+      console.log('prov', data.geodata.nearest[0]?.prov)
+    } catch {
+      setRandomLngLat(new mapboxgl.LngLat(2.338272, 48.858796))
+    }
+  }
+  useEffect(() => {
+    fetchGeoRandom()
+    // eslint-disable-next-line
+  }, [])
 
   useEffect(() => {
     const paintMosaic = async (newMap: mapboxgl.Map): Promise<void> => {
@@ -140,9 +174,13 @@ const MapboxGLMap = (): JSX.Element => {
         setEstimatedTime(duration)
       }
     }
+    if (!randomLngLat) {
+      return
+    }
 
-    const center = map ? map.getCenter() : new mapboxgl.LngLat(2.338272, 48.858796)
-    const zoom = map ? map.getZoom() : 12
+    const center = areCoordsRandom ? randomLngLat : map?.getCenter() ?? randomLngLat
+    const zoom = areCoordsRandom ? randomZoom : map?.getZoom() ?? randomZoom
+    setAreCoordsRandom(false)
 
     setMapboxArtificialSize(sizeFactor)
 
@@ -182,7 +220,7 @@ const MapboxGLMap = (): JSX.Element => {
       newMap.remove()
     }
     // eslint-disable-next-line
-  }, [mapboxStyleURL, maposaicColors, sizeRender, sizeFactor, specificColorTransforms])
+  }, [mapboxStyleURL, maposaicColors, sizeRender, sizeFactor, specificColorTransforms, randomLngLat])
 
   const [drawerVisible, setDrawerVisible] = useState(false)
 
@@ -282,6 +320,12 @@ const MapboxGLMap = (): JSX.Element => {
         Math.pow(pendingSizeFactor / sizeFactor, 2),
     )
   }
+  const setRandomCoords = () => {
+    setIsLoading(true)
+    setAreCoordsRandom(true)
+    setRandomZoom(getRandomZoom())
+    fetchGeoRandom()
+  }
 
   return (
     <div className="root-wrapper" id="root-wrapper">
@@ -338,6 +382,13 @@ const MapboxGLMap = (): JSX.Element => {
                 icon={<PictureOutlined />}
               />
             </Tooltip>
+            <Button
+              className="overmap__actions__button"
+              style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+              shape="circle"
+              onClick={setRandomCoords}
+              icon={<img src={dice} width="13px" alt="dice" />}
+            />
           </div>
         </div>
       </div>

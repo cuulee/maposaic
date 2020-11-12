@@ -1,2 +1,2 @@
-export const ROAD_SIMPLE_GREY = '#383838'
-export const WATER_BLACK = '#1a1a1a'
+export const ROAD_SIMPLE_WHITE = '#ffffff'
+export const WATER_CYAN = '#75cff0'

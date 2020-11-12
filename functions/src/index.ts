@@ -15,12 +15,14 @@ export const helloWorld = functions.https.onRequest((request, response) => {
 export const fetch3Geonames = functions.https.onRequest(async (request, response) => {
   try {
     const result = await fetch('https://api.3geonames.org/?randomland=yes')
+    console.log('res', result)
     const text = await result.text()
     const res = await parseStringPromise(text)
     cors(request, response, () => {
       response.send(res)
     })
-  } catch {
+  } catch (e) {
+    console.log('error', e)
     response.status(500).send('Error')
   }
 })
