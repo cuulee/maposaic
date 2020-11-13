@@ -29,6 +29,7 @@ import {
 import { CM_PER_INCH, FORMAT_RATIO } from 'constants/dimensions'
 import CloudUpload from 'CloudUpload/CloudUpload'
 import { TOOLTIP_ENTER_DELAY } from 'constants/ux'
+import { openPlaceNotification } from 'Mapozaic/notification'
 
 // eslint-disable-next-line
 export const MAPBOX_TOKEN: string = process.env['REACT_APP_MAPBOX_TOKEN'] || ''
@@ -101,10 +102,7 @@ const MapboxGLMap = (): JSX.Element => {
           data.geodata.nearest[0]?.latt[0] ?? 48.858796,
         ),
       )
-      console.log('zoom', randomZoom)
-      console.log('city', data.geodata.nearest[0]?.city)
-      console.log('timezon', data.geodata.nearest[0]?.timezone)
-      console.log('prov', data.geodata.nearest[0]?.prov)
+      openPlaceNotification(data)
     } catch {
       setRandomLngLat(new mapboxgl.LngLat(2.338272, 48.858796))
     }
