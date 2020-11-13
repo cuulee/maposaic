@@ -250,18 +250,6 @@ const MapboxGLMap = (): JSX.Element => {
     map.setCenter(center)
   }
 
-  const openCanvasImage = () => {
-    const mosaicElement = document.getElementById('maposaic-canvas') as HTMLCanvasElement
-    const image = new Image()
-    image.src = mosaicElement.toDataURL()
-    image.style.width = '100vw'
-    const w = window.open('bijour ')
-    if (!w) {
-      return
-    }
-    w.document.write(image.outerHTML)
-  }
-
   const onPosterSizeChange = ({
     isLandscape,
     pixelPerInchResolution,
@@ -343,7 +331,6 @@ const MapboxGLMap = (): JSX.Element => {
             setNewMaposaicColors={setNewMaposaicColors}
             sizeFactor={sizeFactor}
             setNewSizeFactor={setNewSizeFactor}
-            openCanvasImage={openCanvasImage}
             specificColorTransforms={specificColorTransforms}
             setNewSpecificColorTransforms={setNewSpecificColorTransforms}
             remainingTime={remainingTime}

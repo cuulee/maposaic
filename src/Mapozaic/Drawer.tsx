@@ -27,7 +27,6 @@ export type DrawerPropsType = {
   currentCenter: [number, number]
   maposaicColors: MaposaicColors
   setNewMaposaicColors: (colors: MaposaicColors) => void
-  openCanvasImage: () => void
   specificColorTransforms: SpecificColorTransforms
   setNewSpecificColorTransforms: (colors: SpecificColorTransforms) => void
   remainingTime: number | null
@@ -57,7 +56,6 @@ const Drawer = ({
   currentCenter,
   maposaicColors,
   setNewMaposaicColors,
-  openCanvasImage,
   specificColorTransforms,
   setNewSpecificColorTransforms,
   remainingTime,
@@ -116,6 +114,7 @@ const Drawer = ({
       width="min(75%,333px)"
     >
       <GeoSearch flyTo={flyTo} currentCenter={currentCenter} setDrawerVisible={setDrawerVisible} />
+
       <Divider />
       <Title level={4}>Colors</Title>
       <ColorTabs
@@ -124,6 +123,15 @@ const Drawer = ({
         specificColorTransforms={specificColorTransforms}
         setNewSpecificColorTransforms={setNewSpecificColorTransforms}
       />
+
+      <Divider />
+      <Title level={4}>Background</Title>
+      <Radio.Group onChange={onStyleUrlChange} value={mapboxStyleURL}>
+        <Radio value={MAPBOX_STYLE_URL.relief}>Relief</Radio>
+        <Radio value={MAPBOX_STYLE_URL.road}>Road only</Radio>
+        <Radio value={MAPBOX_STYLE_URL.water}>Water only</Radio>
+        <Radio value={MAPBOX_STYLE_URL.administrative}>Administrative</Radio>
+      </Radio.Group>
 
       <Divider />
       <Title level={4}>Poster</Title>
@@ -161,8 +169,8 @@ const Drawer = ({
           </Radio.Button>
         </Radio.Group>
       </div>
-      <Divider />
 
+      <Divider />
       <Title level={4}>
         Scale
         <Tooltip className="scale-tooltip" title="Increase size and... waiting time">
@@ -192,18 +200,6 @@ const Drawer = ({
           </Badge>
         )}
       </div>
-      <Divider />
-      <Title level={4}>Background</Title>
-      <Radio.Group onChange={onStyleUrlChange} value={mapboxStyleURL}>
-        <Radio value={MAPBOX_STYLE_URL.relief}>Relief</Radio>
-        <Radio value={MAPBOX_STYLE_URL.road}>Road only</Radio>
-        <Radio value={MAPBOX_STYLE_URL.water}>Water only</Radio>
-        <Radio value={MAPBOX_STYLE_URL.administrative}>Administrative</Radio>
-      </Radio.Group>
-      <Divider />
-      <Button className="open-button" onClick={openCanvasImage}>
-        Open map image in new window
-      </Button>
     </AntDrawer>
   )
 }
