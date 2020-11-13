@@ -1,9 +1,5 @@
 export type RGBColor = { r: number; g: number; b: number }
 
-export type CustomShadingColor = 'customShading'
-
-export type ShadingColor = PresetColorName | CustomShadingColor
-
 export type MaposaicColors = PresetColorName.Random | string[] | string
 
 export enum PaletteOrigin {
@@ -25,4 +21,5 @@ export enum PresetColorName {
   Purple = 'purple',
   Magenta = 'magenta',
   Grey = 'grey',
+  Custom = 'custom',
 }

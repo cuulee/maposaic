@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { Radio, Tabs, Popover, Select, Button, Checkbox } from 'antd'
+import { Radio, Tabs, Popover, Select, Checkbox } from 'antd'
 import { RadioChangeEvent } from 'antd/lib/radio'
 import { ChromePicker, ColorResult as ReactColorResult, ColorResult } from 'react-color'
 import { generate } from '@ant-design/colors'
 
-import { PRIMARY_COLOR } from 'constants/colors'
 import { AntColors, PRESET_PALETTES } from 'Colors/colors'
-import { MaposaicColors, PresetColorName, PaletteOrigin, ShadingColor } from 'Colors/types'
+import { MaposaicColors, PresetColorName, PaletteOrigin } from 'Colors/types'
 import './colorTabs.style.less'
 import { CheckboxChangeEvent } from 'antd/lib/checkbox'
 import { SpecificColorTransforms } from 'Mapozaic/types'
@@ -23,7 +22,7 @@ const ColorTabs = ({
   specificColorTransforms: SpecificColorTransforms
   setNewSpecificColorTransforms: (colors: SpecificColorTransforms) => void
 }) => {
-  const [shadingColor, setShadingColor] = useState<ShadingColor>(PresetColorName.Random)
+  const [shadingColor, setShadingColor] = useState<PresetColorName>(PresetColorName.Random)
   const [customShadingColor, setCustomShadingColor] = useState('#3c22c3')
   const [presetPaletteIndex, setPresetPaletteIndex] = useState({
     [PaletteOrigin.Coolors]: 0,
@@ -43,19 +42,21 @@ const ColorTabs = ({
   }, [specificColorTransforms])
 
   const handlePresetColorChange = (e: RadioChangeEvent) => {
+    console.log('change', e.target.value)
     const color = e.target.value as PresetColorName
     setShadingColor(color)
-    setNewMaposaicColors(color === PresetColorName.Random ? PresetColorName.Random : AntColors[color])
-  }
-
-  const handleCustomShadingClick = () => {
-    setShadingColor('customShading')
-    setNewMaposaicColors(generate(customShadingColor))
+    if (color === PresetColorName.Custom) {
+      setNewMaposaicColors(generate(customShadingColor))
+    } else if (color === PresetColorName.Random) {
+      setNewMaposaicColors(PresetColorName.Random)
+    } else {
+      setNewMaposaicColors(AntColors[color])
+    }
   }
 
   const handleCustomShadingColorChangeComplete = (color: ReactColorResult) => {
     setCustomShadingColor(color.hex.toLocaleLowerCase())
-    setShadingColor('customShading')
+    setShadingColor(PresetColorName.Custom)
     setNewMaposaicColors(generate(color.hex.toLocaleLowerCase()))
   }
 
@@ -83,11 +84,12 @@ const ColorTabs = ({
 
   const onTabChange = (activeKey: string) => {
     if (activeKey === '1') {
-      if (shadingColor === 'customShading') {
+      if (shadingColor === PresetColorName.Custom) {
         setNewMaposaicColors(generate(customShadingColor))
         return
+      } else {
+        setNewMaposaicColors(shadingColor === PresetColorName.Random ? PresetColorName.Random : AntColors[shadingColor])
       }
-      setNewMaposaicColors(shadingColor === PresetColorName.Random ? PresetColorName.Random : AntColors[shadingColor])
     } else if (activeKey === '2') {
       setNewMaposaicColors(PRESET_PALETTES[paletteOrigin].palettes[presetPaletteIndex[paletteOrigin]])
     } else if (activeKey === '3') {
@@ -137,35 +139,35 @@ const ColorTabs = ({
       <Tabs defaultActiveKey="1" onChange={onTabChange}>
         <Tabs.TabPane key="1" tab={<span className="tab-span">Shading</span>}>
           <Radio.Group name="preset" onChange={handlePresetColorChange} value={shadingColor} style={{ padding: '1px' }}>
-            {Object.entries(PresetColorName).map(([name, color]) => {
-              return (
-                <Radio.Button style={{ width: ' 100px' }} key={color} value={color}>
-                  {name}
-                </Radio.Button>
-              )
-            })}
+            <React.Fragment>
+              {Object.entries(PresetColorName).map(([name, color]) => {
+                if (color === PresetColorName.Custom) {
+                  return (
+                    <Popover
+                      content={
+                        <ChromePicker
+                          color={customShadingColor}
+                          onChange={(c) => setCustomShadingColor(c.hex)}
+                          onChangeComplete={handleCustomShadingColorChangeComplete}
+                          disableAlpha
+                        />
+                      }
+                      placement="bottom"
+                    >
+                      <Radio.Button style={{ width: ' 100px' }} value={color}>
+                        Custom
+                      </Radio.Button>
+                    </Popover>
+                  )
+                }
+                return (
+                  <Radio.Button style={{ width: ' 100px' }} key={color} value={color}>
+                    {name}
+                  </Radio.Button>
+                )
+              })}
+            </React.Fragment>
           </Radio.Group>
-          <Popover
-            content={
-              <ChromePicker
-                color={customShadingColor}
-                onChange={(c) => setCustomShadingColor(c.hex)}
-                onChangeComplete={handleCustomShadingColorChangeComplete}
-                disableAlpha
-              />
-            }
-            placement="bottom"
-          >
-            <Button
-              style={
-                shadingColor === 'customShading' ? { borderColor: PRIMARY_COLOR, color: PRIMARY_COLOR } : undefined
-              }
-              onClick={handleCustomShadingClick}
-              className="shading-custom-button"
-            >
-              Custom seed
-            </Button>
-          </Popover>
         </Tabs.TabPane>
         <Tabs.TabPane
           key="2"
