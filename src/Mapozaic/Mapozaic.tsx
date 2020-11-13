@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { Button, Tooltip } from 'antd'
-import { PictureOutlined, RightCircleFilled } from '@ant-design/icons'
+import { PictureOutlined, SettingOutlined } from '@ant-design/icons'
 import { useHistory } from 'react-router-dom'
 import { Spin } from 'antd'
 import spinner from 'assets/spinner.png'
@@ -362,7 +362,7 @@ const MapboxGLMap = (): JSX.Element => {
                 onClick={() => {
                   setDrawerVisible(true)
                 }}
-                icon={<RightCircleFilled />}
+                icon={<SettingOutlined />}
               />
             </Tooltip>
             <CloudUpload
@@ -382,13 +382,15 @@ const MapboxGLMap = (): JSX.Element => {
                 icon={<PictureOutlined />}
               />
             </Tooltip>
-            <Button
-              className="overmap__actions__button"
-              style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
-              shape="circle"
-              onClick={setRandomCoords}
-              icon={<img src={dice} width="13px" alt="dice" />}
-            />
+            <Tooltip title="Random place" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
+              <Button
+                className="overmap__actions__button"
+                style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+                shape="circle"
+                onClick={setRandomCoords}
+                icon={<img src={dice} width="16px" alt="dice" />}
+              />
+            </Tooltip>
           </div>
         </div>
       </div>
