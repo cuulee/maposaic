@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { Button, Tooltip } from 'antd'
-import { PictureOutlined, SettingOutlined } from '@ant-design/icons'
+import { CompassOutlined, PictureOutlined, SettingOutlined } from '@ant-design/icons'
 import { useHistory } from 'react-router-dom'
 import { Spin } from 'antd'
 import spinner from 'assets/spinner.png'
@@ -18,7 +18,7 @@ import { MaposaicColors, PresetColorName } from 'Colors/types'
 import { getTargetSizeFromSourceSize } from 'Canvas/utils'
 import { ROAD_SIMPLE_WHITE, WATER_CYAN } from 'Colors/mapbox'
 import { ROAD_WHITE } from 'Colors/colors'
-import { GeoData, OnPosterSizeChangePayload, SpecificColorTransforms } from 'Mapozaic/types'
+import { OnPosterSizeChangePayload, SpecificColorTransforms } from 'Mapozaic/types'
 import { Size } from 'Canvas/types'
 import {
   resizeMapsContainer,
@@ -30,19 +30,11 @@ import { CM_PER_INCH, FORMAT_RATIO } from 'constants/dimensions'
 import CloudUpload from 'CloudUpload/CloudUpload'
 import { TOOLTIP_ENTER_DELAY } from 'constants/ux'
 import { openPlaceNotification } from 'Mapozaic/notification'
+import { GEOCODING_BASE_URL, MAPBOX_STYLE_URL, MAPBOX_TOKEN } from 'constants/mapbox'
+import { GeonameData } from 'types/geo'
+import { getPlaceNameFromGeoname, setPlaceNameFromPosition } from 'utils/mapbox'
 
-// eslint-disable-next-line
-export const MAPBOX_TOKEN: string = process.env['REACT_APP_MAPBOX_TOKEN'] || ''
 mapboxgl.accessToken = MAPBOX_TOKEN
-
-export const MAPBOX_STYLE_URL = {
-  road: 'mapbox://styles/cartapuce/ck8vk01zo2e5w1ipmytroxgf4',
-  water: 'mapbox://styles/cartapuce/ck8ynyj0x022h1hpmffi87im9',
-  administrative: 'mapbox://styles/cartapuce/ck8vkvxjt27z71ila3b3jecka',
-  relief: 'mapbox://styles/cartapuce/ckhf6cuex07dd19piqg029oka',
-  satellite: 'mapbox://styles/mapbox/satellite-v9',
-  regular: 'mapbox://styles/mapbox/streets-v11',
-}
 
 const INITIAL_SIZE_FACTOR = 1
 const DISPLAY_PIXEL_RATIO = 1
@@ -80,7 +72,8 @@ const MapboxGLMap = (): JSX.Element => {
   const [maposaicColors, setMaposaicColors] = useState<MaposaicColors>(PresetColorName.Random)
 
   const [isLoading, setIsLoading] = useState(true)
-  const [currentCenter, setCurrentCenter] = useState<[number, number]>([0, 0])
+  const [currentCenter, setCurrentCenter] = useState<null | mapboxgl.LngLat>(null)
+  const [placeName, setPlaceName] = useState<null | string>(null)
   const [sizeRender, setSizeRender] = useState(0)
   const [sizeFactor, setSizeFactor] = useState(INITIAL_SIZE_FACTOR)
   const [specificColorTransforms, setSpecificColorTransforms] = useState<SpecificColorTransforms>({
@@ -95,14 +88,14 @@ const MapboxGLMap = (): JSX.Element => {
   const fetchGeoRandom = async () => {
     try {
       const response = await fetch('https://us-central1-maposaic-99785.cloudfunctions.net/fetch3Geonames')
-      const data: GeoData = await response.json()
+      const data: GeonameData = await response.json()
       setRandomLngLat(
         new mapboxgl.LngLat(
           data.geodata.nearest[0]?.longt[0] ?? 2.338272,
           data.geodata.nearest[0]?.latt[0] ?? 48.858796,
         ),
       )
-      openPlaceNotification(data)
+      openPlaceNotification(getPlaceNameFromGeoname(data))
     } catch {
       setRandomLngLat(new mapboxgl.LngLat(2.338272, 48.858796))
     }
@@ -212,7 +205,9 @@ const MapboxGLMap = (): JSX.Element => {
       lastStartDate = new Date()
       paintWorker = new PaintWorker()
       paintMosaic(newMap)
-      setCurrentCenter([newMap.getCenter().lng, newMap.getCenter().lat])
+      if (newMap.getCenter().lat !== currentCenter?.lat && newMap.getCenter().lng !== currentCenter?.lng) {
+        setCurrentCenter(newMap.getCenter())
+      }
     })
     return () => {
       newMap.remove()
@@ -313,72 +308,82 @@ const MapboxGLMap = (): JSX.Element => {
     fetchGeoRandom()
   }
 
+  useEffect(() => {
+    setPlaceNameFromPosition(currentCenter, setPlaceName)
+  }, [currentCenter])
+
   return (
     <div className="root-wrapper" id="root-wrapper">
       <div className="maps-container" id="maps-container">
         <canvas className="mosaic-canvas" id="maposaic-canvas" />
         <div id="mapbox-wrapper" className="mapbox-wrapper" ref={(el) => (mapboxContainer.current = el)} />
         <Spin spinning={isLoading} indicator={<img className="spinner" src={spinner} alt="spin" />} />
-        <div className="overmap">
-          <Drawer
-            visible={drawerVisible}
-            setDrawerVisible={setDrawerVisible}
-            changeMapStyle={changeMapStyle}
-            mapboxStyleURL={mapboxStyleURL}
-            flyTo={flyTo}
-            currentCenter={currentCenter}
-            maposaicColors={maposaicColors}
-            setNewMaposaicColors={setNewMaposaicColors}
-            sizeFactor={sizeFactor}
-            setNewSizeFactor={setNewSizeFactor}
-            specificColorTransforms={specificColorTransforms}
-            setNewSpecificColorTransforms={setNewSpecificColorTransforms}
-            remainingTime={remainingTime}
-            estimatedTime={estimatedTime}
-            updateEstimatedTime={updateEstimatedTime}
-            onPosterSizeChange={onPosterSizeChange}
-          />
-          <div className="overmap__actions">
-            <Tooltip title="Settings" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
-              <Button
-                className="overmap__actions__button"
-                type="primary"
-                shape="circle"
-                onClick={() => {
-                  setDrawerVisible(true)
-                }}
-                icon={<SettingOutlined />}
-              />
-            </Tooltip>
-            <CloudUpload
-              mapZoom={map?.getZoom()}
-              mapCenter={map?.getCenter()}
+      </div>
+      <div className="overmap">
+        <Drawer
+          visible={drawerVisible}
+          setDrawerVisible={setDrawerVisible}
+          changeMapStyle={changeMapStyle}
+          mapboxStyleURL={mapboxStyleURL}
+          flyTo={flyTo}
+          currentCenter={currentCenter}
+          maposaicColors={maposaicColors}
+          setNewMaposaicColors={setNewMaposaicColors}
+          sizeFactor={sizeFactor}
+          setNewSizeFactor={setNewSizeFactor}
+          specificColorTransforms={specificColorTransforms}
+          setNewSpecificColorTransforms={setNewSpecificColorTransforms}
+          remainingTime={remainingTime}
+          estimatedTime={estimatedTime}
+          updateEstimatedTime={updateEstimatedTime}
+          onPosterSizeChange={onPosterSizeChange}
+        />
+        <div className="overmap__actions">
+          <Tooltip title="Settings" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
+            <Button
               className="overmap__actions__button"
-              isDisabled={isLoading}
+              type="primary"
+              shape="circle"
+              onClick={() => {
+                setDrawerVisible(true)
+              }}
+              icon={<SettingOutlined />}
             />
-            <Tooltip title="Visit gallery" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
-              <Button
-                className="overmap__actions__button"
-                type="default"
-                shape="circle"
-                onClick={() => {
-                  history.push('/gallery')
-                }}
-                icon={<PictureOutlined />}
-              />
-            </Tooltip>
-            <Tooltip title="Random place" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
-              <Button
-                className="overmap__actions__button"
-                style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
-                shape="circle"
-                onClick={setRandomCoords}
-                icon={<img src={dice} width="16px" alt="dice" />}
-              />
-            </Tooltip>
-          </div>
+          </Tooltip>
+          <CloudUpload
+            mapZoom={map?.getZoom()}
+            mapCenter={map?.getCenter()}
+            className="overmap__actions__button"
+            isDisabled={isLoading}
+          />
+          <Tooltip title="Visit gallery" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
+            <Button
+              className="overmap__actions__button"
+              type="default"
+              shape="circle"
+              onClick={() => {
+                history.push('/gallery')
+              }}
+              icon={<PictureOutlined />}
+            />
+          </Tooltip>
+          <Tooltip title="Random place" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
+            <Button
+              className="overmap__actions__button"
+              style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+              shape="circle"
+              onClick={setRandomCoords}
+              icon={<img src={dice} width="16px" alt="dice" />}
+            />
+          </Tooltip>
         </div>
       </div>
+      <Button
+        className="show-place-name"
+        shape="circle"
+        onClick={() => openPlaceNotification(placeName)}
+        icon={<CompassOutlined />}
+      />
     </div>
   )
 }

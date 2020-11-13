@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { AutoComplete, Input } from 'antd'
-import { MAPBOX_TOKEN } from './Mapozaic'
+import { GEOCODING_BASE_URL, MAPBOX_TOKEN } from 'constants/mapbox'
 import { DrawerPropsType } from './Drawer'
 import { SearchOutlined, LoadingOutlined } from '@ant-design/icons'
 
@@ -13,7 +13,6 @@ type GeocoderFeature = {
 type GeocoderResult = {
   features: GeocoderFeature[]
 }
-const baseurl = 'https://api.mapbox.com/geocoding/v5/mapbox.places'
 
 const GeoSearch = ({
   flyTo,
@@ -35,7 +34,8 @@ const GeoSearch = ({
       return
     }
     setIsSearching(true)
-    const request = `${baseurl}/${value}.json?limit=10&language=fr-FR&access_token=${MAPBOX_TOKEN}&proximity=${currentCenter[0]}%2C${currentCenter[1]}`
+    const proximity = currentCenter ? `&proximity=${currentCenter.lng}%2C${currentCenter.lat}` : ''
+    const request = `${GEOCODING_BASE_URL}/${value}.json?limit=10&language=fr-FR&access_token=${MAPBOX_TOKEN}${proximity}`
     const res = await fetch(request)
     const body: GeocoderResult = await res.json()
     setIsSearching(false)

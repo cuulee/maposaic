@@ -6,7 +6,7 @@ import { FormatPainterOutlined, InfoCircleOutlined } from '@ant-design/icons'
 import { Badge } from 'antd'
 import { ClockCircleOutlined } from '@ant-design/icons'
 
-import { MAPBOX_STYLE_URL } from './Mapozaic'
+import { MAPBOX_STYLE_URL } from 'constants/mapbox'
 import GeoSearch from './GeoSearchInput'
 import { MaposaicColors } from 'Colors/types'
 
@@ -24,7 +24,7 @@ export type DrawerPropsType = {
   sizeFactor: number
   setNewSizeFactor: (sizeFactor: number) => void
   flyTo: (center: [number, number]) => void
-  currentCenter: [number, number]
+  currentCenter: mapboxgl.LngLat | null
   maposaicColors: MaposaicColors
   setNewMaposaicColors: (colors: MaposaicColors) => void
   specificColorTransforms: SpecificColorTransforms
