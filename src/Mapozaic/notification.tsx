@@ -15,5 +15,6 @@ export const openPlaceNotification = (data: GeoData) => {
   }
   notification.open({
     message: `${city}${isProv && ', '}${prov}${isTimezone && ', '}${timezone}`,
+    placement: 'bottomRight',
   })
 }
