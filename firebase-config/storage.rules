@@ -1,0 +1,9 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /maposaic_pictures/{allPaths=**} {
+      allow read: if true;
+      allow create: if true;
+    }
+  }
+}

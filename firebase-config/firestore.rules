@@ -5,8 +5,9 @@ service cloud.firestore {
        allow read, write: if true;
      }
      match /pictures/{anything=**} {
-       allow write: if true;
        allow read: if true;
+       allow create: if true;
+       allow update: if true;
      }
    }
  }
