@@ -45,6 +45,7 @@
   position: absolute;
   bottom: 12px;
   right: 8px;
+  z-index: 2;
 }
 .spinner {
   animation: spin 2s linear infinite;
@@ -56,4 +57,7 @@
     -webkit-transform: rotate(360deg);
     transform: rotate(360deg);
   }
+}
+.mapboxgl-ctrl-attrib.mapboxgl-compact:after {
+  display: none;
 }

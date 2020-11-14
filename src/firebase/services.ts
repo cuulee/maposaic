@@ -35,22 +35,16 @@ export const postOrUpdatePicturesDocument = async ({
       .add({ ...sanethizedPayload, timestamp: firebase.firestore.FieldValue.serverTimestamp() })
     return response.id
   } catch (e) {
+    console.log(e)
     return null
   }
-}
-
-type PostOrUpdatePictureDocumentPayload = {
-  downloadURL: string
-  pictureName: string
-  filePath: string
-  mapCenter: number[]
 }
 
 const sanethizePayload = (payload: any) => {
   const res: any = {}
   Object.keys(payload).forEach((key) => {
     const value = payload[key]
-    if (value) {
+    if (value !== undefined) {
       res[key] = value
     }
   })
