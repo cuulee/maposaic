@@ -57,11 +57,13 @@ const CloudUpload = ({
   className,
   mapCenter,
   mapZoom,
+  placeName,
 }: {
   isDisabled: boolean
   className?: string
   mapCenter?: mapboxgl.LngLat
   mapZoom?: number
+  placeName: string | null
 }) => {
   const [modalVisible, setModalVisible] = useState(false)
   const [progress, setProgress] = useState(0)
@@ -83,7 +85,7 @@ const CloudUpload = ({
     setTaskState(null)
     setUploadTask(null)
     setPictureDocumentId(null)
-    setPictureName('')
+    setPictureName(placeName ?? '')
 
     const mosaicElement = document.getElementById('maposaic-canvas') as HTMLCanvasElement | null
     if (!mosaicElement) {
@@ -114,7 +116,8 @@ const CloudUpload = ({
         downloadURL,
         filePath,
         mapCenter: mapCenter?.toArray(),
-        mapZoom: mapZoom,
+        mapZoom,
+        placeName,
       },
     })
     updateDocumentId(documentId)
@@ -245,7 +248,7 @@ const CloudUpload = ({
           </React.Fragment>
         )}
         <div className="form">
-          <div className="form__title">Optional</div>
+          <div className="form__title">Picture name (optional)</div>
           <div className="form__field">
             <Input
               placeholder="Picture name"

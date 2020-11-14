@@ -30,7 +30,7 @@ import { CM_PER_INCH, FORMAT_RATIO } from 'constants/dimensions'
 import CloudUpload from 'CloudUpload/CloudUpload'
 import { TOOLTIP_ENTER_DELAY } from 'constants/ux'
 import { openPlaceNotification } from 'Mapozaic/notification'
-import { GEOCODING_BASE_URL, MAPBOX_STYLE_URL, MAPBOX_TOKEN } from 'constants/mapbox'
+import { MAPBOX_STYLE_URL, MAPBOX_TOKEN } from 'constants/mapbox'
 import { GeonameData } from 'types/geo'
 import { getPlaceNameFromGeoname, setPlaceNameFromPosition } from 'utils/mapbox'
 
@@ -353,6 +353,7 @@ const MapboxGLMap = (): JSX.Element => {
           <CloudUpload
             mapZoom={map?.getZoom()}
             mapCenter={map?.getCenter()}
+            placeName={placeName}
             className="overmap__actions__button"
             isDisabled={isLoading}
           />

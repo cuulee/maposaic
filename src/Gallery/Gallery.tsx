@@ -13,16 +13,18 @@ type ApiPicture = {
   pictureName?: string
   filePath?: string
   downloadURL?: string
+  placeName?: string | null
 }
 
 type Picture = {
   id: string
-  pictureName?: string
+  pictureName: string | undefined
+  placeName: string | undefined | null
   downloadURL: string
 }
 
-const displayedName = (name: string | undefined): string => {
-  return name || 'no name'
+const displayedName = (picture: Picture): string => {
+  return picture.pictureName ?? picture.placeName ?? 'no name'
 }
 
 const Gallery = () => {
@@ -43,6 +45,7 @@ const Gallery = () => {
           id: doc.id,
           pictureName: apiPicture.pictureName,
           downloadURL: apiPicture.downloadURL,
+          placeName: apiPicture.placeName,
         }
         newPictures.push(pic)
       })
@@ -91,12 +94,8 @@ const Gallery = () => {
               className="gallery__picture"
               key={pic.id}
             >
-              <img
-                className="gallery__picture__image"
-                alt={`pic-${displayedName(pic.pictureName)}`}
-                src={pic.downloadURL}
-              />
-              <div className="gallery__picture__name">{displayedName(pic.pictureName)}</div>
+              <img className="gallery__picture__image" alt={`pic-${displayedName(pic)}`} src={pic.downloadURL} />
+              <div className="gallery__picture__name">{displayedName(pic)}</div>
             </div>
           )
         })}
@@ -114,11 +113,11 @@ const Gallery = () => {
           <div className="modal-content">
             <img
               className="modal-content__picture"
-              alt={`pic-${displayedName(pictures[displayedIndex].pictureName)}`}
+              alt={`pic-${displayedName(pictures[displayedIndex])}`}
               src={pictures[displayedIndex].downloadURL}
             />
             <div className="modal-content__nav">
-              <div className="modal-content__name">{displayedName(pictures[displayedIndex].pictureName)}</div>
+              <div className="modal-content__name">{displayedName(pictures[displayedIndex])}</div>
             </div>
           </div>
         )}
