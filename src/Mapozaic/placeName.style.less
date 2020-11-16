@@ -1,0 +1,68 @@
+.place-name {
+  position: absolute;
+  bottom: 8px;
+  right: 0px;
+  display: flex;
+  align-items: center;
+  height: 32px;
+  border-top-left-radius: 16px;
+  border-bottom-left-radius: 16px;
+  padding-right: 8px;
+  background-color: white;
+  max-width: 80%;
+  &--displayed {
+    animation: slidein 0.5s ease-in;
+  }
+  &--hidden {
+    max-width: 32px;
+    background-color: transparent;
+    right: 3px;
+    &--animation {
+      animation: slideout 0.5s ease-out;
+    }
+  }
+
+  cursor: pointer;
+  &__text {
+    margin-left: 8px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}
+@keyframes slideout {
+  0% {
+    background-color: white;
+    max-width: 80%;
+    right: 0px;
+  }
+  95% {
+    right: 0px;
+    background-color: white;
+  }
+  98% {
+    right: 3px;
+    background-color: transparent;
+  }
+  99.99% {
+  }
+  100% {
+    max-width: 32px;
+  }
+}
+@keyframes slidein {
+  0% {
+    background-color: transparent;
+    max-width: 32px;
+    right: 3px;
+  }
+  0.1% {
+    background-color: white;
+  }
+  5% {
+    right: 0;
+  }
+  100% {
+    max-width: 80%;
+  }
+}

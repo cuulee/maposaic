@@ -41,12 +41,6 @@
     }
   }
 }
-.show-place-name {
-  position: absolute;
-  bottom: 12px;
-  right: 8px;
-  z-index: 2;
-}
 .spinner {
   animation: spin 2s linear infinite;
   width: 18px;
@@ -58,6 +52,11 @@
     transform: rotate(360deg);
   }
 }
+// mapbox floating info in bottom right
 .mapboxgl-ctrl-attrib.mapboxgl-compact:after {
+  display: none;
+}
+// mapbox floating info in bottom right
+.mapboxgl-ctrl-bottom-right {
   display: none;
 }

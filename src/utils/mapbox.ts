@@ -1,5 +1,6 @@
 import { GEOCODING_BASE_URL, MAPBOX_TOKEN } from 'constants/mapbox'
 import { GeocodingData, PlaceType, GeonameData } from 'types/geo'
+import mapboxgl from 'mapbox-gl'
 
 export const PLACE_TYPE_RELEVANCE = [
   PlaceType.Place,
@@ -11,12 +12,9 @@ export const PLACE_TYPE_RELEVANCE = [
   PlaceType.Neighborhood,
 ]
 
-export const setPlaceNameFromPosition = async (
-  center: mapboxgl.LngLat | null,
-  setPlaceName: (place: string | null) => void,
-) => {
+export const getPlaceNameFromPosition = async (center: mapboxgl.LngLat | null) => {
   if (!center) {
-    return
+    return null
   }
   const geoResponse = await fetch(`${GEOCODING_BASE_URL}/${center.lng},${center.lat}.json?access_token=${MAPBOX_TOKEN}`)
   const geoCoding: GeocodingData = await geoResponse.json()
@@ -24,13 +22,12 @@ export const setPlaceNameFromPosition = async (
     for (let feature of geoCoding.features) {
       for (let foundPlaceType of feature.place_type) {
         if (foundPlaceType === nextRelevantPlaceType) {
-          setPlaceName(feature.place_name)
-          return
+          return feature.place_name
         }
       }
     }
   }
-  setPlaceName(null)
+  return null
 }
 
 export const getPlaceNameFromGeoname = (data: GeonameData) => {
@@ -45,4 +42,17 @@ export const getPlaceNameFromGeoname = (data: GeonameData) => {
     return null
   }
   return `${city}${isProv && ', '}${prov}${isTimezone && ', '}${timezone}`
+}
+
+export const fetchGeoRandom = async (): Promise<mapboxgl.LngLat> => {
+  try {
+    const response = await fetch('https://us-central1-maposaic-99785.cloudfunctions.net/fetch3Geonames')
+    const data: GeonameData = await response.json()
+    return new mapboxgl.LngLat(
+      data.geodata.nearest[0]?.longt[0] ?? 2.338272,
+      data.geodata.nearest[0]?.latt[0] ?? 48.858796,
+    )
+  } catch {
+    return new mapboxgl.LngLat(Math.random() * 100, Math.random() * 50 + 10)
+  }
 }

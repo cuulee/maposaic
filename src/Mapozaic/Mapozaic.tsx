@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { Button, Tooltip } from 'antd'
-import { CompassOutlined, PictureOutlined, SettingOutlined } from '@ant-design/icons'
+import { PictureOutlined, SettingOutlined } from '@ant-design/icons'
 import { useHistory } from 'react-router-dom'
 import { Spin } from 'antd'
 import spinner from 'assets/spinner.png'
@@ -29,10 +29,9 @@ import {
 import { CM_PER_INCH, FORMAT_RATIO } from 'constants/dimensions'
 import CloudUpload from 'CloudUpload/CloudUpload'
 import { TOOLTIP_ENTER_DELAY } from 'constants/ux'
-import { openPlaceNotification } from 'Mapozaic/notification'
 import { MAPBOX_STYLE_URL, MAPBOX_TOKEN } from 'constants/mapbox'
-import { GeonameData } from 'types/geo'
-import { getPlaceNameFromGeoname, setPlaceNameFromPosition } from 'utils/mapbox'
+import { fetchGeoRandom, getPlaceNameFromPosition } from 'utils/mapbox'
+import PlaceName from 'Mapozaic/PlaceName'
 
 mapboxgl.accessToken = MAPBOX_TOKEN
 
@@ -84,24 +83,20 @@ const MapboxGLMap = (): JSX.Element => {
   const [randomLngLat, setRandomLngLat] = useState<null | mapboxgl.LngLat>(null)
   const [randomZoom, setRandomZoom] = useState(getRandomZoom())
   const [areCoordsRandom, setAreCoordsRandom] = useState(true)
+  const [showPlaceNameTrigger, setShowPlaceNameTrigger] = useState(false)
+  const [showPlaceNameWhenFetched, setShowPlaceNameWhenFetched] = useState(false)
 
-  const fetchGeoRandom = async () => {
-    try {
-      const response = await fetch('https://us-central1-maposaic-99785.cloudfunctions.net/fetch3Geonames')
-      const data: GeonameData = await response.json()
-      setRandomLngLat(
-        new mapboxgl.LngLat(
-          data.geodata.nearest[0]?.longt[0] ?? 2.338272,
-          data.geodata.nearest[0]?.latt[0] ?? 48.858796,
-        ),
-      )
-      openPlaceNotification(getPlaceNameFromGeoname(data))
-    } catch {
-      setRandomLngLat(new mapboxgl.LngLat(2.338272, 48.858796))
-    }
+  const setRandomCoords = async () => {
+    setIsLoading(true)
+    const coords = await fetchGeoRandom()
+    setShowPlaceNameWhenFetched(true)
+    setRandomLngLat(coords)
+    setRandomZoom(getRandomZoom())
+    setAreCoordsRandom(true)
   }
+
   useEffect(() => {
-    fetchGeoRandom()
+    setRandomCoords()
     // eslint-disable-next-line
   }, [])
 
@@ -301,16 +296,24 @@ const MapboxGLMap = (): JSX.Element => {
         Math.pow(pendingSizeFactor / sizeFactor, 2),
     )
   }
-  const setRandomCoords = () => {
-    setIsLoading(true)
-    setAreCoordsRandom(true)
-    setRandomZoom(getRandomZoom())
-    fetchGeoRandom()
+
+  const onCurrentCenterChange = async () => {
+    const placeName = await getPlaceNameFromPosition(currentCenter)
+    setPlaceName(placeName)
+    if (showPlaceNameWhenFetched) {
+      setShowPlaceNameTrigger(true)
+      setShowPlaceNameWhenFetched(false)
+    }
   }
 
   useEffect(() => {
-    setPlaceNameFromPosition(currentCenter, setPlaceName)
+    onCurrentCenterChange()
+    // eslint-disable-next-line
   }, [currentCenter])
+
+  useEffect(() => {
+    setShowPlaceNameTrigger(false)
+  }, [showPlaceNameTrigger])
 
   return (
     <div className="root-wrapper" id="root-wrapper">
@@ -379,12 +382,7 @@ const MapboxGLMap = (): JSX.Element => {
           </Tooltip>
         </div>
       </div>
-      <Button
-        className="show-place-name"
-        shape="circle"
-        onClick={() => openPlaceNotification(placeName)}
-        icon={<CompassOutlined />}
-      />
+      <PlaceName showPlaceNameTrigger={showPlaceNameTrigger} placeName={placeName} />
     </div>
   )
 }
