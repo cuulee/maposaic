@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { Button, Tooltip } from 'antd'
-import { PictureOutlined, SettingOutlined } from '@ant-design/icons'
+import { CloudDownloadOutlined, PictureOutlined, SettingOutlined } from '@ant-design/icons'
 import { useHistory } from 'react-router-dom'
 import { Spin } from 'antd'
 import spinner from 'assets/spinner.png'
@@ -315,6 +315,19 @@ const MapboxGLMap = (): JSX.Element => {
     setShowPlaceNameTrigger(false)
   }, [showPlaceNameTrigger])
 
+  const download = () => {
+    const mosaicElement = document.getElementById('maposaic-canvas') as HTMLCanvasElement | null
+    if (!mosaicElement) {
+      return
+    }
+    mosaicElement.toBlob((blob) => {
+      var link = document.createElement('a')
+      link.download = placeName ? `maposaic - ${placeName}` : 'maposaic'
+      link.href = URL.createObjectURL(blob)
+      link.click()
+    })
+  }
+
   return (
     <div className="root-wrapper" id="root-wrapper">
       <div className="maps-container" id="maps-container">
@@ -351,6 +364,16 @@ const MapboxGLMap = (): JSX.Element => {
                 setDrawerVisible(true)
               }}
               icon={<SettingOutlined />}
+            />
+          </Tooltip>
+          <Tooltip title="Download" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
+            <Button
+              className="overmap__actions__button"
+              type="default"
+              shape="circle"
+              onClick={download}
+              icon={<CloudDownloadOutlined />}
+              disabled={isLoading}
             />
           </Tooltip>
           <CloudUpload
