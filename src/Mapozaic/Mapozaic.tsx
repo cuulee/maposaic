@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { Button, Tooltip } from 'antd'
-import { CloudDownloadOutlined, PictureOutlined, SettingOutlined } from '@ant-design/icons'
+import { CloudDownloadOutlined, SettingOutlined } from '@ant-design/icons'
 import { useHistory } from 'react-router-dom'
 import { Spin } from 'antd'
 import spinner from 'assets/spinner.png'
@@ -383,17 +383,6 @@ const MapboxGLMap = (): JSX.Element => {
             className="overmap__actions__button"
             isDisabled={isLoading}
           />
-          <Tooltip title="Visit gallery" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
-            <Button
-              className="overmap__actions__button"
-              type="default"
-              shape="circle"
-              onClick={() => {
-                history.push('/gallery')
-              }}
-              icon={<PictureOutlined />}
-            />
-          </Tooltip>
           <Tooltip title="Random place" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
             <Button
               className="overmap__actions__button"
@@ -403,6 +392,18 @@ const MapboxGLMap = (): JSX.Element => {
               icon={<img src={dice} width="16px" alt="dice" />}
             />
           </Tooltip>
+        </div>
+        <div className="overmap__actions">
+          <Button
+            className="overmap__actions__button"
+            style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+            onClick={() => {
+              history.push('/gallery')
+            }}
+            shape="round"
+          >
+            Gallery
+          </Button>
         </div>
       </div>
       <PlaceName showPlaceNameTrigger={showPlaceNameTrigger} placeName={placeName} />
