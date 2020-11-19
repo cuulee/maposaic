@@ -4,12 +4,23 @@ import { v4 as uuidv4 } from 'uuid'
 
 const PICTURE_COLLECTION_ID = 'pictures'
 
+export const PICTURE_BASE_PATH = 'maposaic_pictures'
+export const THUMBNAILS_PATH = 'thumbnails'
+
+export const getPicturePathFromFileId = (id: string) => {
+  return `${PICTURE_BASE_PATH}/${id}`
+}
+export const getThumbnailPathFromFileId = (id: string) => {
+  return `${PICTURE_BASE_PATH}/${THUMBNAILS_PATH}/${id}_250x250`
+}
+
 export const uploadBlob = ({ blob }: { blob: Blob }) => {
-  const filePath = 'maposaic_pictures/' + uuidv4()
+  const uuid = uuidv4()
+  const filePath = getPicturePathFromFileId(uuid)
   const storageRef = firestore.ref(filePath)
   const uploadTask = storageRef.put(blob)
 
-  return { filePath, uploadTask }
+  return { fileId: uuid, uploadTask }
 }
 
 export const postOrUpdatePicturesDocument = async ({

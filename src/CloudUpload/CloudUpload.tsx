@@ -3,7 +3,7 @@ import { Button, Input, Modal, Progress, Tooltip } from 'antd'
 import { CheckCircleTwoTone, CloudUploadOutlined, LoadingOutlined, SendOutlined } from '@ant-design/icons'
 import { ProgressProps } from 'antd/lib/progress'
 import firebase from 'firebase/app'
-import { postOrUpdatePicturesDocument, uploadBlob } from 'firebase/services'
+import { uploadBlob, getPicturePathFromFileId, postOrUpdatePicturesDocument } from 'firebase/services'
 
 import { PRIMARY_COLOR, DISABLED_COLOR, SUCCESS_COLOR } from 'constants/colors'
 import link from 'assets/link.svg'
@@ -71,7 +71,7 @@ const CloudUpload = ({
   const [uploadTask, setUploadTask] = useState<null | firebase.storage.UploadTask>(null)
   const [downloadURL, setDownloadURL] = useState<string | null>(null)
   const [pictureName, setPictureName] = useState('')
-  const [filePath, setFilePath] = useState<null | string>(null)
+  const [fileId, setFileId] = useState<null | string>(null)
   const [isFormUploaded, setIsFormUploaded] = useState(false)
   const [isUploadingForm, setIsUploadingForm] = useState(false)
   const [pictureDocumentId, setPictureDocumentId] = useState<string | null>(null)
@@ -96,9 +96,9 @@ const CloudUpload = ({
       if (!blob) {
         return
       }
-      const { uploadTask, filePath } = uploadBlob({ blob })
+      const { uploadTask, fileId } = uploadBlob({ blob })
       setUploadTask(uploadTask)
-      setFilePath(filePath)
+      setFileId(fileId)
     })
   }
 
@@ -109,12 +109,12 @@ const CloudUpload = ({
     setTaskState(UploadStatus.Error)
   }
 
-  const onComplete = async ({ downloadURL, filePath }: { downloadURL: string; filePath: string }) => {
+  const onComplete = async ({ downloadURL, fileId }: { downloadURL: string; fileId: string }) => {
     const documentId = await postOrUpdatePicturesDocument({
       documentId: pictureDocumentId,
       payload: {
         downloadURL,
-        filePath,
+        filePath: getPicturePathFromFileId(fileId),
         mapCenter: mapCenter?.toArray(),
         mapZoom,
         placeName,
@@ -136,7 +136,7 @@ const CloudUpload = ({
   }
 
   useEffect(() => {
-    if (!uploadTask || !filePath) {
+    if (!uploadTask || !fileId) {
       return
     }
     const unsubscribe = uploadTask.on(
@@ -150,14 +150,14 @@ const CloudUpload = ({
       async () => {
         try {
           const downloadURL = await uploadTask.snapshot.ref.getDownloadURL()
-          memoizedOnComplete({ downloadURL, filePath })
+          memoizedOnComplete({ downloadURL, fileId })
         } catch (e) {
           onError()
         }
       },
     )
     return () => unsubscribe()
-  }, [uploadTask, memoizedOnComplete, filePath])
+  }, [uploadTask, memoizedOnComplete, fileId])
 
   const onModalOk = () => {
     if (!isFormSubmitDisabled && !isFormUploaded) {
