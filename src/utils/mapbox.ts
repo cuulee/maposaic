@@ -56,3 +56,8 @@ export const fetchGeoRandom = async (): Promise<mapboxgl.LngLat> => {
     return new mapboxgl.LngLat(Math.random() * 100, Math.random() * 50 + 10)
   }
 }
+
+export const getRandomZoom = () => {
+  // mapbox zoom range : 0 (most zoom out) - 22
+  return Math.random() * 13 + 3
+}

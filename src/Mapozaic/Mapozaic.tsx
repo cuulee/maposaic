@@ -31,7 +31,7 @@ import { CM_PER_INCH, FORMAT_RATIO } from 'constants/dimensions'
 import CloudUpload from 'CloudUpload/CloudUpload'
 import { TOOLTIP_ENTER_DELAY } from 'constants/ux'
 import { MAPBOX_STYLE_URL, MAPBOX_TOKEN } from 'constants/mapbox'
-import { fetchGeoRandom, getPlaceNameFromPosition } from 'utils/mapbox'
+import { fetchGeoRandom, getPlaceNameFromPosition, getRandomZoom } from 'utils/mapbox'
 import PlaceName from 'Mapozaic/PlaceName'
 import GeoSearch from 'Mapozaic/GeoSearchInput'
 
@@ -39,6 +39,7 @@ mapboxgl.accessToken = MAPBOX_TOKEN
 
 const INITIAL_SIZE_FACTOR = 1
 const DISPLAY_PIXEL_RATIO = 1
+const INITIAL_ZOOM = getRandomZoom()
 
 let mapboxResolutionRatio: number | null = null
 let paintWorker = new PaintWorker()
@@ -55,11 +56,6 @@ const computeTime: { pixelCount: number | null; milliseconds: number | null } = 
 }
 
 let lastStartDate = new Date()
-
-const getRandomZoom = () => {
-  // mapbox zoom range : 0 (most zoom out) - 22
-  return Math.random() * 13 + 3
-}
 
 const MapboxGLMap = (): JSX.Element => {
   const history = useHistory()
@@ -82,19 +78,23 @@ const MapboxGLMap = (): JSX.Element => {
     [WATER_CYAN]: { color: null, isEditable: true, name: 'water' },
   })
 
-  const [randomLngLat, setRandomLngLat] = useState<null | mapboxgl.LngLat>(null)
-  const [randomZoom, setRandomZoom] = useState(getRandomZoom())
-  const [areCoordsRandom, setAreCoordsRandom] = useState(true)
+  const [initialCenter, setInitialCenter] = useState<null | mapboxgl.LngLat>(null)
   const [showPlaceNameTrigger, setShowPlaceNameTrigger] = useState(false)
   const [showPlaceNameWhenFetched, setShowPlaceNameWhenFetched] = useState(false)
 
   const setRandomCoords = async () => {
     setIsLoading(true)
-    const coords = await fetchGeoRandom()
+    const randomCenter = await fetchGeoRandom()
     setShowPlaceNameWhenFetched(true)
-    setRandomLngLat(coords)
-    setRandomZoom(getRandomZoom())
-    setAreCoordsRandom(true)
+    if (!initialCenter) {
+      setInitialCenter(randomCenter)
+      return
+    }
+    if (!map) {
+      return
+    }
+    map.setCenter(randomCenter)
+    map.setZoom(getRandomZoom())
   }
 
   useEffect(() => {
@@ -162,13 +162,12 @@ const MapboxGLMap = (): JSX.Element => {
         setEstimatedTime(duration)
       }
     }
-    if (!randomLngLat) {
+    if (!initialCenter) {
       return
     }
 
-    const center = areCoordsRandom ? randomLngLat : map?.getCenter() ?? randomLngLat
-    const zoom = areCoordsRandom ? randomZoom : map?.getZoom() ?? randomZoom
-    setAreCoordsRandom(false)
+    const center = map?.getCenter() ?? initialCenter
+    const zoom = map?.getZoom() ?? INITIAL_ZOOM
 
     setMapboxArtificialSize(sizeFactor)
 
@@ -210,7 +209,7 @@ const MapboxGLMap = (): JSX.Element => {
       newMap.remove()
     }
     // eslint-disable-next-line
-  }, [mapboxStyleURL, maposaicColors, sizeRender, sizeFactor, specificColorTransforms, randomLngLat])
+  }, [mapboxStyleURL, maposaicColors, sizeRender, sizeFactor, specificColorTransforms, initialCenter])
 
   const [drawerVisible, setDrawerVisible] = useState(false)
 
