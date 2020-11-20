@@ -3,11 +3,11 @@ import React, { useEffect, useState } from 'react'
 
 import 'Gallery/style.less'
 import Title from 'antd/lib/typography/Title'
-import { Divider, Modal } from 'antd'
+import { Divider, Modal, Spin } from 'antd'
 import { DISABLED_COLOR } from 'constants/colors'
 
 import { Link } from 'react-router-dom'
-import { LeftOutlined, RightOutlined } from '@ant-design/icons'
+import { LeftOutlined, LoadingOutlined, RightOutlined } from '@ant-design/icons'
 
 type ApiPicture = {
   pictureName?: string
@@ -33,6 +33,7 @@ const Gallery = () => {
   const [pictures, setPictures] = useState<Picture[]>([])
   const [displayedIndex, setDisplayedIndex] = useState<number | null>(null)
   const [isModalVisible, setIsModalVisible] = useState(false)
+  const [isModalPictureLoaded, setIsModalPictureLoaded] = useState(false)
 
   const fetchData = async () => {
     try {
@@ -62,9 +63,14 @@ const Gallery = () => {
   }, [])
 
   const incrementPictureIndex = (increment: -1 | 1) => {
-    if (null === displayedIndex) {
+    if (
+      null === displayedIndex ||
+      (increment < 0 && displayedIndex === 0) ||
+      (increment > 0 && displayedIndex === pictures.length - 1)
+    ) {
       return
     }
+    setIsModalPictureLoaded(false)
     setDisplayedIndex(Math.min(Math.max(0, displayedIndex + increment), pictures.length - 1))
   }
 
@@ -81,6 +87,14 @@ const Gallery = () => {
     return () => window.removeEventListener('keydown', onKeyDown)
   })
 
+  const onThumbnailClick = (index: number) => {
+    if (index !== displayedIndex) {
+      setIsModalPictureLoaded(false)
+    }
+    setDisplayedIndex(index)
+    setIsModalVisible(true)
+  }
+
   return (
     <div className="gallery">
       <Title level={2}>Gallery</Title>
@@ -89,14 +103,7 @@ const Gallery = () => {
       <div className="gallery__pictures">
         {pictures.map((pic, index) => {
           return (
-            <div
-              onClick={() => {
-                setDisplayedIndex(index)
-                setIsModalVisible(true)
-              }}
-              className="gallery__picture"
-              key={pic.id}
-            >
+            <div onClick={() => onThumbnailClick(index)} className="gallery__picture" key={pic.id}>
               <img
                 className="gallery__picture__image"
                 alt={`pic-${displayedName(pic)}`}
@@ -122,9 +129,14 @@ const Gallery = () => {
               className="modal-content__picture"
               alt={`pic-${displayedName(pictures[displayedIndex])}`}
               src={pictures[displayedIndex].downloadURL}
+              onLoad={() => setIsModalPictureLoaded(true)}
             />
             <div className="modal-content__nav">
-              <div className="modal-content__name">{displayedName(pictures[displayedIndex])}</div>
+              {isModalPictureLoaded ? (
+                <div className="modal-content__name">{displayedName(pictures[displayedIndex])}</div>
+              ) : (
+                <Spin indicator={<LoadingOutlined style={{ fontSize: '18px' }} />} />
+              )}
             </div>
           </div>
         )}
