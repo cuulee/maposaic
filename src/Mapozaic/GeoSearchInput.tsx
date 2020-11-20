@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { AutoComplete, Input } from 'antd'
+import mapboxgl from 'mapbox-gl'
 import { GEOCODING_BASE_URL, MAPBOX_TOKEN } from 'constants/mapbox'
 import { DrawerPropsType } from './Drawer'
 import { SearchOutlined, LoadingOutlined } from '@ant-design/icons'
@@ -20,8 +21,8 @@ const GeoSearch = ({
   setDrawerVisible,
   className,
 }: {
-  flyTo: DrawerPropsType['flyTo']
-  currentCenter: DrawerPropsType['currentCenter']
+  flyTo: (center: mapboxgl.LngLat) => void
+  currentCenter: mapboxgl.LngLat | null
   setDrawerVisible: DrawerPropsType['setDrawerVisible']
   className?: string
 }) => {
@@ -48,7 +49,7 @@ const GeoSearch = ({
     const targetOption = options.find((option) => option.id === value)
     if (targetOption) {
       setDrawerVisible(false)
-      flyTo(targetOption.center)
+      flyTo(new mapboxgl.LngLat(targetOption.center[0], targetOption.center[1]))
     }
   }
 

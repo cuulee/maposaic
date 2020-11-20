@@ -7,7 +7,6 @@ import { Badge } from 'antd'
 import { ClockCircleOutlined } from '@ant-design/icons'
 
 import { MAPBOX_STYLE_URL } from 'constants/mapbox'
-import GeoSearch from './GeoSearchInput'
 import { MaposaicColors } from 'Colors/types'
 
 import './drawer.style.less'
@@ -23,8 +22,6 @@ export type DrawerPropsType = {
   changeMapStyle: (style: string) => void
   sizeFactor: number
   setNewSizeFactor: (sizeFactor: number) => void
-  flyTo: (center: [number, number]) => void
-  currentCenter: mapboxgl.LngLat | null
   maposaicColors: MaposaicColors
   setNewMaposaicColors: (colors: MaposaicColors) => void
   specificColorTransforms: SpecificColorTransforms
@@ -52,8 +49,6 @@ const Drawer = ({
   changeMapStyle,
   sizeFactor,
   setNewSizeFactor,
-  flyTo,
-  currentCenter,
   maposaicColors,
   setNewMaposaicColors,
   specificColorTransforms,
@@ -113,9 +108,6 @@ const Drawer = ({
       closable={false}
       width="min(75%,333px)"
     >
-      <GeoSearch flyTo={flyTo} currentCenter={currentCenter} setDrawerVisible={setDrawerVisible} />
-
-      <Divider />
       <Title level={4}>Colors</Title>
       <ColorTabs
         maposaicColors={maposaicColors}

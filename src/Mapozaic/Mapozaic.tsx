@@ -233,7 +233,7 @@ const MapboxGLMap = (): JSX.Element => {
     setIsLoading(true)
   }
 
-  const flyTo = (center: [number, number]) => {
+  const flyTo = (center: mapboxgl.LngLat) => {
     if (!map) {
       return
     }
@@ -361,8 +361,6 @@ const MapboxGLMap = (): JSX.Element => {
           setDrawerVisible={setDrawerVisible}
           changeMapStyle={changeMapStyle}
           mapboxStyleURL={mapboxStyleURL}
-          flyTo={flyTo}
-          currentCenter={currentCenter}
           maposaicColors={maposaicColors}
           setNewMaposaicColors={setNewMaposaicColors}
           sizeFactor={sizeFactor}
