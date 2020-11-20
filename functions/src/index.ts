@@ -62,3 +62,27 @@ exports.updatePictureDocumentWithThumbnailURL = functions.storage.object().onFin
     snap.ref.update({ thumnailDownloadURL: createPersistentDownloadUrl(bucket.name, filePath, uuid) }),
   )
 })
+
+exports.deletePictureDocumentOnFileDeletion = functions.storage.object().onDelete(async (object) => {
+  const filePath = object.name
+  if (!filePath) {
+    return
+  }
+  if (filePath.includes('thumbnails/')) {
+    return
+  }
+
+  const snapshot = await db.collection('pictures').where('filePath', '==', filePath).get()
+
+  if (snapshot.empty) {
+    console.log('No matching documents.')
+    return
+  }
+
+  snapshot.forEach((snap) => {
+    const data = snap.data()
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    snap.ref.delete()
+    console.log(`Picture document with id ${data.id} and place name ${data.placeName} deleted`)
+  })
+})
