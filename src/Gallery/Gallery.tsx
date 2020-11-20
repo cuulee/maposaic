@@ -28,6 +28,8 @@ type Picture = {
 const displayedName = (picture: Picture): string => {
   return picture.pictureName ?? picture.placeName ?? 'no name'
 }
+let xDown: null | number = null
+let yDown: null | number = null
 
 const Gallery = () => {
   const [pictures, setPictures] = useState<Picture[]>([])
@@ -93,6 +95,47 @@ const Gallery = () => {
     }
     setDisplayedIndex(index)
     setIsModalVisible(true)
+  }
+  useEffect(() => {
+    if (!isModalVisible) {
+      return
+    }
+    document.addEventListener('touchstart', handleTouchStart, false)
+    document.addEventListener('touchmove', handleTouchMove, false)
+
+    return () => {
+      document.removeEventListener('touchstart', handleTouchStart)
+      document.removeEventListener('touchmove', handleTouchMove)
+    }
+  }, [isModalVisible, displayedIndex, pictures])
+
+  function handleTouchStart(evt: TouchEvent) {
+    const firstTouch = evt.touches[0]
+    xDown = firstTouch.clientX
+    yDown = firstTouch.clientY
+  }
+
+  function handleTouchMove(evt: TouchEvent) {
+    if (!xDown || !yDown) {
+      return
+    }
+    var xUp = evt.touches[0].clientX
+    var yUp = evt.touches[0].clientY
+
+    var xDiff = xDown - xUp
+    var yDiff = yDown - yUp
+
+    if (Math.abs(xDiff) > Math.abs(yDiff)) {
+      if (xDiff > 0) {
+        incrementPictureIndex(1)
+      } else {
+        incrementPictureIndex(-1)
+      }
+    } else {
+      setIsModalVisible(false)
+    }
+    xDown = null
+    yDown = null
   }
 
   return (
