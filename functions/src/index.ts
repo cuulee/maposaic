@@ -37,11 +37,11 @@ exports.updatePictureDocumentWithThumbnailURL = functions.storage.object().onFin
   if (!filePath) {
     return
   }
-  const fileSplit = filePath?.split('maposaic_pictures/thumbnails/')
-  if (fileSplit.length < 2) {
+  const thumbnailName = filePath?.split('maposaic_pictures/thumbnails/')
+  if (thumbnailName.length < 2) {
     return
   }
-  const pictureId = fileSplit[1].split('_250x250')[0]
+  const pictureId = thumbnailName[1].split('_')[0]
   const snapshot = await db.collection('pictures').where('filePath', '==', `maposaic_pictures/${pictureId}`).get()
   if (snapshot.empty) {
     console.log('No matching documents.')
@@ -59,7 +59,7 @@ exports.updatePictureDocumentWithThumbnailURL = functions.storage.object().onFin
   })
 
   snapshot.forEach((snap) =>
-    snap.ref.update({ thumnailDownloadURL: createPersistentDownloadUrl(bucket.name, filePath, uuid) }),
+    snap.ref.update({ thumbnailDownloadURL: createPersistentDownloadUrl(bucket.name, filePath, uuid) }),
   )
 })
 

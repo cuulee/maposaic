@@ -14,6 +14,7 @@ type ApiPicture = {
   filePath?: string
   downloadURL?: string
   placeName?: string | null
+  thumbnailDownloadURL?: string
 }
 
 type Picture = {
@@ -21,6 +22,7 @@ type Picture = {
   pictureName: string | undefined
   placeName: string | undefined | null
   downloadURL: string
+  thumbnailDownloadURL?: string
 }
 
 const displayedName = (picture: Picture): string => {
@@ -46,6 +48,7 @@ const Gallery = () => {
           pictureName: apiPicture.pictureName,
           downloadURL: apiPicture.downloadURL,
           placeName: apiPicture.placeName,
+          thumbnailDownloadURL: apiPicture.thumbnailDownloadURL,
         }
         newPictures.push(pic)
       })
@@ -94,7 +97,11 @@ const Gallery = () => {
               className="gallery__picture"
               key={pic.id}
             >
-              <img className="gallery__picture__image" alt={`pic-${displayedName(pic)}`} src={pic.downloadURL} />
+              <img
+                className="gallery__picture__image"
+                alt={`pic-${displayedName(pic)}`}
+                src={pic.thumbnailDownloadURL ?? pic.downloadURL}
+              />
               <div className="gallery__picture__name">{displayedName(pic)}</div>
             </div>
           )
