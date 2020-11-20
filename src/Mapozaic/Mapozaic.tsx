@@ -2,11 +2,12 @@ import React, { useState, useRef, useEffect } from 'react'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { Button, Tooltip } from 'antd'
-import { CloudDownloadOutlined, SettingOutlined } from '@ant-design/icons'
+import { CloudDownloadOutlined, PictureOutlined, SettingOutlined } from '@ant-design/icons'
 import { useHistory } from 'react-router-dom'
 import { Spin } from 'antd'
 import spinner from 'assets/spinner.png'
 import dice from 'assets/dice.svg'
+import gps from 'assets/gps.svg'
 
 import Drawer from './Drawer'
 
@@ -32,6 +33,7 @@ import { TOOLTIP_ENTER_DELAY } from 'constants/ux'
 import { MAPBOX_STYLE_URL, MAPBOX_TOKEN } from 'constants/mapbox'
 import { fetchGeoRandom, getPlaceNameFromPosition } from 'utils/mapbox'
 import PlaceName from 'Mapozaic/PlaceName'
+import GeoSearch from 'Mapozaic/GeoSearchInput'
 
 mapboxgl.accessToken = MAPBOX_TOKEN
 
@@ -328,6 +330,24 @@ const MapboxGLMap = (): JSX.Element => {
     })
   }
 
+  const onGeolocationClick = () => {
+    if (!map) {
+      return
+    }
+    setIsLoading(true)
+    if (!navigator.geolocation) {
+      setIsLoading(false)
+      console.log('Geolocation is not supported by your browser')
+    } else {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          map.setCenter(new mapboxgl.LngLat(position.coords.longitude, position.coords.latitude))
+        },
+        () => setIsLoading(false),
+      )
+    }
+  }
+
   return (
     <div className="root-wrapper" id="root-wrapper">
       <div className="maps-container" id="maps-container">
@@ -383,6 +403,24 @@ const MapboxGLMap = (): JSX.Element => {
             className="overmap__actions__button"
             isDisabled={isLoading}
           />
+          <Tooltip title="Visit gallery">
+            <Button
+              className="overmap__actions__button"
+              onClick={() => {
+                history.push('/gallery')
+              }}
+              shape="circle"
+              icon={<PictureOutlined />}
+            />
+          </Tooltip>
+        </div>
+        <div className="overmap__actions">
+          <GeoSearch
+            className="overmap__actions__button"
+            flyTo={flyTo}
+            currentCenter={currentCenter}
+            setDrawerVisible={setDrawerVisible}
+          />
           <Tooltip title="Random place" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
             <Button
               className="overmap__actions__button"
@@ -392,18 +430,12 @@ const MapboxGLMap = (): JSX.Element => {
               icon={<img src={dice} width="16px" alt="dice" />}
             />
           </Tooltip>
-        </div>
-        <div className="overmap__actions">
           <Button
+            onClick={onGeolocationClick}
             className="overmap__actions__button"
-            style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
-            onClick={() => {
-              history.push('/gallery')
-            }}
-            shape="round"
-          >
-            Gallery
-          </Button>
+            shape="circle"
+            icon={<img src={gps} width="16px" alt="gps" />}
+          />
         </div>
       </div>
       <PlaceName showPlaceNameTrigger={showPlaceNameTrigger} placeName={placeName} />

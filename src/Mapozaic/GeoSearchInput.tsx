@@ -18,10 +18,12 @@ const GeoSearch = ({
   flyTo,
   currentCenter,
   setDrawerVisible,
+  className,
 }: {
   flyTo: DrawerPropsType['flyTo']
   currentCenter: DrawerPropsType['currentCenter']
   setDrawerVisible: DrawerPropsType['setDrawerVisible']
+  className?: string
 }) => {
   const [searchText, setSearchText] = useState('')
   const [options, setOptions] = useState<GeocoderFeature[]>([])
@@ -65,14 +67,14 @@ const GeoSearch = ({
 
   return (
     <AutoComplete
-      style={{ width: 200 }}
+      className={className}
       onSearch={handleSearch}
       onSelect={handleSelect}
       value={searchText}
-      placeholder="Search location"
+      placeholder="Search place"
       options={optionChildren}
     >
-      <Input suffix={isSearching ? <LoadingOutlined /> : <SearchOutlined />} />
+      <Input style={{ borderRadius: '16px' }} suffix={isSearching ? <LoadingOutlined /> : <SearchOutlined />} />
     </AutoComplete>
   )
 }
