@@ -107,6 +107,7 @@ const Gallery = () => {
       document.removeEventListener('touchstart', handleTouchStart)
       document.removeEventListener('touchmove', handleTouchMove)
     }
+    // eslint-disable-next-line
   }, [isModalVisible, displayedIndex, pictures])
 
   function handleTouchStart(evt: TouchEvent) {
@@ -175,12 +176,16 @@ const Gallery = () => {
               onLoad={() => setIsModalPictureLoaded(true)}
             />
             <div className="modal-content__nav">
-              {isModalPictureLoaded ? (
-                <div className="modal-content__name">{displayedName(pictures[displayedIndex])}</div>
-              ) : (
-                <Spin indicator={<LoadingOutlined style={{ fontSize: '18px' }} />} />
-              )}
+              <div className="modal-content__name">
+                {isModalPictureLoaded ? displayedName(pictures[displayedIndex]) : '...'}
+              </div>
             </div>
+            {!isModalPictureLoaded && (
+              <Spin
+                className="modal-content__loader"
+                indicator={<LoadingOutlined style={{ fontSize: '24px', color: 'white' }} />}
+              />
+            )}
           </div>
         )}
       </Modal>
