@@ -6,9 +6,10 @@ import firebase from 'firebase/app'
 import { uploadBlob, getPicturePathFromFileId, postOrUpdatePicturesDocument } from 'firebase/services'
 
 import { PRIMARY_COLOR, DISABLED_COLOR, SUCCESS_COLOR } from 'constants/colors'
-import link from 'assets/link.svg'
 import 'CloudUpload/style.less'
 import { TOOLTIP_ENTER_DELAY } from 'constants/ux'
+import { useHistory } from 'react-router-dom'
+import { PICTURE_ID_PARAM } from 'Gallery/Gallery'
 
 enum UploadStatus {
   Error = 'error',
@@ -26,7 +27,8 @@ const ProgressStatus: { [key in UploadStatus]: ProgressProps['status'] } = {
   [UploadStatus.Success]: 'success',
 }
 
-const StatusMessage = ({ taskState, downloadURL }: { taskState: TaskState; downloadURL: string | null }) => {
+const StatusMessage = ({ taskState, documentId }: { taskState: TaskState; documentId: string | null }) => {
+  const history = useHistory()
   if (!taskState) {
     return <div>No upload in progress</div>
   }
@@ -36,16 +38,19 @@ const StatusMessage = ({ taskState, downloadURL }: { taskState: TaskState; downl
   if (taskState === UploadStatus.Running) {
     return <div>Uploading picture...</div>
   }
-  if (taskState === UploadStatus.Error || !downloadURL) {
+  if (taskState === UploadStatus.Error || !documentId) {
     return <div>Upload failed</div>
   }
   if (taskState === UploadStatus.Success) {
     return (
-      <div>
+      <div className="status-message">
         Picture uploaded !{' '}
-        <a target="_blank" rel="noopener noreferrer" href={downloadURL}>
-          show <img alt="" width="14px" src={link} />
-        </a>
+        <div
+          className="status-message__link"
+          onClick={() => history.push(`/gallery?${PICTURE_ID_PARAM}=${documentId}`)}
+        >
+          show in gallery
+        </div>
       </div>
     )
   }
@@ -69,7 +74,6 @@ const CloudUpload = ({
   const [progress, setProgress] = useState(0)
   const [taskState, setTaskState] = useState<TaskState>(null)
   const [uploadTask, setUploadTask] = useState<null | firebase.storage.UploadTask>(null)
-  const [downloadURL, setDownloadURL] = useState<string | null>(null)
   const [pictureName, setPictureName] = useState('')
   const [fileId, setFileId] = useState<null | string>(null)
   const [isFormUploaded, setIsFormUploaded] = useState(false)
@@ -81,7 +85,6 @@ const CloudUpload = ({
     if (taskState === UploadStatus.Running) {
       return
     }
-    setDownloadURL(null)
     setTaskState(null)
     setUploadTask(null)
     setPictureDocumentId(null)
@@ -123,7 +126,6 @@ const CloudUpload = ({
     updateDocumentId(documentId)
     if (documentId) {
       setTaskState(UploadStatus.Success)
-      setDownloadURL(downloadURL)
     } else {
       setTaskState(UploadStatus.Error)
     }
@@ -202,11 +204,10 @@ const CloudUpload = ({
   }
 
   const updateDocumentId = (newDocumentId: string | null) => {
-    if (!newDocumentId) {
+    if (!newDocumentId || pictureDocumentId) {
+      return
     }
-    if (!pictureDocumentId && newDocumentId) {
-      setPictureDocumentId(newDocumentId)
-    }
+    setPictureDocumentId(newDocumentId)
   }
 
   const InputSuffix = ({ className }: { className?: string }) => {
@@ -237,7 +238,7 @@ const CloudUpload = ({
         />
       </Tooltip>
       <Modal visible={modalVisible} onCancel={onModalCancel} onOk={onModalOk}>
-        <StatusMessage downloadURL={downloadURL} taskState={taskState} />
+        <StatusMessage documentId={pictureDocumentId} taskState={taskState} />
         {taskState && (
           <React.Fragment>
             <Progress

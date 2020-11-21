@@ -9,6 +9,8 @@ import { DISABLED_COLOR } from 'constants/colors'
 import { Link } from 'react-router-dom'
 import { LeftOutlined, LoadingOutlined, RightOutlined } from '@ant-design/icons'
 
+export const PICTURE_ID_PARAM = 'pictureId'
+
 type ApiPicture = {
   pictureName?: string
   filePath?: string
@@ -37,14 +39,20 @@ const Gallery = () => {
   const [isModalVisible, setIsModalVisible] = useState(false)
   const [isModalPictureLoaded, setIsModalPictureLoaded] = useState(false)
 
-  const fetchData = async () => {
+  const fetchData = async (initialPictureId: string | null) => {
     try {
       const snapshot = await db.collection('pictures').orderBy('timestamp', 'desc').get()
       const newPictures: Picture[] = []
+      let pictureIndex: null | number = null
       snapshot.forEach((doc) => {
         const apiPicture = doc.data() as ApiPicture
         if (!apiPicture.downloadURL) {
           return
+        }
+        pictureIndex = pictureIndex !== null ? pictureIndex + 1 : 0
+        if (initialPictureId && doc.id === initialPictureId) {
+          setDisplayedIndex(pictureIndex)
+          setIsModalVisible(true)
         }
         const pic = {
           id: doc.id,
@@ -61,8 +69,21 @@ const Gallery = () => {
     }
   }
   useEffect(() => {
-    fetchData()
+    const urlParams = new URLSearchParams(window.location.search)
+    const initialPictureId = urlParams.get(PICTURE_ID_PARAM)
+    fetchData(initialPictureId)
   }, [])
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    const pictureId = displayedIndex ? pictures[displayedIndex]?.id : null
+    if (!pictureId) {
+      urlParams.delete(PICTURE_ID_PARAM)
+    } else {
+      urlParams.set(PICTURE_ID_PARAM, pictureId)
+    }
+    window.history.replaceState({}, '', `${window.location.pathname}?${urlParams}`)
+  }, [displayedIndex, pictures])
 
   const incrementPictureIndex = (increment: -1 | 1) => {
     if (
