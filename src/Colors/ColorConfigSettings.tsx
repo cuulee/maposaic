@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import Radio, { RadioChangeEvent } from 'antd/lib/radio'
-import { ChromePicker, ColorResult as ReactColorResult, ColorResult } from 'react-color'
+import { ChromePicker, ColorResult } from 'react-color'
 
 import { AntColors, PRESET_PALETTES } from 'Colors/constants'
 import {

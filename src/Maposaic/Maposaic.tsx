@@ -62,6 +62,7 @@ const MapboxGLMap = (): JSX.Element => {
   const history = useHistory()
   const [map, setMap] = useState<mapboxgl.Map | null>(null)
   const mapboxContainer = useRef<HTMLDivElement | null>(null)
+  const [drawerVisible, setDrawerVisible] = useState(false)
 
   const [estimatedTime, setEstimatedTime] = useState<number | null>(null)
   const [remainingTime, setRemainingTime] = useState<number | null>(null)
@@ -211,8 +212,6 @@ const MapboxGLMap = (): JSX.Element => {
     }
     // eslint-disable-next-line
   }, [mapboxStyleURL, colorConfig, sizeRender, sizeFactor, specificColorTransforms, initialCenter])
-
-  const [drawerVisible, setDrawerVisible] = useState(true)
 
   const changeMapStyle = (newStyle: string) => {
     toggleCanvasOpacity(true)
