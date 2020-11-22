@@ -1,6 +1,7 @@
 export type RGBColor = { r: number; g: number; b: number }
+export type HexColor = string
 
-export type MaposaicColors = PresetColorName.Random | string[]
+export type MaposaicColors = PresetColorName.Random | ColorConfigType.Random | string[]
 
 export enum PaletteOrigin {
   Coolors = 'coolors',
@@ -21,5 +22,65 @@ export enum PresetColorName {
   Purple = 'purple',
   Magenta = 'magenta',
   Grey = 'grey',
+  Custom = 'custom',
+}
+
+export enum ShadingPresetName {
+  Red = 'red',
+  Volcano = 'volcano',
+  Gold = 'gold',
+  Yellow = 'yellow',
+  Lime = 'lime',
+  Green = 'green',
+  Cyan = 'cyan',
+  Blue = 'blue',
+  Geekblue = 'geekblue',
+  Purple = 'purple',
+  Magenta = 'magenta',
+  Grey = 'grey',
+}
+
+export enum ColorConfigType {
+  Random = 'random',
+  Shading = 'shading',
+  Palette = 'palette',
+}
+
+export type ColorConfig = RandomColorConfig | ShadingColorConfig | PaletteColorConfig
+
+export type RandomColorConfig = { type: ColorConfigType.Random }
+
+export type PaletteColorConfig =
+  | {
+      type: ColorConfigType.Palette
+      paletteType: PaletteType.Preset
+      origin: PaletteOrigin
+      paletteIndex: number
+    }
+  | {
+      type: ColorConfigType.Palette
+      paletteType: PaletteType.Custom
+      colors: string[]
+    }
+
+export type ShadingColorConfig =
+  | {
+      type: ColorConfigType.Shading
+      shadingType: ShadingType.Preset
+      seedColor: ShadingPresetName
+    }
+  | {
+      type: ColorConfigType.Shading
+      shadingType: ShadingType.Custom
+      seedColor: HexColor
+    }
+
+export enum PaletteType {
+  Preset = 'preset',
+  Custom = 'custom',
+}
+
+export enum ShadingType {
+  Preset = 'preset',
   Custom = 'custom',
 }

@@ -1,6 +1,6 @@
 import React from 'react'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
-import Mapozaic from 'Mapozaic/Mapozaic'
+import Maposaic from 'Maposaic/Maposaic'
 import Gallery from 'Gallery/Gallery'
 
 import 'App.less'
@@ -13,7 +13,7 @@ function App() {
           <Gallery />
         </Route>
         <Route path="/">
-          <Mapozaic />
+          <Maposaic />
         </Route>
       </Switch>
     </Router>

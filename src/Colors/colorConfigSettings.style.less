@@ -1,0 +1,77 @@
+@preset-color-width: 26px;
+
+.shading-settings {
+  &__type {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    &:not(:first-child) {
+      margin-top: 16px;
+    }
+    &__name {
+      width: 56px;
+    }
+    &__presets {
+      flex-grow: 1;
+      display: grid;
+      grid-template-columns: repeat(6, minmax(@preset-color-width, 0fr));
+      row-gap: 0px;
+      column-gap: 0px;
+    }
+  }
+}
+
+.shading-color {
+  width: @preset-color-width;
+  height: @preset-color-width;
+  padding: 4px;
+  cursor: pointer;
+  &--selected {
+    border: 1px solid @primary-color;
+  }
+  &__fill {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.settings {
+  margin-top: 16px;
+}
+
+.palette-settings {
+  display: flex;
+  flex-direction: column;
+  &__preset {
+    margin-top: 8px;
+  }
+  &__custom-palette {
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    &__colors {
+      margin-left: 8px;
+    }
+  }
+}
+.palette-colors {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  flex-wrap: wrap;
+  &__color {
+    width: @preset-color-width;
+    height: @preset-color-width;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    &__fill {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      border: 1px solid darkgrey;
+    }
+  }
+}
