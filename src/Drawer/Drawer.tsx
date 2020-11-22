@@ -9,7 +9,7 @@ import { ClockCircleOutlined } from '@ant-design/icons'
 import { MAPBOX_STYLE_URL } from 'constants/mapbox'
 import { MaposaicColors } from 'Colors/types'
 
-import './drawer.style.less'
+import 'Drawer/drawer.style.less'
 import ColorTabs from 'Colors/ColorTabs'
 import { OnPosterSizeChangePayload, SpecificColorTransforms } from 'Mapozaic/types'
 import { Format, FORMATS, FORMAT_SIZE } from 'constants/dimensions'

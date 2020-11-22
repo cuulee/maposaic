@@ -9,12 +9,12 @@ import spinner from 'assets/spinner.png'
 import dice from 'assets/dice.svg'
 import gps from 'assets/gps.svg'
 
-import Drawer from './Drawer'
+import Drawer from 'Drawer/Drawer'
 
 // eslint-disable-next-line
 import PaintWorker from 'worker-loader!./paint.worker'
 
-import 'Mapozaic/style.less'
+import 'Mapozaic/mapozaic.style.less'
 import { MaposaicColors, PresetColorName } from 'Colors/types'
 import { getTargetSizeFromSourceSize } from 'Canvas/utils'
 import { ROAD_SIMPLE_WHITE, WATER_CYAN } from 'Colors/mapbox'
@@ -31,9 +31,9 @@ import { CM_PER_INCH, FORMAT_RATIO } from 'constants/dimensions'
 import CloudUpload from 'CloudUpload/CloudUpload'
 import { TOOLTIP_ENTER_DELAY } from 'constants/ux'
 import { MAPBOX_STYLE_URL, MAPBOX_TOKEN } from 'constants/mapbox'
-import { fetchGeoRandom, getPlaceNameFromPosition, getRandomZoom } from 'utils/mapbox'
-import PlaceName from 'Mapozaic/PlaceName'
-import GeoSearch from 'Mapozaic/GeoSearchInput'
+import { fetchGeoRandom, getPlaceNameFromPosition, getRandomZoom } from 'Geo/utils'
+import PlaceName from 'PlaceName/PlaceName'
+import GeoSearch from 'Geo/GeoSearchInput'
 
 mapboxgl.accessToken = MAPBOX_TOKEN
 

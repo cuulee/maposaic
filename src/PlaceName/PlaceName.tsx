@@ -2,7 +2,7 @@ import { CompassOutlined } from '@ant-design/icons'
 import { Button } from 'antd'
 import React, { useState, useRef, useEffect } from 'react'
 
-import 'Mapozaic/placeName.style.less'
+import 'PlaceName/placeName.style.less'
 
 const PlaceName = ({
   placeName,
