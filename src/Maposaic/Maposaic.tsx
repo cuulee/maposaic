@@ -14,19 +14,19 @@ import Drawer from 'Drawer/Drawer'
 // eslint-disable-next-line
 import PaintWorker from 'worker-loader!./paint.worker'
 
-import 'Mapozaic/mapozaic.style.less'
-import { MaposaicColors, PresetColorName } from 'Colors/types'
+import 'Maposaic/maposaic.style.less'
+import { ColorConfig } from 'Colors/types'
 import { getTargetSizeFromSourceSize } from 'Canvas/utils'
 import { ROAD_SIMPLE_WHITE, WATER_CYAN } from 'Colors/mapbox'
-import { ROAD_WHITE } from 'Colors/colors'
-import { OnPosterSizeChangePayload, SpecificColorTransforms } from 'Mapozaic/types'
+import { RANDOM_CONFIG, ROAD_WHITE } from 'Colors/constants'
+import { OnPosterSizeChangePayload, SpecificColorTransforms } from 'Maposaic/types'
 import { Size } from 'Canvas/types'
 import {
   resizeMapsContainer,
   setMapboxArtificialSize,
   setMapboxDisplaySize,
   toggleCanvasOpacity,
-} from 'Mapozaic/elementHelpers'
+} from 'Maposaic/elementHelpers'
 import { CM_PER_INCH, FORMAT_RATIO } from 'constants/dimensions'
 import CloudUpload from 'CloudUpload/CloudUpload'
 import { TOOLTIP_ENTER_DELAY } from 'constants/ux'
@@ -34,6 +34,7 @@ import { MAPBOX_STYLE_URL, MAPBOX_TOKEN } from 'constants/mapbox'
 import { fetchGeoRandom, getPlaceNameFromPosition, getRandomZoom } from 'Geo/utils'
 import PlaceName from 'PlaceName/PlaceName'
 import GeoSearch from 'Geo/GeoSearchInput'
+import { createMaposaicColors } from 'Colors/utils'
 
 mapboxgl.accessToken = MAPBOX_TOKEN
 
@@ -66,7 +67,7 @@ const MapboxGLMap = (): JSX.Element => {
   const [remainingTime, setRemainingTime] = useState<number | null>(null)
 
   const [mapboxStyleURL, setMapboxStyleURL] = useState(MAPBOX_STYLE_URL.relief)
-  const [maposaicColors, setMaposaicColors] = useState<MaposaicColors>(PresetColorName.Random)
+  const [colorConfig, setColorConfig] = useState<ColorConfig>(RANDOM_CONFIG)
 
   const [isLoading, setIsLoading] = useState(true)
   const [currentCenter, setCurrentCenter] = useState<null | mapboxgl.LngLat>(null)
@@ -142,7 +143,7 @@ const MapboxGLMap = (): JSX.Element => {
         sourceSize: mapboxCanvasSize,
         targetSize: maposaicCanvasSize,
         canvassRatio: DISPLAY_PIXEL_RATIO,
-        maposaicColors,
+        maposaicColors: createMaposaicColors(colorConfig, specificColorTransforms),
         specificColorTransforms,
       })
 
@@ -209,9 +210,9 @@ const MapboxGLMap = (): JSX.Element => {
       newMap.remove()
     }
     // eslint-disable-next-line
-  }, [mapboxStyleURL, maposaicColors, sizeRender, sizeFactor, specificColorTransforms, initialCenter])
+  }, [mapboxStyleURL, colorConfig, sizeRender, sizeFactor, specificColorTransforms, initialCenter])
 
-  const [drawerVisible, setDrawerVisible] = useState(false)
+  const [drawerVisible, setDrawerVisible] = useState(true)
 
   const changeMapStyle = (newStyle: string) => {
     toggleCanvasOpacity(true)
@@ -219,8 +220,8 @@ const MapboxGLMap = (): JSX.Element => {
     setMapboxStyleURL(newStyle)
   }
 
-  const setNewMaposaicColors = (colors: MaposaicColors) => {
-    setMaposaicColors(colors)
+  const setNewColorConfig = (colorConfig: ColorConfig) => {
+    setColorConfig(colorConfig)
     setIsLoading(true)
   }
   const setNewSizeFactor = (sizeFactor: number) => {
@@ -360,8 +361,8 @@ const MapboxGLMap = (): JSX.Element => {
           setDrawerVisible={setDrawerVisible}
           changeMapStyle={changeMapStyle}
           mapboxStyleURL={mapboxStyleURL}
-          maposaicColors={maposaicColors}
-          setNewMaposaicColors={setNewMaposaicColors}
+          colorConfig={colorConfig}
+          setColorConfig={setNewColorConfig}
           sizeFactor={sizeFactor}
           setNewSizeFactor={setNewSizeFactor}
           specificColorTransforms={specificColorTransforms}

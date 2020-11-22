@@ -1,7 +1,7 @@
 import { Size } from 'Canvas/types'
 import { MaposaicColors } from 'Colors/types'
 import { CanvasDataTransformer } from 'Canvas/CanvasDataTransformer'
-import { SpecificColorTransforms } from 'Mapozaic/types'
+import { SpecificColorTransforms } from 'Maposaic/types'
 
 onmessage = ({
   data: {

@@ -7,30 +7,12 @@ import { Badge } from 'antd'
 import { ClockCircleOutlined } from '@ant-design/icons'
 
 import { MAPBOX_STYLE_URL } from 'constants/mapbox'
-import { MaposaicColors } from 'Colors/types'
 
 import 'Drawer/drawer.style.less'
-import ColorTabs from 'Colors/ColorTabs'
-import { OnPosterSizeChangePayload, SpecificColorTransforms } from 'Mapozaic/types'
+import ColorConfig from 'Colors/ColorConfigChoice'
 import { Format, FORMATS, FORMAT_SIZE } from 'constants/dimensions'
 import { PRIMARY_COLOR } from 'constants/colors'
-
-export type DrawerPropsType = {
-  visible: boolean
-  setDrawerVisible: (visible: boolean) => void
-  mapboxStyleURL: string
-  changeMapStyle: (style: string) => void
-  sizeFactor: number
-  setNewSizeFactor: (sizeFactor: number) => void
-  maposaicColors: MaposaicColors
-  setNewMaposaicColors: (colors: MaposaicColors) => void
-  specificColorTransforms: SpecificColorTransforms
-  setNewSpecificColorTransforms: (colors: SpecificColorTransforms) => void
-  remainingTime: number | null
-  estimatedTime: number | null
-  updateEstimatedTime: (sizeFactor: number) => void
-  onPosterSizeChange: (p: OnPosterSizeChangePayload) => void
-}
+import { DrawerPropsType } from 'Drawer/types'
 
 const millisecondsToText = (millis: number | null) => {
   const min = Math.floor((millis || 0) / 60000)
@@ -49,8 +31,8 @@ const Drawer = ({
   changeMapStyle,
   sizeFactor,
   setNewSizeFactor,
-  maposaicColors,
-  setNewMaposaicColors,
+  colorConfig,
+  setColorConfig,
   specificColorTransforms,
   setNewSpecificColorTransforms,
   remainingTime,
@@ -105,19 +87,19 @@ const Drawer = ({
       visible={visible}
       placement="left"
       onClose={() => setDrawerVisible(false)}
-      closable={false}
-      width="min(75%,333px)"
+      closable={true}
+      width="min(100%,333px)"
     >
-      <Title level={4}>Colors</Title>
-      <ColorTabs
-        maposaicColors={maposaicColors}
-        setNewMaposaicColors={setNewMaposaicColors}
+      <Title level={3}>Colors</Title>
+      <ColorConfig
+        colorConfig={colorConfig}
+        setColorConfig={setColorConfig}
         specificColorTransforms={specificColorTransforms}
         setNewSpecificColorTransforms={setNewSpecificColorTransforms}
       />
 
       <Divider />
-      <Title level={4}>Background</Title>
+      <Title level={3}>Background</Title>
       <Radio.Group onChange={onStyleUrlChange} value={mapboxStyleURL}>
         <Radio value={MAPBOX_STYLE_URL.relief}>Relief</Radio>
         <Radio value={MAPBOX_STYLE_URL.road}>Road only</Radio>
@@ -126,7 +108,7 @@ const Drawer = ({
       </Radio.Group>
 
       <Divider />
-      <Title level={4}>Poster</Title>
+      <Title level={3}>Poster</Title>
       <div className="poster-options">
         <Select value={format} onSelect={handleFormatChange}>
           {FORMATS.map((format) => {
@@ -163,7 +145,7 @@ const Drawer = ({
       </div>
 
       <Divider />
-      <Title level={4}>
+      <Title level={3}>
         Scale
         <Tooltip className="scale-tooltip" title="Increase size and... waiting time">
           <InfoCircleOutlined />

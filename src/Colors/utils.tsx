@@ -1,5 +1,15 @@
-import { MaposaicColors, PresetColorName, RGBColor } from 'Colors/types'
-import { SpecificColorTransforms } from 'Mapozaic/types'
+import {
+  ColorConfig,
+  ColorConfigType,
+  MaposaicColors,
+  PaletteType,
+  PresetColorName,
+  RGBColor,
+  ShadingType,
+} from 'Colors/types'
+import { SpecificColorTransforms } from 'Maposaic/types'
+import { generate } from '@ant-design/colors'
+import { AntColors, PRESET_PALETTES } from 'Colors/constants'
 
 export const createRGB = (r: number, g: number, b: number): RGBColor => {
   return { r, g, b }
@@ -56,7 +66,7 @@ export const isColorSimilar = (color1: RGBColor, color2: RGBColor, similarColorT
   )
 }
 
-export const getMainColorsWithoutSpecific = (
+export const getMaposaicColorsWithoutSpecific = (
   mainColors: MaposaicColors,
   specificColorTransforms: SpecificColorTransforms,
 ) => {
@@ -79,4 +89,26 @@ export const getMainColorsWithoutSpecific = (
   }
 
   return colors
+}
+
+export const getMaposaicColorsFromColorConfig = (colorConfig: ColorConfig) => {
+  if (colorConfig.type === ColorConfigType.Random) {
+    return ColorConfigType.Random
+  }
+  if (colorConfig.type === ColorConfigType.Shading) {
+    if (colorConfig.shadingType === ShadingType.Custom) {
+      return generate(colorConfig.seedColor)
+    } else {
+      return AntColors[colorConfig.seedColor]
+    }
+  }
+  if (colorConfig.paletteType === PaletteType.Preset) {
+    return PRESET_PALETTES[colorConfig.origin].palettes[colorConfig.paletteIndex]
+  }
+
+  return colorConfig.colors
+}
+
+export const createMaposaicColors = (colorConfig: ColorConfig, specificColorTransforms: SpecificColorTransforms) => {
+  return getMaposaicColorsWithoutSpecific(getMaposaicColorsFromColorConfig(colorConfig), specificColorTransforms)
 }

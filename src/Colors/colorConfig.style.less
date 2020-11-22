@@ -1,0 +1,25 @@
+.color-tabs {
+  &__configs {
+    display: flex;
+    &__config {
+      // padding: 8px;
+      cursor: pointer;
+      opacity: 0.5;
+      &--selected {
+        opacity: 1;
+      }
+      &:not(:first-child) {
+        margin-left: 16px;
+      }
+    }
+  }
+}
+
+.specific-colors {
+  margin-top: 16px;
+
+  &__color {
+    display: flex;
+    align-items: center;
+  }
+}
