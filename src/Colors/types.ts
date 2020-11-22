@@ -1,6 +1,6 @@
 export type RGBColor = { r: number; g: number; b: number }
 
-export type MaposaicColors = PresetColorName.Random | string[] | string
+export type MaposaicColors = PresetColorName.Random | string[]
 
 export enum PaletteOrigin {
   Coolors = 'coolors',

@@ -22,7 +22,7 @@ export const rgbToHex = (rgb: RGBColor) => {
   return `#${intToHex(rgb.r)}${intToHex(rgb.g)}${intToHex(rgb.b)}`
 }
 
-export const createColor = (colors: MaposaicColors) => {
+export const createColor = (colors: MaposaicColors | string) => {
   if (colors === PresetColorName.Random) {
     return createRGB(Math.floor(Math.random() * 256), Math.floor(Math.random() * 256), Math.floor(Math.random() * 256))
   }
