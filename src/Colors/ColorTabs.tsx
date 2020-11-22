@@ -6,7 +6,7 @@ import { generate } from '@ant-design/colors'
 
 import { AntColors, PRESET_PALETTES } from 'Colors/colors'
 import { MaposaicColors, PresetColorName, PaletteOrigin } from 'Colors/types'
-import './colorTabs.style.less'
+import 'Colors/colorTabs.style.less'
 import { CheckboxChangeEvent } from 'antd/lib/checkbox'
 import { SpecificColorTransforms } from 'Mapozaic/types'
 import { createColor, rgbToHex } from 'Colors/utils'
