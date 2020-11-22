@@ -6,13 +6,13 @@ import { FormatPainterOutlined, InfoCircleOutlined } from '@ant-design/icons'
 import { Badge } from 'antd'
 import { ClockCircleOutlined } from '@ant-design/icons'
 
-import { MAPBOX_STYLE_URL } from 'constants/mapbox'
-
 import 'Drawer/drawer.style.less'
 import ColorConfig from 'Colors/ColorConfigChoice'
 import { Format, FORMATS, FORMAT_SIZE } from 'constants/dimensions'
 import { PRIMARY_COLOR } from 'constants/colors'
 import { DrawerPropsType } from 'Drawer/types'
+import { MapboxStyle } from 'Maposaic/types'
+import { MAPBOX_STYLES } from 'Maposaic/constants'
 
 const millisecondsToText = (millis: number | null) => {
   const min = Math.floor((millis || 0) / 60000)
@@ -27,7 +27,7 @@ const radioStyle = { display: 'flex', justifyContent: 'center', alignItems: 'cen
 const Drawer = ({
   visible,
   setDrawerVisible,
-  mapboxStyleURL,
+  mapboxStyle,
   changeMapStyle,
   sizeFactor,
   setNewSizeFactor,
@@ -40,10 +40,6 @@ const Drawer = ({
   updateEstimatedTime,
   onPosterSizeChange,
 }: DrawerPropsType) => {
-  const onStyleUrlChange = (event: RadioChangeEvent) => {
-    setDrawerVisible(false)
-    changeMapStyle(event.target.value)
-  }
   const [localSizeFactor, setLocalSizeFactor] = useState(sizeFactor)
   const [isLandscape, setIsLandscape] = useState<boolean | null>(null)
   const [format, setFormat] = useState<Format>(Format.A4)
@@ -100,13 +96,21 @@ const Drawer = ({
 
       <Divider />
       <Title level={3}>Background</Title>
-      <Radio.Group onChange={onStyleUrlChange} value={mapboxStyleURL}>
-        <Radio value={MAPBOX_STYLE_URL.relief}>Relief</Radio>
-        <Radio value={MAPBOX_STYLE_URL.road}>Road only</Radio>
-        <Radio value={MAPBOX_STYLE_URL.water}>Water only</Radio>
-        <Radio value={MAPBOX_STYLE_URL.administrative}>Administrative</Radio>
-      </Radio.Group>
-
+      <div className="drawer__backgroungs">
+        {Object.values(MapboxStyle).map((style) => {
+          return (
+            <div
+              className={`drawer__backgroungs__background${
+                mapboxStyle === style ? ' drawer__backgroungs__background--selected' : ''
+              }`}
+              onClick={() => changeMapStyle(style)}
+            >
+              <div>{MAPBOX_STYLES[style].name}</div>
+              <img width="80px" alt={style} src={MAPBOX_STYLES[style].imgPath} />
+            </div>
+          )
+        })}
+      </div>
       <Divider />
       <Title level={3}>Poster</Title>
       <div className="poster-options">

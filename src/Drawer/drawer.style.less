@@ -27,3 +27,20 @@
     margin-left: 16px;
   }
 }
+
+.drawer {
+  &__backgroungs {
+    display: flex;
+
+    &__background {
+      cursor: pointer;
+      opacity: 0.5;
+      &--selected {
+        opacity: 1;
+      }
+      &:not(:first-child) {
+        margin-left: 16px;
+      }
+    }
+  }
+}

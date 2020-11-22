@@ -1,6 +1,7 @@
-import { GEOCODING_BASE_URL, MAPBOX_TOKEN } from 'constants/mapbox'
+import { MAPBOX_TOKEN } from 'constants/mapbox'
 import { GeocodingData, PlaceType, GeonameData } from 'types/geo'
 import mapboxgl from 'mapbox-gl'
+import { GEOCODING_BASE_URL } from 'Gallery/constants'
 
 export const PLACE_TYPE_RELEVANCE = [
   PlaceType.Place,

@@ -1,11 +1,11 @@
 import { ColorConfig, MaposaicColors } from 'Colors/types'
-import { OnPosterSizeChangePayload, SpecificColorTransforms } from 'Maposaic/types'
+import { MapboxStyle, OnPosterSizeChangePayload, SpecificColorTransforms } from 'Maposaic/types'
 
 export type DrawerPropsType = {
   visible: boolean
   setDrawerVisible: (visible: boolean) => void
-  mapboxStyleURL: string
-  changeMapStyle: (style: string) => void
+  mapboxStyle: string
+  changeMapStyle: (style: MapboxStyle) => void
   sizeFactor: number
   setNewSizeFactor: (sizeFactor: number) => void
   specificColorTransforms: SpecificColorTransforms

@@ -9,7 +9,7 @@ import {
   RANDOM_CONFIG,
 } from 'Colors/constants'
 import { ColorConfig, ShadingColorConfig, PaletteColorConfig, ColorConfigType } from 'Colors/types'
-import 'Colors/colorConfig.style.less'
+import 'Colors/colorConfigChoice.style.less'
 import { CheckboxChangeEvent } from 'antd/lib/checkbox'
 import { SpecificColorTransforms } from 'Maposaic/types'
 import { createColor, rgbToHex, getMaposaicColorsFromColorConfig } from 'Colors/utils'
@@ -74,12 +74,12 @@ const ColorConfigChoice = ({
 
   return (
     <div>
-      <div className="color-tabs__configs">
+      <div className="color-choice__configs">
         {Object.entries(ColorConfigNamesAndImage).map(([configName, config]) => {
           return (
             <div
-              className={`color-tabs__configs__config${
-                colorConfig.type === configName ? ' color-tabs__configs__config--selected' : ''
+              className={`color-choice__configs__config${
+                colorConfig.type === configName ? ' color-choice__configs__config--selected' : ''
               }`}
               onClick={() => changeColorConfig(configName as ColorConfigType)}
             >

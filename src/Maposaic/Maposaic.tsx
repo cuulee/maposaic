@@ -19,7 +19,7 @@ import { ColorConfig } from 'Colors/types'
 import { getTargetSizeFromSourceSize } from 'Canvas/utils'
 import { ROAD_SIMPLE_WHITE, WATER_CYAN } from 'Colors/mapbox'
 import { RANDOM_CONFIG, ROAD_WHITE } from 'Colors/constants'
-import { OnPosterSizeChangePayload, SpecificColorTransforms } from 'Maposaic/types'
+import { MapboxStyle, OnPosterSizeChangePayload, SpecificColorTransforms } from 'Maposaic/types'
 import { Size } from 'Canvas/types'
 import {
   resizeMapsContainer,
@@ -30,11 +30,12 @@ import {
 import { CM_PER_INCH, FORMAT_RATIO } from 'constants/dimensions'
 import CloudUpload from 'CloudUpload/CloudUpload'
 import { TOOLTIP_ENTER_DELAY } from 'constants/ux'
-import { MAPBOX_STYLE_URL, MAPBOX_TOKEN } from 'constants/mapbox'
+import { MAPBOX_TOKEN } from 'constants/mapbox'
 import { fetchGeoRandom, getPlaceNameFromPosition, getRandomZoom } from 'Geo/utils'
 import PlaceName from 'PlaceName/PlaceName'
 import GeoSearch from 'Geo/GeoSearchInput'
 import { createMaposaicColors } from 'Colors/utils'
+import { MAPBOX_STYLES } from 'Maposaic/constants'
 
 mapboxgl.accessToken = MAPBOX_TOKEN
 
@@ -67,7 +68,7 @@ const MapboxGLMap = (): JSX.Element => {
   const [estimatedTime, setEstimatedTime] = useState<number | null>(null)
   const [remainingTime, setRemainingTime] = useState<number | null>(null)
 
-  const [mapboxStyleURL, setMapboxStyleURL] = useState(MAPBOX_STYLE_URL.relief)
+  const [mapboxStyle, setMapboxStyle] = useState(MapboxStyle.Relief)
   const [colorConfig, setColorConfig] = useState<ColorConfig>(RANDOM_CONFIG)
 
   const [isLoading, setIsLoading] = useState(true)
@@ -175,7 +176,7 @@ const MapboxGLMap = (): JSX.Element => {
 
     const newMap = new mapboxgl.Map({
       container: mapboxContainer.current ? mapboxContainer.current : '',
-      style: mapboxStyleURL,
+      style: MAPBOX_STYLES[mapboxStyle].url,
       zoom,
       center,
       maxTileCacheSize: 0,
@@ -211,12 +212,12 @@ const MapboxGLMap = (): JSX.Element => {
       newMap.remove()
     }
     // eslint-disable-next-line
-  }, [mapboxStyleURL, colorConfig, sizeRender, sizeFactor, specificColorTransforms, initialCenter])
+  }, [mapboxStyle, colorConfig, sizeRender, sizeFactor, specificColorTransforms, initialCenter])
 
-  const changeMapStyle = (newStyle: string) => {
+  const changeMapStyle = (newStyle: MapboxStyle) => {
     toggleCanvasOpacity(true)
     setIsLoading(true)
-    setMapboxStyleURL(newStyle)
+    setMapboxStyle(newStyle)
   }
 
   const setNewColorConfig = (colorConfig: ColorConfig) => {
@@ -359,7 +360,7 @@ const MapboxGLMap = (): JSX.Element => {
           visible={drawerVisible}
           setDrawerVisible={setDrawerVisible}
           changeMapStyle={changeMapStyle}
-          mapboxStyleURL={mapboxStyleURL}
+          mapboxStyle={mapboxStyle}
           colorConfig={colorConfig}
           setColorConfig={setNewColorConfig}
           sizeFactor={sizeFactor}

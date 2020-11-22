@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import { AutoComplete, Input } from 'antd'
 import mapboxgl from 'mapbox-gl'
-import { GEOCODING_BASE_URL, MAPBOX_TOKEN } from 'constants/mapbox'
+import { MAPBOX_TOKEN } from 'constants/mapbox'
 import { DrawerPropsType } from 'Drawer/types'
 import { SearchOutlined, LoadingOutlined } from '@ant-design/icons'
+import { GEOCODING_BASE_URL } from 'Gallery/constants'
 
 type GeocoderFeature = {
   id: string

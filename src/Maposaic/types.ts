@@ -18,3 +18,9 @@ export type OnPosterSizeChangePayload = {
   pixelPerInchResolution: number
   longerPropertyCMLength: number
 }
+
+export enum MapboxStyle {
+  Relief = 'relief',
+  Road = 'road',
+  Water = 'water',
+}
