@@ -24,3 +24,9 @@ export enum MapboxStyle {
   Road = 'road',
   Water = 'water',
 }
+
+export enum MaposaicURLParamKey {
+  Lat = 'lat',
+  Lng = 'lng',
+  Zoom = 'zoom',
+}

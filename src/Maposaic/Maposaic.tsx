@@ -19,7 +19,7 @@ import { ColorConfig } from 'Colors/types'
 import { getTargetSizeFromSourceSize } from 'Canvas/utils'
 import { ROAD_SIMPLE_WHITE, WATER_CYAN } from 'Colors/mapbox'
 import { RANDOM_CONFIG, ROAD_WHITE } from 'Colors/constants'
-import { MapboxStyle, OnPosterSizeChangePayload, SpecificColorTransforms } from 'Maposaic/types'
+import { MapboxStyle, MaposaicURLParamKey, OnPosterSizeChangePayload, SpecificColorTransforms } from 'Maposaic/types'
 import { Size } from 'Canvas/types'
 import {
   resizeMapsContainer,
@@ -41,7 +41,6 @@ mapboxgl.accessToken = MAPBOX_TOKEN
 
 const INITIAL_SIZE_FACTOR = 1
 const DISPLAY_PIXEL_RATIO = 1
-const INITIAL_ZOOM = getRandomZoom()
 
 let mapboxResolutionRatio: number | null = null
 let paintWorker = new PaintWorker()
@@ -76,19 +75,34 @@ const MapboxGLMap = (): JSX.Element => {
   const [placeName, setPlaceName] = useState<null | string>(null)
   const [sizeRender, setSizeRender] = useState(0)
   const [sizeFactor, setSizeFactor] = useState(INITIAL_SIZE_FACTOR)
+  const [initialCenter, setInitialCenter] = useState<null | mapboxgl.LngLat>(null)
+  const [initialZoom, setInitialZoom] = useState<number>(getRandomZoom())
+  const [showPlaceNameTrigger, setShowPlaceNameTrigger] = useState(false)
+  const [showPlaceNameWhenFetched, setShowPlaceNameWhenFetched] = useState(false)
   const [specificColorTransforms, setSpecificColorTransforms] = useState<SpecificColorTransforms>({
     [ROAD_SIMPLE_WHITE]: { color: ROAD_WHITE, isEditable: true, name: 'roads' },
     [WATER_CYAN]: { color: null, isEditable: true, name: 'water' },
   })
 
-  const [initialCenter, setInitialCenter] = useState<null | mapboxgl.LngLat>(null)
-  const [showPlaceNameTrigger, setShowPlaceNameTrigger] = useState(false)
-  const [showPlaceNameWhenFetched, setShowPlaceNameWhenFetched] = useState(false)
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    if (!currentCenter || !map) {
+      return
+    }
+    urlParams.set(MaposaicURLParamKey.Lat, (Math.floor(currentCenter.lat * 1000000) / 1000000).toString())
+    urlParams.set(MaposaicURLParamKey.Lng, (Math.floor(currentCenter.lng * 1000000) / 1000000).toString())
+    urlParams.set(MaposaicURLParamKey.Zoom, (Math.floor(map.getZoom() * 1000) / 1000).toString())
 
-  const setRandomCoords = async () => {
+    window.history.replaceState({}, '', `${window.location.pathname}?${urlParams}`)
+  }, [currentCenter])
+
+  const setRandomCoords = async (setZoom = true) => {
     setIsLoading(true)
     const randomCenter = await fetchGeoRandom()
     setShowPlaceNameWhenFetched(true)
+    if (initialZoom === null && setZoom) {
+      setInitialZoom(getRandomZoom())
+    }
     if (!initialCenter) {
       setInitialCenter(randomCenter)
       return
@@ -97,11 +111,25 @@ const MapboxGLMap = (): JSX.Element => {
       return
     }
     map.setCenter(randomCenter)
-    map.setZoom(getRandomZoom())
+    if (setZoom) {
+      map.setZoom(getRandomZoom())
+    }
   }
 
   useEffect(() => {
-    setRandomCoords()
+    const urlParams = new URLSearchParams(window.location.search)
+    const lat = urlParams.get(MaposaicURLParamKey.Lat)
+    const lng = urlParams.get(MaposaicURLParamKey.Lng)
+    const zoom = urlParams.get(MaposaicURLParamKey.Zoom)
+    if (lat && lng) {
+      setInitialCenter(new mapboxgl.LngLat(parseFloat(lng), parseFloat(lat)))
+    } else {
+      setRandomCoords(!zoom)
+    }
+    if (zoom) {
+      setInitialZoom(parseFloat(zoom))
+    }
+
     // eslint-disable-next-line
   }, [])
 
@@ -170,7 +198,7 @@ const MapboxGLMap = (): JSX.Element => {
     }
 
     const center = map?.getCenter() ?? initialCenter
-    const zoom = map?.getZoom() ?? INITIAL_ZOOM
+    const zoom = map?.getZoom() ?? initialZoom
 
     setMapboxArtificialSize(sizeFactor)
 
@@ -424,7 +452,7 @@ const MapboxGLMap = (): JSX.Element => {
               className="overmap__actions__button"
               style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
               shape="circle"
-              onClick={setRandomCoords}
+              onClick={() => setRandomCoords(true)}
               icon={<img src={dice} width="16px" alt="dice" />}
             />
           </Tooltip>
