@@ -133,7 +133,6 @@ const MapboxGLMap = (): JSX.Element => {
       setInitialZoom(parseFloat(zoom))
     }
     const colorConfig = getColorConfigFromURLParams(new URLSearchParams(window.location.search))
-    console.log('colorConfig', colorConfig)
     if (colorConfig) {
       setColorConfig(colorConfig)
     }

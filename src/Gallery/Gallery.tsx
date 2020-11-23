@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import mapboxgl from 'mapbox-gl'
 import 'Gallery/style.less'
 import Title from 'antd/lib/typography/Title'
-import { Divider, Modal, Spin } from 'antd'
+import { Divider, Modal, Spin, Tooltip } from 'antd'
 import { DISABLED_COLOR } from 'constants/colors'
 
 import { Link, useHistory } from 'react-router-dom'
@@ -153,7 +153,6 @@ const Gallery = () => {
   const history = useHistory()
   const diveInMaposaics = (picture: Picture) => {
     const urlParams = getMaposaicURLParamsFromPicture(picture)
-    console.log('urlParams', urlParams, picture.mapCenter)
     if (!showMaposaicLink(picture) || !urlParams) {
       return
     }
@@ -197,12 +196,15 @@ const Gallery = () => {
               onLoad={() => setIsModalPictureLoaded(true)}
             />
             <div className="modal-content__nav">
-              <div
-                className={`${showMaposaicLink(pictures[displayedIndex]) ? ' modal-content__name--link' : ''}`}
-                onClick={() => diveInMaposaics(pictures[displayedIndex])}
-              >
-                {isModalPictureLoaded ? displayedName(pictures[displayedIndex]) : '...'}
-              </div>
+              {showMaposaicLink(pictures[displayedIndex]) ? (
+                <Tooltip title="Explore maposaics from this picture">
+                  <div className="modal-content__name--link" onClick={() => diveInMaposaics(pictures[displayedIndex])}>
+                    {isModalPictureLoaded ? displayedName(pictures[displayedIndex]) : '...'}
+                  </div>
+                </Tooltip>
+              ) : (
+                <div>{isModalPictureLoaded ? displayedName(pictures[displayedIndex]) : '...'}</div>
+              )}
             </div>
             {!isModalPictureLoaded && (
               <Spin
