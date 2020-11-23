@@ -36,7 +36,7 @@ import PlaceName from 'PlaceName/PlaceName'
 import GeoSearch from 'Geo/GeoSearchInput'
 import { createMaposaicColors } from 'Colors/utils'
 import { MAPBOX_STYLES } from 'Maposaic/constants'
-import { getColorConfigFromURLParams, getURLParamsFromColorConfig, roundCoord, roundZoom } from 'Maposaic/utils'
+import { getColorConfigFromURLParams, getURLParamsFromColorConfig, getURLParamsFromCoords } from 'Maposaic/utils'
 
 mapboxgl.accessToken = MAPBOX_TOKEN
 
@@ -84,14 +84,10 @@ const MapboxGLMap = (): JSX.Element => {
   })
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search)
     if (!currentCenter || !map) {
       return
     }
-    urlParams.set(MaposaicGeoURLParamKey.Lat, roundCoord(currentCenter.lat).toString())
-    urlParams.set(MaposaicGeoURLParamKey.Lng, roundCoord(currentCenter.lng).toString())
-    urlParams.set(MaposaicGeoURLParamKey.Zoom, roundZoom(map.getZoom()).toString())
-
+    const urlParams = getURLParamsFromCoords(currentCenter, map.getZoom(), new URLSearchParams(window.location.search))
     window.history.replaceState({}, '', `${window.location.pathname}?${urlParams}`)
   }, [currentCenter, map])
 

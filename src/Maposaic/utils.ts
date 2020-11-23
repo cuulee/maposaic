@@ -6,9 +6,17 @@ import {
   DEFAULT_PALETTE_CONFIG,
 } from 'Colors/constants'
 import { ColorConfig, ColorConfigType, PaletteType, ShadingPresetName, ShadingType, PaletteOrigin } from 'Colors/types'
-import { MaposaicColorURLParamKey } from 'Maposaic/types'
+import { MaposaicColorURLParamKey, MaposaicGeoURLParamKey } from 'Maposaic/types'
 
 const COLORS_SEPARATOR = ','
+
+export const getURLParamsFromCoords = (center: mapboxgl.LngLat, zoom: number, urlParams: URLSearchParams) => {
+  urlParams.set(MaposaicGeoURLParamKey.Lat, roundCoord(center.lat).toString())
+  urlParams.set(MaposaicGeoURLParamKey.Lng, roundCoord(center.lng).toString())
+  urlParams.set(MaposaicGeoURLParamKey.Zoom, roundZoom(zoom).toString())
+
+  return urlParams
+}
 
 export const getURLParamsFromColorConfig = (colorConfig: ColorConfig, urlParams: URLSearchParams) => {
   Object.values(MaposaicColorURLParamKey).forEach((key) => {

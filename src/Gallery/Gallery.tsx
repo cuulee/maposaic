@@ -1,6 +1,6 @@
 import { db } from 'index'
 import React, { useEffect, useState } from 'react'
-
+import mapboxgl from 'mapbox-gl'
 import 'Gallery/style.less'
 import Title from 'antd/lib/typography/Title'
 import { Divider, Modal, Spin } from 'antd'
@@ -8,6 +8,7 @@ import { DISABLED_COLOR } from 'constants/colors'
 
 import { Link } from 'react-router-dom'
 import { LeftOutlined, LoadingOutlined, RightOutlined } from '@ant-design/icons'
+import { ColorConfig } from 'Colors/types'
 
 export const PICTURE_ID_PARAM = 'pictureId'
 
@@ -17,6 +18,8 @@ type ApiPicture = {
   downloadURL?: string
   placeName?: string | null
   thumbnailDownloadURL?: string
+  mapCenter?: [number, number]
+  colorConfig?: ColorConfig
 }
 
 type Picture = {
@@ -25,6 +28,8 @@ type Picture = {
   placeName: string | undefined | null
   downloadURL: string
   thumbnailDownloadURL?: string
+  colorConfig?: ColorConfig
+  mapCenter?: mapboxgl.LngLat
 }
 
 const displayedName = (picture: Picture): string => {
@@ -60,6 +65,10 @@ const Gallery = () => {
           downloadURL: apiPicture.downloadURL,
           placeName: apiPicture.placeName,
           thumbnailDownloadURL: apiPicture.thumbnailDownloadURL,
+          colorConfig: apiPicture.colorConfig,
+          mapCenter: apiPicture.mapCenter
+            ? new mapboxgl.LngLat(apiPicture.mapCenter[0], apiPicture.mapCenter[1])
+            : undefined,
         }
         newPictures.push(pic)
       })
