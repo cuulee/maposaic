@@ -1,1 +1,1 @@
-export const GEOCODING_BASE_URL = 'https://api.mapbox.com/geocoding/v5/mapbox.places'
+export const PICTURE_ID_PARAM = 'pictureId'

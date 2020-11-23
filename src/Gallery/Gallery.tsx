@@ -6,31 +6,11 @@ import Title from 'antd/lib/typography/Title'
 import { Divider, Modal, Spin } from 'antd'
 import { DISABLED_COLOR } from 'constants/colors'
 
-import { Link } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 import { LeftOutlined, LoadingOutlined, RightOutlined } from '@ant-design/icons'
-import { ColorConfig } from 'Colors/types'
-
-export const PICTURE_ID_PARAM = 'pictureId'
-
-type ApiPicture = {
-  pictureName?: string
-  filePath?: string
-  downloadURL?: string
-  placeName?: string | null
-  thumbnailDownloadURL?: string
-  mapCenter?: [number, number]
-  colorConfig?: ColorConfig
-}
-
-type Picture = {
-  id: string
-  pictureName: string | undefined
-  placeName: string | undefined | null
-  downloadURL: string
-  thumbnailDownloadURL?: string
-  colorConfig?: ColorConfig
-  mapCenter?: mapboxgl.LngLat
-}
+import { ApiPicture, Picture } from 'Gallery/types'
+import { PICTURE_ID_PARAM } from 'Gallery/constants'
+import { getMaposaicURLParamsFromPicture, showMaposaicLink } from 'Gallery/utils'
 
 const displayedName = (picture: Picture): string => {
   return picture.pictureName ?? picture.placeName ?? 'no name'
@@ -69,6 +49,7 @@ const Gallery = () => {
           mapCenter: apiPicture.mapCenter
             ? new mapboxgl.LngLat(apiPicture.mapCenter[0], apiPicture.mapCenter[1])
             : undefined,
+          mapZoom: apiPicture.mapZoom,
         }
         newPictures.push(pic)
       })
@@ -85,7 +66,7 @@ const Gallery = () => {
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search)
-    const pictureId = displayedIndex ? pictures[displayedIndex]?.id : null
+    const pictureId = displayedIndex !== null ? pictures[displayedIndex]?.id : null
     if (!pictureId) {
       urlParams.delete(PICTURE_ID_PARAM)
     } else {
@@ -169,6 +150,16 @@ const Gallery = () => {
     yDown = null
   }
 
+  const history = useHistory()
+  const diveInMaposaics = (picture: Picture) => {
+    const urlParams = getMaposaicURLParamsFromPicture(picture)
+    console.log('urlParams', urlParams, picture.mapCenter)
+    if (!showMaposaicLink(picture) || !urlParams) {
+      return
+    }
+    history.push(`/?${urlParams}`)
+  }
+
   return (
     <div className="gallery">
       <Title level={2}>Gallery</Title>
@@ -206,7 +197,10 @@ const Gallery = () => {
               onLoad={() => setIsModalPictureLoaded(true)}
             />
             <div className="modal-content__nav">
-              <div className="modal-content__name">
+              <div
+                className={`${showMaposaicLink(pictures[displayedIndex]) ? ' modal-content__name--link' : ''}`}
+                onClick={() => diveInMaposaics(pictures[displayedIndex])}
+              >
                 {isModalPictureLoaded ? displayedName(pictures[displayedIndex]) : '...'}
               </div>
             </div>

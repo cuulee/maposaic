@@ -4,7 +4,7 @@ import mapboxgl from 'mapbox-gl'
 import { MAPBOX_TOKEN } from 'constants/mapbox'
 import { DrawerPropsType } from 'Drawer/types'
 import { SearchOutlined, LoadingOutlined } from '@ant-design/icons'
-import { GEOCODING_BASE_URL } from 'Gallery/constants'
+import { GEOCODING_BASE_URL } from 'Geo/constants'
 
 type GeocoderFeature = {
   id: string

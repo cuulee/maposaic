@@ -9,7 +9,7 @@ import { PRIMARY_COLOR, DISABLED_COLOR, SUCCESS_COLOR } from 'constants/colors'
 import 'CloudUpload/style.less'
 import { TOOLTIP_ENTER_DELAY } from 'constants/ux'
 import { useHistory } from 'react-router-dom'
-import { PICTURE_ID_PARAM } from 'Gallery/Gallery'
+import { PICTURE_ID_PARAM } from 'Gallery/constants'
 import { ColorConfig } from 'Colors/types'
 
 enum UploadStatus {
