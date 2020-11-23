@@ -11,6 +11,7 @@ import { TOOLTIP_ENTER_DELAY } from 'constants/ux'
 import { useHistory } from 'react-router-dom'
 import { PICTURE_ID_PARAM } from 'Gallery/constants'
 import { ColorConfig } from 'Colors/types'
+import { MapboxStyle } from 'Maposaic/types'
 
 enum UploadStatus {
   Error = 'error',
@@ -65,6 +66,7 @@ const CloudUpload = ({
   mapZoom,
   placeName,
   colorConfig,
+  mapboxStyle,
 }: {
   isDisabled: boolean
   className?: string
@@ -72,6 +74,7 @@ const CloudUpload = ({
   mapZoom?: number
   placeName: string | null
   colorConfig: ColorConfig
+  mapboxStyle: MapboxStyle
 }) => {
   const [modalVisible, setModalVisible] = useState(false)
   const [progress, setProgress] = useState(0)
@@ -125,6 +128,7 @@ const CloudUpload = ({
         colorConfig,
         mapZoom,
         placeName,
+        mapboxStyle,
       },
     })
     updateDocumentId(documentId)

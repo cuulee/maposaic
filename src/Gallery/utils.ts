@@ -1,5 +1,5 @@
 import { Picture } from 'Gallery/types'
-import { MaposaicGeoURLParamKey } from 'Maposaic/types'
+import { MaposaicGeoURLParamKey, MAPOSAIC_STYLE_URL_PARAM_KEY } from 'Maposaic/types'
 import { getURLParamsFromColorConfig } from 'Maposaic/utils'
 
 export const showMaposaicLink = (picture: Picture) => {
@@ -15,6 +15,9 @@ export const getMaposaicURLParamsFromPicture = (picture: Picture) => {
   urlParams.set(MaposaicGeoURLParamKey.Lng, picture.mapCenter.lng.toString())
   if (picture.mapZoom) {
     urlParams.set(MaposaicGeoURLParamKey.Zoom, picture.mapZoom.toString())
+  }
+  if (picture.mapboxStyle) {
+    urlParams.set(MAPOSAIC_STYLE_URL_PARAM_KEY, picture.mapboxStyle)
   }
 
   return picture.colorConfig ? getURLParamsFromColorConfig(picture.colorConfig, urlParams) : urlParams

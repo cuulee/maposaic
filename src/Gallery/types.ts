@@ -1,4 +1,5 @@
 import { ColorConfig } from 'Colors/types'
+import { MapboxStyle } from 'Maposaic/types'
 
 export type ApiPicture = {
   pictureName?: string
@@ -9,6 +10,7 @@ export type ApiPicture = {
   mapCenter?: [number, number]
   mapZoom?: number
   colorConfig?: ColorConfig
+  mapboxStyle?: MapboxStyle
 }
 
 export type Picture = {
@@ -20,4 +22,5 @@ export type Picture = {
   colorConfig?: ColorConfig
   mapCenter?: mapboxgl.LngLat
   mapZoom?: number
+  mapboxStyle?: MapboxStyle
 }

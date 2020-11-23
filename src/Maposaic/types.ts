@@ -25,6 +25,8 @@ export enum MapboxStyle {
   Water = 'water',
 }
 
+export const MAPOSAIC_STYLE_URL_PARAM_KEY = 'style'
+
 export enum MaposaicGeoURLParamKey {
   Lat = 'lat',
   Lng = 'lng',

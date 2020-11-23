@@ -19,7 +19,13 @@ import { ColorConfig } from 'Colors/types'
 import { getTargetSizeFromSourceSize } from 'Canvas/utils'
 import { ROAD_SIMPLE_WHITE, WATER_CYAN } from 'Colors/mapbox'
 import { RANDOM_CONFIG, ROAD_WHITE } from 'Colors/constants'
-import { MapboxStyle, MaposaicGeoURLParamKey, OnPosterSizeChangePayload, SpecificColorTransforms } from 'Maposaic/types'
+import {
+  MapboxStyle,
+  MaposaicGeoURLParamKey,
+  MAPOSAIC_STYLE_URL_PARAM_KEY,
+  OnPosterSizeChangePayload,
+  SpecificColorTransforms,
+} from 'Maposaic/types'
 import { Size } from 'Canvas/types'
 import {
   resizeMapsContainer,
@@ -99,6 +105,15 @@ const MapboxGLMap = (): JSX.Element => {
     window.history.replaceState({}, '', `${window.location.pathname}?${urlParams}`)
   }, [colorConfig, isInitialUrlParamsParsed])
 
+  useEffect(() => {
+    if (!isInitialUrlParamsParsed) {
+      return
+    }
+    const urlParams = new URLSearchParams(window.location.search)
+    urlParams.set(MAPOSAIC_STYLE_URL_PARAM_KEY, mapboxStyle)
+    window.history.replaceState({}, '', `${window.location.pathname}?${urlParams}`)
+  }, [mapboxStyle, isInitialUrlParamsParsed])
+
   const setRandomCoords = async (setZoom = true) => {
     setIsLoading(true)
     const randomCenter = await fetchGeoRandom()
@@ -135,6 +150,10 @@ const MapboxGLMap = (): JSX.Element => {
     const colorConfig = getColorConfigFromURLParams(new URLSearchParams(window.location.search))
     if (colorConfig) {
       setColorConfig(colorConfig)
+    }
+    const style = urlParams.get(MAPOSAIC_STYLE_URL_PARAM_KEY)
+    if (style && Object.values(MapboxStyle).includes(style as MapboxStyle)) {
+      setMapboxStyle(style as MapboxStyle)
     }
     setIsInitialUrlParamsParsed(true)
     // eslint-disable-next-line
@@ -432,6 +451,7 @@ const MapboxGLMap = (): JSX.Element => {
           <CloudUpload
             mapZoom={map?.getZoom()}
             mapCenter={map?.getCenter()}
+            mapboxStyle={mapboxStyle}
             colorConfig={colorConfig}
             placeName={placeName}
             className="overmap__actions__button"

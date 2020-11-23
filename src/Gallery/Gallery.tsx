@@ -50,6 +50,7 @@ const Gallery = () => {
             ? new mapboxgl.LngLat(apiPicture.mapCenter[0], apiPicture.mapCenter[1])
             : undefined,
           mapZoom: apiPicture.mapZoom,
+          mapboxStyle: apiPicture.mapboxStyle,
         }
         newPictures.push(pic)
       })
