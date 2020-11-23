@@ -19,7 +19,7 @@ import { ColorConfig } from 'Colors/types'
 import { getTargetSizeFromSourceSize } from 'Canvas/utils'
 import { ROAD_SIMPLE_WHITE, WATER_CYAN } from 'Colors/mapbox'
 import { RANDOM_CONFIG, ROAD_WHITE } from 'Colors/constants'
-import { MapboxStyle, MaposaicURLParamKey, OnPosterSizeChangePayload, SpecificColorTransforms } from 'Maposaic/types'
+import { MapboxStyle, MaposaicGeoURLParamKey, OnPosterSizeChangePayload, SpecificColorTransforms } from 'Maposaic/types'
 import { Size } from 'Canvas/types'
 import {
   resizeMapsContainer,
@@ -36,6 +36,7 @@ import PlaceName from 'PlaceName/PlaceName'
 import GeoSearch from 'Geo/GeoSearchInput'
 import { createMaposaicColors } from 'Colors/utils'
 import { MAPBOX_STYLES } from 'Maposaic/constants'
+import { getColorConfigFromURLParams, getURLParamsFromColorConfig, roundCoord, roundZoom } from 'Maposaic/utils'
 
 mapboxgl.accessToken = MAPBOX_TOKEN
 
@@ -60,16 +61,14 @@ let lastStartDate = new Date()
 
 const MapboxGLMap = (): JSX.Element => {
   const history = useHistory()
+  const [isInitialUrlParamsParsed, setIsInitialUrlParamsParsed] = useState(false)
   const [map, setMap] = useState<mapboxgl.Map | null>(null)
   const mapboxContainer = useRef<HTMLDivElement | null>(null)
   const [drawerVisible, setDrawerVisible] = useState(false)
-
   const [estimatedTime, setEstimatedTime] = useState<number | null>(null)
   const [remainingTime, setRemainingTime] = useState<number | null>(null)
-
   const [mapboxStyle, setMapboxStyle] = useState(MapboxStyle.Relief)
   const [colorConfig, setColorConfig] = useState<ColorConfig>(RANDOM_CONFIG)
-
   const [isLoading, setIsLoading] = useState(true)
   const [currentCenter, setCurrentCenter] = useState<null | mapboxgl.LngLat>(null)
   const [placeName, setPlaceName] = useState<null | string>(null)
@@ -89,12 +88,20 @@ const MapboxGLMap = (): JSX.Element => {
     if (!currentCenter || !map) {
       return
     }
-    urlParams.set(MaposaicURLParamKey.Lat, (Math.floor(currentCenter.lat * 1000000) / 1000000).toString())
-    urlParams.set(MaposaicURLParamKey.Lng, (Math.floor(currentCenter.lng * 1000000) / 1000000).toString())
-    urlParams.set(MaposaicURLParamKey.Zoom, (Math.floor(map.getZoom() * 1000) / 1000).toString())
+    urlParams.set(MaposaicGeoURLParamKey.Lat, roundCoord(currentCenter.lat).toString())
+    urlParams.set(MaposaicGeoURLParamKey.Lng, roundCoord(currentCenter.lng).toString())
+    urlParams.set(MaposaicGeoURLParamKey.Zoom, roundZoom(map.getZoom()).toString())
 
     window.history.replaceState({}, '', `${window.location.pathname}?${urlParams}`)
-  }, [currentCenter])
+  }, [currentCenter, map])
+
+  useEffect(() => {
+    if (!isInitialUrlParamsParsed) {
+      return
+    }
+    const urlParams = getURLParamsFromColorConfig(colorConfig, new URLSearchParams(window.location.search))
+    window.history.replaceState({}, '', `${window.location.pathname}?${urlParams}`)
+  }, [colorConfig, isInitialUrlParamsParsed])
 
   const setRandomCoords = async (setZoom = true) => {
     setIsLoading(true)
@@ -118,9 +125,9 @@ const MapboxGLMap = (): JSX.Element => {
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search)
-    const lat = urlParams.get(MaposaicURLParamKey.Lat)
-    const lng = urlParams.get(MaposaicURLParamKey.Lng)
-    const zoom = urlParams.get(MaposaicURLParamKey.Zoom)
+    const lat = urlParams.get(MaposaicGeoURLParamKey.Lat)
+    const lng = urlParams.get(MaposaicGeoURLParamKey.Lng)
+    const zoom = urlParams.get(MaposaicGeoURLParamKey.Zoom)
     if (lat && lng) {
       setInitialCenter(new mapboxgl.LngLat(parseFloat(lng), parseFloat(lat)))
     } else {
@@ -129,7 +136,12 @@ const MapboxGLMap = (): JSX.Element => {
     if (zoom) {
       setInitialZoom(parseFloat(zoom))
     }
-
+    const colorConfig = getColorConfigFromURLParams(new URLSearchParams(window.location.search))
+    console.log('colorConfig', colorConfig)
+    if (colorConfig) {
+      setColorConfig(colorConfig)
+    }
+    setIsInitialUrlParamsParsed(true)
     // eslint-disable-next-line
   }, [])
 
@@ -425,6 +437,7 @@ const MapboxGLMap = (): JSX.Element => {
           <CloudUpload
             mapZoom={map?.getZoom()}
             mapCenter={map?.getCenter()}
+            colorConfig={colorConfig}
             placeName={placeName}
             className="overmap__actions__button"
             isDisabled={isLoading}

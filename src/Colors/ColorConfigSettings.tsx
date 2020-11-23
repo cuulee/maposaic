@@ -16,6 +16,7 @@ import {
 } from 'Colors/types'
 import 'Colors/colorConfigSettings.style.less'
 import { Popover, Select } from 'antd'
+import { getInitialPresetPaletteIndex } from 'Colors/utils'
 
 const ColorConfigSettings = ({
   colorConfig,
@@ -37,10 +38,16 @@ const ColorConfigSettings = ({
       ? colorConfig.seedColor
       : '#3c22c3',
   )
-  const [paletteOrigin, setPaletteOrigin] = useState<PaletteOrigin | PaletteType.Custom>(PaletteOrigin.Coolors)
+  const [paletteOrigin, setPaletteOrigin] = useState<PaletteOrigin | PaletteType.Custom>(
+    colorConfig.type === ColorConfigType.Palette
+      ? colorConfig.paletteType === PaletteType.Preset
+        ? colorConfig.origin
+        : PaletteType.Custom
+      : PaletteOrigin.Coolors,
+  )
   const [presetPaletteIndex, setPresetPaletteIndex] = useState({
-    [PaletteOrigin.Coolors]: 0,
-    [PaletteOrigin.ColorHunt]: 0,
+    [PaletteOrigin.Coolors]: getInitialPresetPaletteIndex(colorConfig, PaletteOrigin.Coolors),
+    [PaletteOrigin.ColorHunt]: getInitialPresetPaletteIndex(colorConfig, PaletteOrigin.ColorHunt),
   })
   const [customPaletteColors, setCustomPaletteColors] = useState<string[]>(
     colorConfig.type === ColorConfigType.Palette && colorConfig.paletteType === PaletteType.Custom

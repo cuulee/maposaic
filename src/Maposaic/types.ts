@@ -25,8 +25,16 @@ export enum MapboxStyle {
   Water = 'water',
 }
 
-export enum MaposaicURLParamKey {
+export enum MaposaicGeoURLParamKey {
   Lat = 'lat',
   Lng = 'lng',
   Zoom = 'zoom',
+}
+
+export enum MaposaicColorURLParamKey {
+  Color = 'color',
+  Seed = 'seed',
+  Origin = 'origin',
+  Index = 'index',
+  Colors = 'colors',
 }

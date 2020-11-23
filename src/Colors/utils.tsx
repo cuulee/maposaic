@@ -2,8 +2,8 @@ import {
   ColorConfig,
   ColorConfigType,
   MaposaicColors,
+  PaletteOrigin,
   PaletteType,
-  PresetColorName,
   RGBColor,
   ShadingType,
 } from 'Colors/types'
@@ -33,7 +33,7 @@ export const rgbToHex = (rgb: RGBColor) => {
 }
 
 export const createColor = (colors: MaposaicColors | string) => {
-  if (colors === PresetColorName.Random) {
+  if (colors === ColorConfigType.Random) {
     return createRGB(Math.floor(Math.random() * 256), Math.floor(Math.random() * 256), Math.floor(Math.random() * 256))
   }
   if (typeof colors === 'string') {
@@ -111,4 +111,12 @@ export const getMaposaicColorsFromColorConfig = (colorConfig: ColorConfig) => {
 
 export const createMaposaicColors = (colorConfig: ColorConfig, specificColorTransforms: SpecificColorTransforms) => {
   return getMaposaicColorsWithoutSpecific(getMaposaicColorsFromColorConfig(colorConfig), specificColorTransforms)
+}
+
+export const getInitialPresetPaletteIndex = (colorConfig: ColorConfig, origin: PaletteOrigin) => {
+  return colorConfig.type === ColorConfigType.Palette &&
+    colorConfig.paletteType === PaletteType.Preset &&
+    colorConfig.origin === origin
+    ? colorConfig.paletteIndex
+    : 0
 }

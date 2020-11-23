@@ -10,6 +10,7 @@ import 'CloudUpload/style.less'
 import { TOOLTIP_ENTER_DELAY } from 'constants/ux'
 import { useHistory } from 'react-router-dom'
 import { PICTURE_ID_PARAM } from 'Gallery/Gallery'
+import { ColorConfig } from 'Colors/types'
 
 enum UploadStatus {
   Error = 'error',
@@ -63,12 +64,14 @@ const CloudUpload = ({
   mapCenter,
   mapZoom,
   placeName,
+  colorConfig,
 }: {
   isDisabled: boolean
   className?: string
   mapCenter?: mapboxgl.LngLat
   mapZoom?: number
   placeName: string | null
+  colorConfig: ColorConfig
 }) => {
   const [modalVisible, setModalVisible] = useState(false)
   const [progress, setProgress] = useState(0)
@@ -118,7 +121,8 @@ const CloudUpload = ({
       payload: {
         downloadURL,
         filePath: getPicturePathFromFileId(fileId),
-        mapCenter: mapCenter?.toArray(),
+        mapCenter: mapCenter?.toArray() ?? '',
+        colorConfig,
         mapZoom,
         placeName,
       },

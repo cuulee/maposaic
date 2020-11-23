@@ -1,31 +1,15 @@
 export type RGBColor = { r: number; g: number; b: number }
 export type HexColor = string
 
-export type MaposaicColors = PresetColorName.Random | ColorConfigType.Random | string[]
+export type MaposaicColors = ColorConfigType.Random | ColorConfigType.Random | string[]
 
 export enum PaletteOrigin {
   Coolors = 'coolors',
   ColorHunt = 'colorHunt',
 }
 
-export enum PresetColorName {
-  Random = 'random',
-  Red = 'red',
-  Volcano = 'volcano',
-  Gold = 'gold',
-  Yellow = 'yellow',
-  Lime = 'lime',
-  Green = 'green',
-  Cyan = 'cyan',
-  Blue = 'blue',
-  Geekblue = 'geekblue',
-  Purple = 'purple',
-  Magenta = 'magenta',
-  Grey = 'grey',
-  Custom = 'custom',
-}
-
 export enum ShadingPresetName {
+  Blue = 'blue',
   Red = 'red',
   Volcano = 'volcano',
   Gold = 'gold',
@@ -33,7 +17,6 @@ export enum ShadingPresetName {
   Lime = 'lime',
   Green = 'green',
   Cyan = 'cyan',
-  Blue = 'blue',
   Geekblue = 'geekblue',
   Purple = 'purple',
   Magenta = 'magenta',

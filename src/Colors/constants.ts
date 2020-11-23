@@ -20,7 +20,6 @@ import {
   PaletteColorConfig,
   PaletteOrigin,
   PaletteType,
-  PresetColorName,
   RandomColorConfig,
   ShadingColorConfig,
   ShadingPresetName,
@@ -28,18 +27,18 @@ import {
 } from 'Colors/types'
 
 export const AntColors = {
-  [PresetColorName.Red]: red,
-  [PresetColorName.Volcano]: volcano,
-  [PresetColorName.Gold]: gold,
-  [PresetColorName.Yellow]: yellow,
-  [PresetColorName.Lime]: lime,
-  [PresetColorName.Green]: green,
-  [PresetColorName.Cyan]: cyan,
-  [PresetColorName.Blue]: blue,
-  [PresetColorName.Geekblue]: geekblue,
-  [PresetColorName.Purple]: purple,
-  [PresetColorName.Magenta]: magenta,
-  [PresetColorName.Grey]: grey,
+  [ShadingPresetName.Blue]: blue,
+  [ShadingPresetName.Red]: red,
+  [ShadingPresetName.Volcano]: volcano,
+  [ShadingPresetName.Gold]: gold,
+  [ShadingPresetName.Yellow]: yellow,
+  [ShadingPresetName.Lime]: lime,
+  [ShadingPresetName.Green]: green,
+  [ShadingPresetName.Cyan]: cyan,
+  [ShadingPresetName.Geekblue]: geekblue,
+  [ShadingPresetName.Purple]: purple,
+  [ShadingPresetName.Magenta]: magenta,
+  [ShadingPresetName.Grey]: grey,
 }
 
 export const PRESET_PALETTES: { [key in PaletteOrigin]: { name: string; palettes: string[][] } } = {

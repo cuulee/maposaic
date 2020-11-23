@@ -28,8 +28,12 @@ const ColorConfigChoice = ({
   colorConfig: ColorConfig
   setColorConfig: (colorConfig: ColorConfig) => void
 }) => {
-  const [shadingColorConfig, setShadingColorConfig] = useState<ShadingColorConfig>(DEFAULT_SHADING_CONFIG)
-  const [paletteColorConfig, setPaletteColorConfig] = useState<PaletteColorConfig>(DEFAULT_PALETTE_CONFIG)
+  const [shadingColorConfig, setShadingColorConfig] = useState<ShadingColorConfig>(
+    colorConfig.type === ColorConfigType.Shading ? colorConfig : DEFAULT_SHADING_CONFIG,
+  )
+  const [paletteColorConfig, setPaletteColorConfig] = useState<PaletteColorConfig>(
+    colorConfig.type === ColorConfigType.Palette ? colorConfig : DEFAULT_PALETTE_CONFIG,
+  )
   const [specificColorPicks, setSpecificColorPicks] = useState<Record<string, string>>({})
 
   useEffect(() => {

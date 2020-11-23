@@ -104,6 +104,7 @@ const Drawer = ({
                 mapboxStyle === style ? ' drawer__backgroungs__background--selected' : ''
               }`}
               onClick={() => changeMapStyle(style)}
+              key={style}
             >
               <div>{MAPBOX_STYLES[style].name}</div>
               <img width="80px" alt={style} src={MAPBOX_STYLES[style].imgPath} />
