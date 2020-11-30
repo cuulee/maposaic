@@ -1,4 +1,4 @@
-import { db, firestore } from 'index'
+import { db, firebaseStorage } from 'index'
 import firebase from 'firebase/app'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -17,7 +17,7 @@ export const getThumbnailPathFromFileId = (id: string) => {
 export const uploadBlob = ({ blob }: { blob: Blob }) => {
   const uuid = uuidv4()
   const filePath = getPicturePathFromFileId(uuid)
-  const storageRef = firestore.ref(filePath)
+  const storageRef = firebaseStorage.ref(filePath)
   const uploadTask = storageRef.put(blob)
 
   return { fileId: uuid, uploadTask }
@@ -26,9 +26,11 @@ export const uploadBlob = ({ blob }: { blob: Blob }) => {
 export const postOrUpdatePicturesDocument = async ({
   documentId,
   payload,
+  anonymousUid,
 }: {
   documentId: string | null
   payload: Record<string, any>
+  anonymousUid: string | null
 }) => {
   // undefined value in payload is not accepted by firestore
   const sanethizedPayload = sanethizePayload(payload)
@@ -43,7 +45,7 @@ export const postOrUpdatePicturesDocument = async ({
   try {
     const response = await db
       .collection(PICTURE_COLLECTION_ID)
-      .add({ ...sanethizedPayload, timestamp: firebase.firestore.FieldValue.serverTimestamp() })
+      .add({ ...sanethizedPayload, anonymousUid, timestamp: firebase.firestore.FieldValue.serverTimestamp() })
     return response.id
   } catch (e) {
     console.log(e)

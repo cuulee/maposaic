@@ -7,6 +7,7 @@ import firebase from 'firebase/app'
 import 'firebase/firestore'
 import 'firebase/analytics'
 import 'firebase/storage'
+import 'firebase/auth'
 
 const firebaseConfig = {
   apiKey: 'AIzaSyAuounsVwHYGk-hZ_0EBsLi0aQLhYepYJk',
@@ -21,8 +22,10 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig)
 firebase.analytics()
+
 export const db = firebase.firestore()
-export const firestore = firebase.storage()
+export const firebaseStorage = firebase.storage()
+export const firebaseAuth = firebase.auth()
 
 ReactDOM.render(
   <React.StrictMode>

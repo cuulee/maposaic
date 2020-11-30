@@ -3,6 +3,7 @@ import { Button, Input, Modal, Progress, Tooltip } from 'antd'
 import { CheckCircleTwoTone, CloudUploadOutlined, LoadingOutlined, SendOutlined } from '@ant-design/icons'
 import { ProgressProps } from 'antd/lib/progress'
 import firebase from 'firebase/app'
+import { firebaseAuth } from 'index'
 import { uploadBlob, getPicturePathFromFileId, postOrUpdatePicturesDocument } from 'firebase/services'
 
 import { PRIMARY_COLOR, DISABLED_COLOR, SUCCESS_COLOR } from 'constants/colors'
@@ -85,6 +86,18 @@ const CloudUpload = ({
   const [isFormUploaded, setIsFormUploaded] = useState(false)
   const [isUploadingForm, setIsUploadingForm] = useState(false)
   const [pictureDocumentId, setPictureDocumentId] = useState<string | null>(null)
+  const [anonymousUid, setAnonymousUid] = useState<string | null>(null)
+
+  useEffect(() => {
+    firebaseAuth.signInAnonymously()
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        setAnonymousUid(user.uid)
+      } else {
+        setAnonymousUid(null)
+      }
+    })
+  }, [])
 
   const onUploadClick = () => {
     setModalVisible(true)
@@ -121,6 +134,7 @@ const CloudUpload = ({
   const onComplete = async ({ downloadURL, fileId }: { downloadURL: string; fileId: string }) => {
     const documentId = await postOrUpdatePicturesDocument({
       documentId: pictureDocumentId,
+      anonymousUid,
       payload: {
         downloadURL,
         filePath: getPicturePathFromFileId(fileId),
@@ -138,7 +152,7 @@ const CloudUpload = ({
       setTaskState(UploadStatus.Error)
     }
   }
-  const memoizedOnComplete = useCallback(onComplete, [pictureDocumentId])
+  const memoizedOnComplete = useCallback(onComplete, [pictureDocumentId, anonymousUid])
 
   const onSnapshot = (snapshot: firebase.storage.UploadTaskSnapshot, rand: number) => {
     setProgress((snapshot.bytesTransferred / snapshot.totalBytes) * 100)
@@ -205,7 +219,11 @@ const CloudUpload = ({
       return
     }
     setIsUploadingForm(true)
-    const documentId = await postOrUpdatePicturesDocument({ documentId: pictureDocumentId, payload: { pictureName } })
+    const documentId = await postOrUpdatePicturesDocument({
+      documentId: pictureDocumentId,
+      payload: { pictureName },
+      anonymousUid,
+    })
     updateDocumentId(documentId)
     setIsUploadingForm(false)
     setIsFormUploaded(true)
