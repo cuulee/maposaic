@@ -6,11 +6,12 @@ import Title from 'antd/lib/typography/Title'
 import { Divider, Modal, Spin, Tooltip } from 'antd'
 import { DISABLED_COLOR } from 'constants/colors'
 
-import { Link, useHistory } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { LeftOutlined, LoadingOutlined, RightOutlined } from '@ant-design/icons'
 import { ApiPicture, Picture } from 'Gallery/types'
 import { PICTURE_ID_PARAM } from 'Gallery/constants'
 import { getMaposaicURLParamsFromPicture, showMaposaicLink } from 'Gallery/utils'
+import link from 'assets/link.svg'
 
 const displayedName = (picture: Picture): string => {
   return picture.pictureName ?? picture.placeName ?? 'no name'
@@ -151,13 +152,12 @@ const Gallery = () => {
     yDown = null
   }
 
-  const history = useHistory()
   const diveInMaposaics = (picture: Picture) => {
     const urlParams = getMaposaicURLParamsFromPicture(picture)
     if (!showMaposaicLink(picture) || !urlParams) {
       return
     }
-    history.push(`/?${urlParams}`)
+    window.open(`${window.location.origin}/?${urlParams}`)
   }
 
   return (
@@ -199,8 +199,9 @@ const Gallery = () => {
             <div className="modal-content__nav">
               {showMaposaicLink(pictures[displayedIndex]) ? (
                 <Tooltip title="Explore maposaics from this picture">
-                  <div className="modal-content__name--link" onClick={() => diveInMaposaics(pictures[displayedIndex])}>
-                    {isModalPictureLoaded ? displayedName(pictures[displayedIndex]) : '...'}
+                  <div className="modal-content__name" onClick={() => diveInMaposaics(pictures[displayedIndex])}>
+                    <div>{isModalPictureLoaded ? displayedName(pictures[displayedIndex]) : '...'}</div>
+                    <img alt="new-window" className="modal-content__name__icon" src={link} width="18px" />
                   </div>
                 </Tooltip>
               ) : (

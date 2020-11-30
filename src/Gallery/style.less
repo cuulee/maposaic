@@ -64,10 +64,14 @@
     justify-content: center;
     width: 100%;
   }
-  &__name--link {
+  &__name {
+    display: flex;
     cursor: pointer;
     text-decoration: underline;
     color: @primary-color;
+    &__icon {
+      margin-left: 4px;
+    }
   }
   &__loader {
     position: absolute;
