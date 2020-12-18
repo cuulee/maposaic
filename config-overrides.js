@@ -1,6 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const { override, fixBabelImports, addLessLoader, addWebpackModuleRule, addWebpackPlugin } = require('customize-cra')
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+const { override, fixBabelImports, addLessLoader, addWebpackModuleRule } = require('customize-cra')
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 /* eslint-env commonjs */
 module.exports = override(
@@ -14,5 +14,5 @@ module.exports = override(
     modifyVars: { '@primary-color': '#e53f67' },
   }),
   addWebpackModuleRule({ test: /\.worker\.{ts|js}$/, use: { loader: 'worker-loader' } }),
-  addWebpackPlugin(new BundleAnalyzerPlugin()),
+  // addWebpackPlugin(new BundleAnalyzerPlugin()),
 )
