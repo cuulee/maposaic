@@ -3,8 +3,8 @@ import { Button, Input, Modal, Progress, Tooltip } from 'antd'
 import { CheckCircleTwoTone, CloudUploadOutlined, LoadingOutlined, SendOutlined } from '@ant-design/icons'
 import { ProgressProps } from 'antd/lib/progress'
 import firebase from 'firebase/app'
-import { firebaseAuth } from 'index'
-import { uploadBlob, getPicturePathFromFileId, postOrUpdatePicturesDocument } from 'firebase/services'
+import { firebaseAuth } from 'firebaseService/initialize'
+import { uploadBlob, getPicturePathFromFileId, postOrUpdatePicturesDocument } from 'firebaseService/services'
 
 import { PRIMARY_COLOR, DISABLED_COLOR, SUCCESS_COLOR } from 'constants/colors'
 import 'CloudUpload/style.less'
@@ -58,6 +58,20 @@ const StatusMessage = ({ taskState, documentId }: { taskState: TaskState; docume
     )
   }
   return <div>Upload failed</div>
+}
+
+export const UploadButton = ({ isDisabled, onUploadClick }: { isDisabled: boolean; onUploadClick: () => void }) => {
+  return (
+    <Tooltip title="Upload picture to gallery" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
+      <Button
+        disabled={isDisabled}
+        type="default"
+        shape="circle"
+        onClick={onUploadClick}
+        icon={<CloudUploadOutlined />}
+      />
+    </Tooltip>
+  )
 }
 
 const CloudUpload = ({
@@ -254,15 +268,7 @@ const CloudUpload = ({
 
   return (
     <div className={className}>
-      <Tooltip title="Upload picture to gallery" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
-        <Button
-          disabled={isDisabled}
-          type="default"
-          shape="circle"
-          onClick={onUploadClick}
-          icon={<CloudUploadOutlined />}
-        />
-      </Tooltip>
+      <UploadButton isDisabled={isDisabled} onUploadClick={onUploadClick} />
       <Modal visible={modalVisible} onCancel={onModalCancel} onOk={onModalOk}>
         <StatusMessage documentId={pictureDocumentId} taskState={taskState} />
         {taskState && (

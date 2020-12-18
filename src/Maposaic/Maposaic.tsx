@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, Suspense } from 'react'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { Button, Tooltip } from 'antd'
@@ -15,6 +15,8 @@ import Drawer from 'Drawer/Drawer'
 import PaintWorker from 'worker-loader!./paint.worker'
 
 import 'Maposaic/maposaic.style.less'
+import 'spinner.style.less'
+
 import { ColorConfig } from 'Colors/types'
 import { getTargetSizeFromSourceSize } from 'Canvas/utils'
 import { ROAD_SIMPLE_WHITE, WATER_CYAN } from 'Colors/mapbox'
@@ -34,7 +36,6 @@ import {
   toggleCanvasOpacity,
 } from 'Maposaic/elementHelpers'
 import { CM_PER_INCH, FORMAT_RATIO } from 'constants/dimensions'
-import CloudUpload from 'CloudUpload/CloudUpload'
 import { TOOLTIP_ENTER_DELAY } from 'constants/ux'
 import { MAPBOX_TOKEN } from 'constants/mapbox'
 import { fetchGeoRandom, getPlaceNameFromPosition, getRandomZoom } from 'Geo/utils'
@@ -43,6 +44,9 @@ import GeoSearch from 'Geo/GeoSearchInput'
 import { createMaposaicColors } from 'Colors/utils'
 import { MAPBOX_STYLES } from 'Maposaic/constants'
 import { getColorConfigFromURLParams, getURLParamsFromColorConfig, getURLParamsFromCoords } from 'Maposaic/utils'
+import { UploadButton } from 'CloudUpload/CloudUpload'
+
+const CloudUpload = React.lazy(() => import('CloudUpload/CloudUpload'))
 
 mapboxgl.accessToken = MAPBOX_TOKEN
 
@@ -407,7 +411,11 @@ const MapboxGLMap = (): JSX.Element => {
       <div className="maps-container" id="maps-container">
         <canvas className="mosaic-canvas" id="maposaic-canvas" />
         <div id="mapbox-wrapper" className="mapbox-wrapper" ref={(el) => (mapboxContainer.current = el)} />
-        <Spin spinning={isLoading} indicator={<img className="spinner" src={spinner} alt="spin" />} />
+        <Spin
+          className="maps-container__spin"
+          spinning={isLoading}
+          indicator={<img className="spinner" src={spinner} alt="spin" />}
+        />
       </div>
       <div className="overmap">
         <Drawer
@@ -448,15 +456,17 @@ const MapboxGLMap = (): JSX.Element => {
               disabled={isLoading}
             />
           </Tooltip>
-          <CloudUpload
-            mapZoom={map?.getZoom()}
-            mapCenter={map?.getCenter()}
-            mapboxStyle={mapboxStyle}
-            colorConfig={colorConfig}
-            placeName={placeName}
-            className="overmap__actions__button"
-            isDisabled={isLoading}
-          />
+          <Suspense fallback={<UploadButton isDisabled={true} onUploadClick={() => {}} />}>
+            <CloudUpload
+              mapZoom={map?.getZoom()}
+              mapCenter={map?.getCenter()}
+              mapboxStyle={mapboxStyle}
+              colorConfig={colorConfig}
+              placeName={placeName}
+              className="overmap__actions__button"
+              isDisabled={isLoading}
+            />
+          </Suspense>
           <Tooltip title="Visit gallery">
             <Button
               className="overmap__actions__button"

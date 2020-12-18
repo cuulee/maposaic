@@ -1,4 +1,4 @@
-import { db } from 'index'
+import { db } from 'firebaseService/initialize'
 import React, { useEffect, useState } from 'react'
 import mapboxgl from 'mapbox-gl'
 import 'Gallery/style.less'

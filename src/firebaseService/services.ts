@@ -1,4 +1,4 @@
-import { db, firebaseStorage } from 'index'
+import { db, firebaseStorage } from 'firebaseService/initialize'
 import firebase from 'firebase/app'
 import { v4 as uuidv4 } from 'uuid'
 
