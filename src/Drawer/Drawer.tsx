@@ -158,7 +158,7 @@ const Drawer = ({
       </Title>
       <div className="scale">
         <InputNumber
-          min={1}
+          min={0}
           max={10}
           step={0.1}
           value={Math.round(localSizeFactor * 10) / 10}

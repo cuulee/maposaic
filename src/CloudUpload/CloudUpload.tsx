@@ -62,7 +62,7 @@ const StatusMessage = ({ taskState, documentId }: { taskState: TaskState; docume
 
 export const UploadButton = ({ isDisabled, onUploadClick }: { isDisabled: boolean; onUploadClick: () => void }) => {
   return (
-    <Tooltip title="Upload picture to gallery" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
+    <Tooltip title="Upload to public gallery" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
       <Button
         disabled={isDisabled}
         type="default"
