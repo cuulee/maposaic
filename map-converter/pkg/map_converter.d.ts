@@ -2,6 +2,13 @@
 /* eslint-disable */
 /**
 */
+export function run(): void;
+/**
+* @param {number} coucou
+*/
+export function convert(coucou: number): void;
+/**
+*/
 export enum Cell {
   Dead,
   Alive,

@@ -18,12 +18,58 @@ function getStringFromWasm0(ptr, len) {
     return cachedTextDecoder.decode(getUint8Memory0().subarray(ptr, ptr + len));
 }
 
+const heap = new Array(32).fill(undefined);
+
+heap.push(undefined, null, true, false);
+
+let heap_next = heap.length;
+
+function addHeapObject(obj) {
+    if (heap_next === heap.length) heap.push(heap.length + 1);
+    const idx = heap_next;
+    heap_next = heap[idx];
+
+    heap[idx] = obj;
+    return idx;
+}
+
+function getObject(idx) { return heap[idx]; }
+
+function dropObject(idx) {
+    if (idx < 36) return;
+    heap[idx] = heap_next;
+    heap_next = idx;
+}
+
+function takeObject(idx) {
+    const ret = getObject(idx);
+    dropObject(idx);
+    return ret;
+}
+/**
+*/
+export function run() {
+    wasm.run();
+}
+
+function notDefined(what) { return () => { throw new Error(`${what} is not defined`); }; }
+/**
+* @param {number} coucou
+*/
+export function convert(coucou) {
+    wasm.convert(coucou);
+}
+
 let cachegetInt32Memory0 = null;
 function getInt32Memory0() {
     if (cachegetInt32Memory0 === null || cachegetInt32Memory0.buffer !== wasm.memory.buffer) {
         cachegetInt32Memory0 = new Int32Array(wasm.memory.buffer);
     }
     return cachegetInt32Memory0;
+}
+
+function getArrayU8FromWasm0(ptr, len) {
+    return getUint8Memory0().subarray(ptr / 1, ptr / 1 + len);
 }
 /**
 */
@@ -95,6 +141,90 @@ export class Universe {
         }
     }
 }
+
+export const __wbg_log_fc9ef2125db2004d = function(arg0, arg1) {
+    console.log(getStringFromWasm0(arg0, arg1));
+};
+
+export const __wbg_log_5b213c929fbceec0 = function(arg0) {
+    console.log(arg0 >>> 0);
+};
+
+export const __wbg_log_0efbfafbb39d35e8 = function(arg0, arg1, arg2, arg3) {
+    console.log(getStringFromWasm0(arg0, arg1), getStringFromWasm0(arg2, arg3));
+};
+
+export const __wbindgen_string_new = function(arg0, arg1) {
+    var ret = getStringFromWasm0(arg0, arg1);
+    return addHeapObject(ret);
+};
+
+export const __wbindgen_object_drop_ref = function(arg0) {
+    takeObject(arg0);
+};
+
+export const __wbindgen_number_new = function(arg0) {
+    var ret = arg0;
+    return addHeapObject(ret);
+};
+
+export const __wbg_log_a6c3eb93acac8073 = typeof console.log == 'function' ? console.log : notDefined('console.log');
+
+export const __wbg_log_f2e13ca55da8bad3 = function(arg0) {
+    console.log(getObject(arg0));
+};
+
+export const __wbg_log_cfb43f8a7dc1ad0a = function(arg0, arg1) {
+    console.log(getObject(arg0), getObject(arg1));
+};
+
+export const __wbindgen_is_undefined = function(arg0) {
+    var ret = getObject(arg0) === undefined;
+    return ret;
+};
+
+export const __wbg_new_3a746f2619705add = function(arg0, arg1) {
+    var ret = new Function(getStringFromWasm0(arg0, arg1));
+    return addHeapObject(ret);
+};
+
+export const __wbg_call_f54d3a6dadb199ca = function(arg0, arg1) {
+    var ret = getObject(arg0).call(getObject(arg1));
+    return addHeapObject(ret);
+};
+
+export const __wbindgen_jsval_eq = function(arg0, arg1) {
+    var ret = getObject(arg0) === getObject(arg1);
+    return ret;
+};
+
+export const __wbg_self_ac379e780a0d8b94 = function(arg0) {
+    var ret = getObject(arg0).self;
+    return addHeapObject(ret);
+};
+
+export const __wbg_crypto_1e4302b85d4f64a2 = function(arg0) {
+    var ret = getObject(arg0).crypto;
+    return addHeapObject(ret);
+};
+
+export const __wbg_getRandomValues_1b4ba144162a5c9e = function(arg0) {
+    var ret = getObject(arg0).getRandomValues;
+    return addHeapObject(ret);
+};
+
+export const __wbg_require_6461b1e9a0d7c34a = function(arg0, arg1) {
+    var ret = require(getStringFromWasm0(arg0, arg1));
+    return addHeapObject(ret);
+};
+
+export const __wbg_getRandomValues_1ef11e888e5228e9 = function(arg0, arg1, arg2) {
+    getObject(arg0).getRandomValues(getArrayU8FromWasm0(arg1, arg2));
+};
+
+export const __wbg_randomFillSync_1b52c8482374c55b = function(arg0, arg1, arg2) {
+    getObject(arg0).randomFillSync(getArrayU8FromWasm0(arg1, arg2));
+};
 
 export const __wbindgen_throw = function(arg0, arg1) {
     throw new Error(getStringFromWasm0(arg0, arg1));
