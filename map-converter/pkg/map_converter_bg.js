@@ -46,6 +46,14 @@ function takeObject(idx) {
     dropObject(idx);
     return ret;
 }
+
+let cachegetInt32Memory0 = null;
+function getInt32Memory0() {
+    if (cachegetInt32Memory0 === null || cachegetInt32Memory0.buffer !== wasm.memory.buffer) {
+        cachegetInt32Memory0 = new Int32Array(wasm.memory.buffer);
+    }
+    return cachegetInt32Memory0;
+}
 /**
 */
 export function run() {
@@ -60,20 +68,80 @@ export function convert(coucou) {
     wasm.convert(coucou);
 }
 
-let cachegetInt32Memory0 = null;
-function getInt32Memory0() {
-    if (cachegetInt32Memory0 === null || cachegetInt32Memory0.buffer !== wasm.memory.buffer) {
-        cachegetInt32Memory0 = new Int32Array(wasm.memory.buffer);
+let WASM_VECTOR_LEN = 0;
+
+function passArray8ToWasm0(arg, malloc) {
+    const ptr = malloc(arg.length * 1);
+    getUint8Memory0().set(arg, ptr / 1);
+    WASM_VECTOR_LEN = arg.length;
+    return ptr;
+}
+
+function _assertClass(instance, klass) {
+    if (!(instance instanceof klass)) {
+        throw new Error(`expected instance of ${klass.name}`);
     }
-    return cachegetInt32Memory0;
+    return instance.ptr;
 }
 
 function getArrayU8FromWasm0(ptr, len) {
     return getUint8Memory0().subarray(ptr / 1, ptr / 1 + len);
 }
 /**
+* @param {Uint8Array} source
+* @param {Size} size
+* @returns {Uint8Array}
+*/
+export function parse_vec(source, size) {
+    try {
+        const retptr = wasm.__wbindgen_export_0.value - 16;
+        wasm.__wbindgen_export_0.value = retptr;
+        var ptr0 = passArray8ToWasm0(source, wasm.__wbindgen_malloc);
+        var len0 = WASM_VECTOR_LEN;
+        _assertClass(size, Size);
+        var ptr1 = size.ptr;
+        size.ptr = 0;
+        wasm.parse_vec(retptr, ptr0, len0, ptr1);
+        var r0 = getInt32Memory0()[retptr / 4 + 0];
+        var r1 = getInt32Memory0()[retptr / 4 + 1];
+        var v2 = getArrayU8FromWasm0(r0, r1).slice();
+        wasm.__wbindgen_free(r0, r1 * 1);
+        return v2;
+    } finally {
+        wasm.__wbindgen_export_0.value += 16;
+    }
+}
+
+/**
 */
 export const Cell = Object.freeze({ Dead:0,"0":"Dead",Alive:1,"1":"Alive", });
+/**
+*/
+export class Size {
+
+    static __wrap(ptr) {
+        const obj = Object.create(Size.prototype);
+        obj.ptr = ptr;
+
+        return obj;
+    }
+
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+
+        wasm.__wbg_size_free(ptr);
+    }
+    /**
+    * @param {number} width
+    * @param {number} height
+    * @returns {Size}
+    */
+    static new(width, height) {
+        var ret = wasm.size_new(width, height);
+        return Size.__wrap(ret);
+    }
+}
 /**
 */
 export class Universe {
