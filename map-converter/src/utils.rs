@@ -1,3 +1,4 @@
+use crate::Color;
 use crate::Point;
 use crate::Size;
 
@@ -12,14 +13,14 @@ pub fn set_panic_hook() {
     console_error_panic_hook::set_once();
 }
 
-fn get_point_from_pixel_index(index: &u32, width: &u32) -> Point {
+pub fn get_point_from_pixel_index(index: usize, width: u32) -> Point {
     Point {
-        x: index % width,
-        y: index / width,
+        x: (index as u32) % width,
+        y: (index as u32) / width,
     }
 }
-fn get_pixel_index_from_point(point: &Point, width: &u32) -> u32 {
-    point.y * width + point.x
+pub fn get_pixel_index_from_point(point: &Point, width: u32) -> usize {
+    (point.y * width + point.x) as usize
 }
 
 fn get_source_point_from_target_point(point: &Point, size: &Size, ratio: u32) -> Point {
@@ -29,13 +30,55 @@ fn get_source_point_from_target_point(point: &Point, size: &Size, ratio: u32) ->
     }
 }
 
-pub fn get_source_pixel_index_from_target_pixel_index(
-    target_pixel_index: u32,
+pub fn get_source_index_from_target_index(
+    target_pixel_index: usize,
     target_size: &Size,
     source_size: &Size,
     ratio: u32,
-) -> u32 {
-    let target = get_point_from_pixel_index(&target_pixel_index, &target_size.width);
+) -> usize {
+    let target = get_point_from_pixel_index(target_pixel_index, target_size.width);
     let source = get_source_point_from_target_point(&target, &target_size, ratio);
-    return get_pixel_index_from_point(&source, &source_size.width);
+
+    get_pixel_index_from_point(&source, source_size.width)
+}
+
+pub fn are_colors_similar(color1: &Color, color2: &Color) -> bool {
+    color1.r == color2.r && color1.g == color1.g && color1.b == color2.b
+}
+
+pub fn get_adjacent_points(point: &Point, size: &Size) -> [Option<Point>; 4] {
+    [
+        if point.y < size.height - 1 {
+            Some(Point {
+                x: point.x,
+                y: point.y + 1,
+            })
+        } else {
+            None
+        },
+        if point.x < size.width - 1 {
+            Some(Point {
+                x: point.x + 1,
+                y: point.y,
+            })
+        } else {
+            None
+        },
+        if point.x > 0 {
+            Some(Point {
+                x: point.x - 1,
+                y: point.y,
+            })
+        } else {
+            None
+        },
+        if point.y > 0 {
+            Some(Point {
+                x: point.x,
+                y: point.y - 1,
+            })
+        } else {
+            None
+        },
+    ]
 }
