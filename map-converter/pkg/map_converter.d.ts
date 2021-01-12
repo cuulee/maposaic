@@ -8,10 +8,27 @@ export function run(): void;
 */
 export function convert(coucou: number): void;
 /**
+* @param {Uint8Array} source
+* @param {Size} size
+* @returns {Uint8Array}
+*/
+export function parse_vec(source: Uint8Array, size: Size): Uint8Array;
+/**
 */
 export enum Cell {
   Dead,
   Alive,
+}
+/**
+*/
+export class Size {
+  free(): void;
+/**
+* @param {number} width
+* @param {number} height
+* @returns {Size}
+*/
+  static new(width: number, height: number): Size;
 }
 /**
 */
