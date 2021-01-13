@@ -3,7 +3,7 @@ import { MaposaicColors } from 'Colors/types'
 import { CanvasDataTransformer } from 'Canvas/CanvasDataTransformer'
 import { SpecificColorTransforms } from 'Maposaic/types'
 
-onmessage = ({
+onmessage = async ({
   data: {
     sourcePixelArray,
     targetPixelArray,
@@ -23,24 +23,31 @@ onmessage = ({
     maposaicColors: MaposaicColors
     specificColorTransforms: SpecificColorTransforms
   }
-}): void => {
+}): Promise<void> => {
   const t1 = new Date()
 
-  const canvasDataTransformer = new CanvasDataTransformer(
-    sourcePixelArray,
-    targetPixelArray,
-    sourceSize,
-    targetSize,
-    canvassRatio,
-    maposaicColors,
-    specificColorTransforms,
-  )
-  canvasDataTransformer.paintTargetData()
+  // const canvasDataTransformer = new CanvasDataTransformer(
+  //   sourcePixelArray,
+  //   targetPixelArray,
+  //   sourceSize,
+  //   targetSize,
+  //   canvassRatio,
+  //   maposaicColors,
+  //   specificColorTransforms,
+  // )
+  // canvasDataTransformer.paintTargetData()
+
+  const wasm = await import('map-converter')
+  const t1bis = new Date()
+  console.log('coucou import')
+  console.log('fin import', t1bis.getTime() - t1.getTime())
+
+  const target = wasm.parse_vec(sourcePixelArray, wasm.Size.new(sourceSize.w, sourceSize.h))
 
   const t2 = new Date()
   console.log('fin', t2.getTime() - t1.getTime())
 
   // eslint-disable-next-line
   // @ts-ignore
-  postMessage({ pixels: canvasDataTransformer.targetPixelArray, paintedBoundsMin: 0 })
+  postMessage({ pixels: target, paintedBoundsMin: 0 })
 }

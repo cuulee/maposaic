@@ -1,13 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
-*/
-export function run(): void;
-/**
-* @param {number} coucou
-*/
-export function convert(coucou: number): void;
-/**
 * @param {Uint8Array} source
 * @param {Size} size
 * @returns {Uint8Array}
