@@ -5,19 +5,19 @@ export const MAPBOX_STYLES = {
     url: 'mapbox://styles/cartapuce/ckhf6cuex07dd19piqg029oka',
     name: 'Relief',
     imgPath:
-      'https://firebasestorage.googleapis.com/v0/b/maposaic-99785.appspot.com/o/app_assets%2Fsaint-affrique-random-relief.png?alt=media&token=1cd8f1c9-51da-44af-a714-524e73e74e22',
+      'https://firebasestorage.googleapis.com/v0/b/maposaic-99785.appspot.com/o/app_assets%2Frelief-alpes.png?alt=media&token=add862d4-3a5e-49ff-aa1f-57b98543050a',
   },
   [MapboxStyle.Road]: {
     url: 'mapbox://styles/cartapuce/ck8vk01zo2e5w1ipmytroxgf4',
-    name: 'Streets',
+    name: 'Roads',
     imgPath:
-      'https://firebasestorage.googleapis.com/v0/b/maposaic-99785.appspot.com/o/app_assets%2Fsaint-affrique-random-road.png?alt=media&token=0fe8ca06-c885-48fe-a904-ad45787977c9',
+      'https://firebasestorage.googleapis.com/v0/b/maposaic-99785.appspot.com/o/app_assets%2Fstreet-paris-fourche.png?alt=media&token=b247c027-eab3-4804-b08c-4fa971432f52',
   },
   [MapboxStyle.Water]: {
     url: 'mapbox://styles/cartapuce/ck8ynyj0x022h1hpmffi87im9',
-    name: 'Water',
+    name: 'Water land',
     imgPath:
-      'https://firebasestorage.googleapis.com/v0/b/maposaic-99785.appspot.com/o/app_assets%2Fsaint-affrique-random-water.png?alt=media&token=184e049b-5c67-4155-8905-be29661cd12f',
+      'https://firebasestorage.googleapis.com/v0/b/maposaic-99785.appspot.com/o/app_assets%2Fwater-loire.png?alt=media&token=1b986519-854e-433e-bbc0-81b974a77a39',
   },
   administrative: { url: 'mapbox://styles/cartapuce/ck8vkvxjt27z71ila3b3jecka', name: '' },
   satellite: { url: 'mapbox://styles/mapbox/satellite-v9', name: '' },
