@@ -42,7 +42,7 @@ onmessage = async ({
   console.log('coucou import')
   console.log('fin import', t1bis.getTime() - t1.getTime())
 
-  const target = wasm.parse_vec(sourcePixelArray, wasm.Size.new(sourceSize.w, sourceSize.h))
+  const target = wasm.convert_pixels(sourcePixelArray, wasm.Size.new(sourceSize.w, sourceSize.h))
 
   const t2 = new Date()
   console.log('fin', t2.getTime() - t1.getTime())
