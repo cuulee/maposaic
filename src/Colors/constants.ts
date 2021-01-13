@@ -51,15 +51,18 @@ export const ROAD_WHITE = '#ffffff'
 export const ColorConfigNamesAndImage: { [key in ColorConfigType]: { name: string; imgPath: string } } = {
   [ColorConfigType.Random]: {
     name: 'Random',
-    imgPath: require('assets/gallery/indiana-random.png'),
+    imgPath:
+      'https://firebasestorage.googleapis.com/v0/b/maposaic-99785.appspot.com/o/app_assets%2Findiana-random.png?alt=media&token=f74a331b-0df8-49c7-8abe-1b9b4b5161e5',
   },
   [ColorConfigType.Shading]: {
     name: 'Shading',
-    imgPath: require('assets/gallery/indiana-shading-blue.png'),
+    imgPath:
+      'https://firebasestorage.googleapis.com/v0/b/maposaic-99785.appspot.com/o/app_assets%2Findiana-shading-blue.png?alt=media&token=9c1acece-2f2b-4daf-bf92-a173a911b318',
   },
   [ColorConfigType.Palette]: {
     name: 'Palette',
-    imgPath: require('assets/gallery/indiana-palette.png'),
+    imgPath:
+      'https://firebasestorage.googleapis.com/v0/b/maposaic-99785.appspot.com/o/app_assets%2Findiana-palette.png?alt=media&token=d50d25e2-e4a0-4adf-9fbb-8c263f33a6ab',
   },
 }
 
