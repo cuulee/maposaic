@@ -5,48 +5,14 @@ use std::collections::HashSet;
 
 use wasm_bindgen::prelude::*;
 
-#[wasm_bindgen(start)]
-pub fn run() {
-    bare_bones();
-    using_a_macro();
-    using_web_sys();
-}
-
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_namespace = console)]
     fn log(s: &str);
-    #[wasm_bindgen(js_namespace = console, js_name = log)]
-    fn log_u32(a: u32);
-    #[wasm_bindgen(js_namespace = console, js_name = log)]
-    fn log_u8(a: u8);
-    #[wasm_bindgen(js_namespace = console, js_name = log)]
-    fn log_many(a: &str, b: &str);
-}
-
-fn bare_bones() {
-    log("Hello from Rust!");
-    log_u32(42);
-    log_many("Logging", "many values!");
 }
 
 macro_rules! console_log {
     ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
-}
-
-fn using_a_macro() {
-    console_log!("Hello {}!", "world");
-    console_log!("Let's print some numbers...");
-    console_log!("1 + 3 = {}", 1 + 3);
-}
-
-fn using_web_sys() {
-    use web_sys::console;
-
-    console::log_1(&"Hello using web-sys".into());
-
-    let js: JsValue = 4.into();
-    console::log_2(&"Logging arbitrary values looks like".into(), &js);
 }
 
 #[wasm_bindgen]
@@ -78,14 +44,6 @@ pub struct Color {
 }
 
 #[wasm_bindgen]
-pub fn convert(coucou: u8) {
-    println!("yoweshhhh");
-    log_u8(coucou);
-    let secret_number = rand::thread_rng().gen_range(1, 101);
-    console_log!("secret is {}", secret_number)
-}
-
-#[wasm_bindgen]
 pub fn parse_vec(source: &[u8], size: Size) -> Vec<u8> {
     let mut visited: HashSet<usize> = HashSet::new();
 
@@ -94,10 +52,8 @@ pub fn parse_vec(source: &[u8], size: Size) -> Vec<u8> {
     for i in 0..size.height {
         for j in 0..size.width {
             let target_index = (i * size.width + j) as usize;
-            console_log!("main index {} visited len {}", target_index, visited.len());
 
             if visited.contains(&target_index) {
-                console_log!("continue {}", visited.len());
                 continue;
             }
             let source_index =
@@ -141,7 +97,6 @@ fn paint_current_area(
 ) {
     let mut stack = Vec::new();
     stack.push(initial_target_index);
-    console_log!("new area index {}", initial_target_index);
 
     while let Some(target_index) = stack.pop() {
         visited.insert(target_index);
@@ -152,27 +107,20 @@ fn paint_current_area(
         target[(target_index * 4 + 3) as usize] = area_color.a;
 
         let target_point = utils::get_point_from_pixel_index(target_index, size.width);
-        console_log!("target point {} {}", target_point.x, target_point.y);
+
         for adjacent_candidate in utils::get_adjacent_points(&target_point, &size).iter() {
             match adjacent_candidate {
                 Some(adjacent) => {
-                    console_log!("candidate point {} {}", adjacent.x, adjacent.y,);
                     let adjacent_index = utils::get_pixel_index_from_point(&adjacent, size.width);
                     if visited.contains(&adjacent_index) {
-                        console_log!("contains {}", adjacent_index);
                         continue;
                     }
                     let source_index =
                         utils::get_source_index_from_target_index(adjacent_index, &size, &size, 1)
                             as usize;
-                    console_log!("adj {} {}", adjacent_index, source_index);
-                    let col = create_color_from_index(source, source_index);
+                    let source_color = create_color_from_index(source, source_index);
 
-                    if utils::are_colors_similar(
-                        &initial_color,
-                        &create_color_from_index(source, source_index as usize),
-                    ) {
-                        console_log!("push {}", adjacent_index);
+                    if utils::are_colors_similar(&initial_color, &source_color) {
                         stack.push(adjacent_index);
                     }
                 }

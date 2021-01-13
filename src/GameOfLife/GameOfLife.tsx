@@ -1,4 +1,4 @@
-import { convert, parse_vec, Size, Universe } from 'map-converter'
+import { parse_vec, Size, Universe } from 'map-converter'
 import React, { useEffect, useState } from 'react'
 
 const SIZE = { w: 3, h: 2 }
@@ -55,7 +55,6 @@ const GameOfLife = () => {
   const loadMapConverter = () => {
     const universe = Universe.new()
     // run()
-    convert(250)
     const size = Size.new(SIZE.w, SIZE.h)
 
     const a = parse_vec(new Uint8Array(EXAMPLE), size)
