@@ -16,35 +16,7 @@ macro_rules! console_log {
 }
 
 #[wasm_bindgen]
-pub struct Size {
-    width: u32,
-    height: u32,
-}
-#[wasm_bindgen]
-impl Size {
-    pub fn new(width: u32, height: u32) -> Size {
-        Size {
-            width: width,
-            height: height,
-        }
-    }
-}
-
-pub struct Point {
-    x: u32,
-    y: u32,
-}
-
-#[derive(Copy, Clone)]
-pub struct Color {
-    r: u8,
-    g: u8,
-    b: u8,
-    a: u8,
-}
-
-#[wasm_bindgen]
-pub fn parse_vec(source: &[u8], size: Size) -> Vec<u8> {
+pub fn convert_pixels(source: &[u8], size: Size) -> Vec<u8> {
     let mut visited: HashSet<usize> = HashSet::new();
 
     let mut target = vec![0; (size.width * size.height * 4) as usize];
@@ -148,4 +120,32 @@ fn create_transformed_color(initial_color: &Color) -> Color {
             a: 255,
         }
     }
+}
+
+#[wasm_bindgen]
+pub struct Size {
+    width: u32,
+    height: u32,
+}
+#[wasm_bindgen]
+impl Size {
+    pub fn new(width: u32, height: u32) -> Size {
+        Size {
+            width: width,
+            height: height,
+        }
+    }
+}
+
+pub struct Point {
+    x: u32,
+    y: u32,
+}
+
+#[derive(Copy, Clone)]
+pub struct Color {
+    r: u8,
+    g: u8,
+    b: u8,
+    a: u8,
 }

@@ -70,7 +70,7 @@ function getArrayU8FromWasm0(ptr, len) {
 * @param {Size} size
 * @returns {Uint8Array}
 */
-export function parse_vec(source, size) {
+export function convert_pixels(source, size) {
     try {
         const retptr = wasm.__wbindgen_export_0.value - 16;
         wasm.__wbindgen_export_0.value = retptr;
@@ -79,7 +79,7 @@ export function parse_vec(source, size) {
         _assertClass(size, Size);
         var ptr1 = size.ptr;
         size.ptr = 0;
-        wasm.parse_vec(retptr, ptr0, len0, ptr1);
+        wasm.convert_pixels(retptr, ptr0, len0, ptr1);
         var r0 = getInt32Memory0()[retptr / 4 + 0];
         var r1 = getInt32Memory0()[retptr / 4 + 1];
         var v2 = getArrayU8FromWasm0(r0, r1).slice();

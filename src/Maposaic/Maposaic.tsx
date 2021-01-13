@@ -45,7 +45,7 @@ import { createMaposaicColors } from 'Colors/utils'
 import { MAPBOX_STYLES } from 'Maposaic/constants'
 import { getColorConfigFromURLParams, getURLParamsFromColorConfig, getURLParamsFromCoords } from 'Maposaic/utils'
 import { UploadButton } from 'CloudUpload/CloudUpload'
-import { parse_vec, Size as WasmSize } from 'map-converter'
+import { convert_pixels, Size as WasmSize } from 'map-converter'
 
 const CloudUpload = React.lazy(() => import('CloudUpload/CloudUpload'))
 
@@ -197,7 +197,7 @@ const MapboxGLMap = (): JSX.Element => {
 
       const mapboxPixels = new Uint8Array(gl.drawingBufferWidth * gl.drawingBufferHeight * 4)
       gl.readPixels(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight, gl.RGBA, gl.UNSIGNED_BYTE, mapboxPixels)
-      // const target = parse_vec(mapboxPixels, WasmSize.new(mapboxCanvasSize.w, mapboxCanvasSize.h))
+      // const target = convert_pixels(mapboxPixels, WasmSize.new(mapboxCanvasSize.w, mapboxCanvasSize.h))
       // console.log('target', target)
       // console.log('canvasss size', maposaicData.length, target.length)
       // imageData.data.set(target, 0)

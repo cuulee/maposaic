@@ -5,7 +5,7 @@
 * @param {Size} size
 * @returns {Uint8Array}
 */
-export function parse_vec(source: Uint8Array, size: Size): Uint8Array;
+export function convert_pixels(source: Uint8Array, size: Size): Uint8Array;
 /**
 */
 export enum Cell {

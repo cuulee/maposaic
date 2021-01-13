@@ -1,4 +1,4 @@
-import { parse_vec, Size, Universe } from 'map-converter'
+import { convert_pixels, Size, Universe } from 'map-converter'
 import React, { useEffect, useState } from 'react'
 
 const SIZE = { w: 3, h: 2 }
@@ -57,12 +57,12 @@ const GameOfLife = () => {
     // run()
     const size = Size.new(SIZE.w, SIZE.h)
 
-    const a = parse_vec(new Uint8Array(EXAMPLE), size)
+    const a = convert_pixels(new Uint8Array(EXAMPLE), size)
 
     logArray(EXAMPLE)
     logArray(a)
 
-    console.log('parse_vec', EXAMPLE, a)
+    console.log('convert_pixels', EXAMPLE, a)
 
     const renderLoop = () => {
       setGameResult(universe.render())
