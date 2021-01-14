@@ -196,6 +196,10 @@ export class Universe {
     }
 }
 
+export const __wbg_log_fc9ef2125db2004d = function(arg0, arg1) {
+    console.log(getStringFromWasm0(arg0, arg1));
+};
+
 export const __wbindgen_object_drop_ref = function(arg0) {
     takeObject(arg0);
 };

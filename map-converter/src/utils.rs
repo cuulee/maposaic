@@ -43,7 +43,7 @@ pub fn get_source_index_from_target_index(
 }
 
 pub fn are_colors_similar(color1: &Color, color2: &Color) -> bool {
-    color1.r == color2.r && color1.g == color1.g && color1.b == color2.b
+    color1.r == color2.r && color1.g == color2.g && color1.b == color2.b
 }
 
 pub fn get_adjacent_points(point: &Point, size: &Size) -> [Option<Point>; 4] {

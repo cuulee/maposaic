@@ -17,6 +17,7 @@ macro_rules! console_log {
 
 #[wasm_bindgen]
 pub fn convert_pixels(source: &[u8], size: Size) -> Vec<u8> {
+    console_log!("start-------");
     let mut visited: HashSet<usize> = HashSet::new();
 
     let mut target = vec![0; (size.width * size.height * 4) as usize];
@@ -45,7 +46,7 @@ pub fn convert_pixels(source: &[u8], size: Size) -> Vec<u8> {
             )
         }
     }
-
+    console_log!("end-------");
     target
 }
 
