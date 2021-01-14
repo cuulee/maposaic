@@ -50,4 +50,5 @@ onmessage = async ({
   // eslint-disable-next-line
   // @ts-ignore
   postMessage({ pixels: target, paintedBoundsMin: 0 })
+  // postMessage({ pixels: canvasDataTransformer.targetPixelArray, paintedBoundsMin: 0 })
 }
