@@ -1,6 +1,5 @@
 pub mod game_of_life;
 mod utils;
-use hibitset::BitSet;
 use rand::Rng;
 
 use wasm_bindgen::prelude::*;
@@ -17,34 +16,48 @@ macro_rules! console_log {
 
 #[wasm_bindgen]
 pub fn convert_pixels(source: &[u8], size: Size) -> Vec<u8> {
-    console_log!("start-------");
-    let mut visited: BitSet = BitSet::new();
+    let pixel_count = (size.height * size.width) as usize;
+    let visited_len: usize = pixel_count / 64 + (if pixel_count % 64 == 0 { 0 } else { 1 });
+    let mut visited: Vec<u64> = vec![0; visited_len];
+    let mut target = vec![0; pixel_count * 4];
+    console_log!("start------- {} source {}", visited_len, pixel_count);
+    let mut visited_index: usize = 0;
 
-    let mut target = vec![0; (size.width * size.height * 4) as usize];
+    for x in &visited {
+        console_log!("visited {}", x);
+    }
 
-    for i in 0..size.height {
-        for j in 0..size.width {
-            let target_index = i * size.width + j;
+    loop {
+        console_log!(
+            "visited {} bit_field {}",
+            visited_index,
+            visited[visited_index]
+        );
+        let bit_index = visited[visited_index].leading_ones();
+        console_log!("bit_index {}", bit_index);
 
-            if visited.contains(target_index) {
-                continue;
-            }
-            let source_index =
-                utils::get_source_index_from_target_index(target_index, &size, &size, 1);
-
-            let initial_color = create_color_from_index(&source, source_index as usize);
-            let area_color = create_transformed_color(&initial_color);
-
-            paint_current_area(
-                &mut visited,
-                &mut target,
-                source,
-                &size,
-                target_index,
-                &area_color,
-                &initial_color,
-            )
+        let target_index = visited_index * 64 + (bit_index as usize);
+        if target_index >= pixel_count {
+            break;
         }
+        if bit_index >= 64 {
+            visited_index += 1;
+            continue;
+        }
+
+        let source_index = utils::get_source_index_from_target_index(target_index, &size, &size, 1);
+        let initial_color = create_color_from_index(&source, source_index as usize);
+        let area_color = create_transformed_color(&initial_color);
+
+        paint_current_area(
+            &mut visited,
+            &mut target,
+            source,
+            &size,
+            target_index,
+            &area_color,
+            &initial_color,
+        )
     }
     console_log!("end-------");
     target
@@ -60,11 +73,11 @@ fn create_color_from_index(pixels: &[u8], index: usize) -> Color {
 }
 
 fn paint_current_area(
-    visited: &mut BitSet,
+    visited: &mut Vec<u64>,
     target: &mut Vec<u8>,
     source: &[u8],
     size: &Size,
-    initial_target_index: u32,
+    initial_target_index: usize,
     area_color: &Color,
     initial_color: &Color,
 ) {
@@ -72,10 +85,12 @@ fn paint_current_area(
     stack.push(initial_target_index);
 
     while let Some(target_index) = stack.pop() {
-        if target_index > 1000000 {
-            console_log!("paniiiiic");
-        }
-        visited.add(target_index);
+        console_log!(
+            "updating target_index {} with {}",
+            target_index,
+            ((1 as u64) << (63 - (target_index % 64)))
+        );
+        visited[target_index / 64] |= (1 as u64) << (63 - (target_index % 64));
 
         target[(target_index * 4) as usize] = area_color.r;
         target[(target_index * 4 + 1) as usize] = area_color.g;
@@ -88,7 +103,9 @@ fn paint_current_area(
             match adjacent_candidate {
                 Some(adjacent) => {
                     let adjacent_index = utils::get_pixel_index_from_point(&adjacent, size.width);
-                    if visited.contains(adjacent_index) {
+                    if (visited[adjacent_index / 64] & ((1 as u64) << (63 - (adjacent_index % 64))))
+                        != 0
+                    {
                         continue;
                     }
                     let source_index =
