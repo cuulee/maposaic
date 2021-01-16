@@ -199,7 +199,7 @@ const MapboxGLMap = (): JSX.Element => {
       gl.readPixels(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight, gl.RGBA, gl.UNSIGNED_BYTE, mapboxPixels)
       // const target = convert_pixels(mapboxPixels, WasmSize.new(mapboxCanvasSize.w, mapboxCanvasSize.h))
       // console.log('target', target)
-      // console.log('canvasss size', maposaicData.length, target.length)
+      console.log('pîxel count', gl.drawingBufferWidth * gl.drawingBufferHeight)
       // imageData.data.set(target, 0)
       // maposaicContext.putImageData(imageData, 0, 0)
 
