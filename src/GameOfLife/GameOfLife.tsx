@@ -1,42 +1,11 @@
 import { convert_pixels, Size, Universe } from 'map-converter'
 import React, { useEffect, useState } from 'react'
 
-const SIZE = { w: 3, h: 2 }
+const SIZE = { w: 16, h: 5 }
 
-const subEXAMPLE = Array.from({ length: 8 }, (_) => Math.round(Math.random() * 255))
-// const EXAMPLE = Array.from({ length: 24 }, (_) => 38)
+const EXAMPLE = Array.from({ length: 80 * 4 }, (_) => Math.floor(Math.random() * 256))
 
-const EXAMPLE = [
-  35,
-  36,
-  37,
-  38,
-  35,
-  36,
-  37,
-  38,
-  255,
-  255,
-  255,
-  255,
-  35,
-  36,
-  37,
-  38,
-  40,
-  41,
-  42,
-  43,
-  255,
-  255,
-  255,
-  255,
-  35,
-  36,
-  37,
-  38,
-  ...subEXAMPLE,
-]
+// const EXAMPLE = [35, 36, 37, 38, 35, 36, 37, 38, 255, 255, 255, 255, 35, 36, 37, 38, 40, 41, 42, 43, 255, 255, 255, 255]
 
 const logArray = (arr: number[] | Uint8Array) => {
   const res = []
