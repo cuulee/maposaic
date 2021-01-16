@@ -118,42 +118,42 @@ export class CanvasDataTransformer {
 
       // anti-aliasing
       if (!isColorSimilar(targetPointColor, initialColor, SIMILAR_COLOR_TOLERANCE)) {
-        const similarPointCount = Object.values(adjacentTargetPoints).filter((adjacentTargetPoint) => {
-          if (!adjacentTargetPoint) {
-            return false
-          }
-          const adjacentTargetIndex = getPixelIndexFromPoint(adjacentTargetPoint, this.targetSize.w)
-          if (this.visited[adjacentTargetIndex]) {
-            return false
-          }
-          const adjSourceIndex = getSourcePixelIndexFromTargetPixelIndex({
-            targetPixelIndex: adjacentTargetIndex,
-            targetSize: this.targetSize,
-            canvassRatio: this.canvassRatio,
-            sourceSize: this.sourceSize,
-          })
+        // const similarPointCount = Object.values(adjacentTargetPoints).filter((adjacentTargetPoint) => {
+        //   if (!adjacentTargetPoint) {
+        //     return false
+        //   }
+        //   const adjacentTargetIndex = getPixelIndexFromPoint(adjacentTargetPoint, this.targetSize.w)
+        //   if (this.visited[adjacentTargetIndex]) {
+        //     return false
+        //   }
+        //   const adjSourceIndex = getSourcePixelIndexFromTargetPixelIndex({
+        //     targetPixelIndex: adjacentTargetIndex,
+        //     targetSize: this.targetSize,
+        //     canvassRatio: this.canvassRatio,
+        //     sourceSize: this.sourceSize,
+        //   })
 
-          return isColorSimilar(
-            createRGB(
-              this.sourcePixelArray[adjSourceIndex * 4],
-              this.sourcePixelArray[adjSourceIndex * 4 + 1],
-              this.sourcePixelArray[adjSourceIndex * 4 + 2],
-            ),
-            targetPointColor,
-            SIMILAR_COLOR_TOLERANCE,
-          )
-        }).length
+        //   return isColorSimilar(
+        //     createRGB(
+        //       this.sourcePixelArray[adjSourceIndex * 4],
+        //       this.sourcePixelArray[adjSourceIndex * 4 + 1],
+        //       this.sourcePixelArray[adjSourceIndex * 4 + 2],
+        //     ),
+        //     targetPointColor,
+        //     SIMILAR_COLOR_TOLERANCE,
+        //   )
+        // }).length
 
-        if (similarPointCount < 2) {
-          const colorRatio = initialColor.r ? targetPointColor.r / initialColor.r : 1
-          const antiAliasingColor = createRGB(
-            targetColor.r * colorRatio,
-            targetColor.g * colorRatio,
-            targetColor.b * colorRatio,
-          )
+        // if (similarPointCount < 2) {
+        //   const colorRatio = initialColor.r ? targetPointColor.r / initialColor.r : 1
+        //   const antiAliasingColor = createRGB(
+        //     targetColor.r * colorRatio,
+        //     targetColor.g * colorRatio,
+        //     targetColor.b * colorRatio,
+        //   )
 
-          this.paintTargetPixel({ color: antiAliasingColor, pixelIndex: targetPixelIndex })
-        }
+        //   this.paintTargetPixel({ color: antiAliasingColor, pixelIndex: targetPixelIndex })
+        // }
         continue
       }
 
