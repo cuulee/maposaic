@@ -20,21 +20,10 @@ pub fn convert_pixels(source: &[u8], size: Size) -> Vec<u8> {
     let visited_len: usize = pixel_count / 64 + (if pixel_count % 64 == 0 { 0 } else { 1 });
     let mut visited: Vec<u64> = vec![0; visited_len];
     let mut target = vec![0; pixel_count * 4];
-    console_log!("start------- {} source {}", visited_len, pixel_count);
     let mut visited_index: usize = 0;
 
-    for x in &visited {
-        console_log!("visited {}", x);
-    }
-
     loop {
-        console_log!(
-            "visited {} bit_field {}",
-            visited_index,
-            visited[visited_index]
-        );
         let bit_index = visited[visited_index].leading_ones();
-        console_log!("bit_index {}", bit_index);
 
         let target_index = visited_index * 64 + (bit_index as usize);
         if target_index >= pixel_count {
@@ -59,7 +48,7 @@ pub fn convert_pixels(source: &[u8], size: Size) -> Vec<u8> {
             &initial_color,
         )
     }
-    console_log!("end-------");
+
     target
 }
 
@@ -85,11 +74,6 @@ fn paint_current_area(
     stack.push(initial_target_index);
 
     while let Some(target_index) = stack.pop() {
-        console_log!(
-            "updating target_index {} with {}",
-            target_index,
-            ((1 as u64) << (63 - (target_index % 64)))
-        );
         visited[target_index / 64] |= (1 as u64) << (63 - (target_index % 64));
 
         target[(target_index * 4) as usize] = area_color.r;
