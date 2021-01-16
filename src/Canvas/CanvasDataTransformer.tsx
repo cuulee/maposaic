@@ -2,10 +2,9 @@ import { imagePoint, Size } from 'Canvas/types'
 import { MaposaicColors, RGBColor } from 'Colors/types'
 import { getAdjacentPoints, getSourcePixelIndexFromTargetPixelIndex } from 'Canvas/utils'
 import { getPixelIndexFromPoint, getPointFromPixelIndex } from 'Canvas/utils'
-import { createRGB, getMaposaicColorsWithoutSpecific, isColorSimilar, transformInitialColor } from 'Colors/utils'
+import { createRGB, isColorSimilar, transformInitialColor } from 'Colors/utils'
 import { SpecificColorTransforms } from 'Maposaic/types'
 
-const MAX_SET_SIZE = 16777216
 const SIMILAR_COLOR_TOLERANCE = 1
 
 export class CanvasDataTransformer {
@@ -17,7 +16,7 @@ export class CanvasDataTransformer {
   targetColors: MaposaicColors
   specificColorTransforms: SpecificColorTransforms
 
-  visitedPixelSets: Set<number>[] = []
+  visited: number[]
 
   currentArea = {
     bounds: { min: 0, max: 0 },
@@ -43,51 +42,47 @@ export class CanvasDataTransformer {
     this.specificColorTransforms = specificColorTransforms
     this.targetColors = targetColors
 
-    const numberOfSets = Math.floor((targetSize.h * targetSize.w) / MAX_SET_SIZE) + 1
-    for (let index = 0; index < numberOfSets; index++) {
-      this.visitedPixelSets.push(new Set<number>()) // because Set size cannot exceed 2^24
+    const visitedSize = targetSize.h * targetSize.w
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    this.visited = new Array(visitedSize)
+    for (let i = 0; i < visitedSize; ++i) {
+      this.visited[i] = 0
     }
   }
 
   paintTargetData() {
-    let targetPixelIndex = 0
-
-    for (let i = 0; i < this.targetSize.h; i += 1) {
-      for (let j = 0; j < this.targetSize.w; j += 1) {
-        targetPixelIndex = i * this.targetSize.w + j
-
-        if (this.visitedPixelSets[Math.floor(targetPixelIndex / MAX_SET_SIZE)].has(targetPixelIndex)) {
-          continue
-        }
-        const sourcePixelIndex = getSourcePixelIndexFromTargetPixelIndex({
-          targetPixelIndex,
-          targetSize: this.targetSize,
-          sourceSize: this.sourceSize,
-          canvassRatio: this.canvassRatio,
-        })
-
-        this.currentArea.initialColor = createRGB(
-          this.sourcePixelArray[sourcePixelIndex * 4],
-          this.sourcePixelArray[sourcePixelIndex * 4 + 1],
-          this.sourcePixelArray[sourcePixelIndex * 4 + 2],
-        )
-        this.currentArea.targetColor = transformInitialColor(
-          this.currentArea.initialColor,
-          this.targetColors,
-          this.specificColorTransforms,
-        )
-        this.currentArea.initialTargetPoint = getPointFromPixelIndex(targetPixelIndex, this.targetSize.w)
-        this.currentArea.bounds = { min: sourcePixelIndex, max: sourcePixelIndex }
-
-        this.paintCurrentArea()
-
-        //   if (Math.random() > 0.8) {
-        //     postMessage({
-        //       pixels: targetPixelArray.slice(paintedBounds.min, paintedBounds.max + 1),
-        //       paintedBoundsMin: paintedBounds.min,
-        //     })
-        //   }
+    for (let targetPixelIndex = 0; targetPixelIndex < this.visited.length; targetPixelIndex++) {
+      if (this.visited[targetPixelIndex]) {
+        continue
       }
+      const sourcePixelIndex = getSourcePixelIndexFromTargetPixelIndex({
+        targetPixelIndex,
+        targetSize: this.targetSize,
+        sourceSize: this.sourceSize,
+        canvassRatio: this.canvassRatio,
+      })
+
+      this.currentArea.initialColor = createRGB(
+        this.sourcePixelArray[sourcePixelIndex * 4],
+        this.sourcePixelArray[sourcePixelIndex * 4 + 1],
+        this.sourcePixelArray[sourcePixelIndex * 4 + 2],
+      )
+      this.currentArea.targetColor = transformInitialColor(
+        this.currentArea.initialColor,
+        this.targetColors,
+        this.specificColorTransforms,
+      )
+      this.currentArea.initialTargetPoint = getPointFromPixelIndex(targetPixelIndex, this.targetSize.w)
+      this.currentArea.bounds = { min: sourcePixelIndex, max: sourcePixelIndex }
+
+      this.paintCurrentArea()
+
+      //   if (Math.random() > 0.8) {
+      //     postMessage({
+      //       pixels: targetPixelArray.slice(paintedBounds.min, paintedBounds.max + 1),
+      //       paintedBoundsMin: paintedBounds.min,
+      //     })
+      //   }
     }
   }
 
@@ -102,7 +97,7 @@ export class CanvasDataTransformer {
       }
       const targetPixelIndex = getPixelIndexFromPoint(targetPoint, this.targetSize.w)
 
-      if (this.visitedPixelSets[Math.floor(targetPixelIndex / MAX_SET_SIZE)].has(targetPixelIndex)) {
+      if (this.visited[targetPixelIndex]) {
         continue
       }
 
@@ -128,7 +123,7 @@ export class CanvasDataTransformer {
             return false
           }
           const adjacentTargetIndex = getPixelIndexFromPoint(adjacentTargetPoint, this.targetSize.w)
-          if (this.visitedPixelSets[Math.floor(adjacentTargetIndex / MAX_SET_SIZE)].has(adjacentTargetIndex)) {
+          if (this.visited[adjacentTargetIndex]) {
             return false
           }
           const adjSourceIndex = getSourcePixelIndexFromTargetPixelIndex({
@@ -169,7 +164,7 @@ export class CanvasDataTransformer {
           return
         }
         const adjacentTargetIndex = getPixelIndexFromPoint(adjacentPoint, this.targetSize.w)
-        if (!this.visitedPixelSets[Math.floor(adjacentTargetIndex / MAX_SET_SIZE)].has(adjacentTargetIndex)) {
+        if (!this.visited[adjacentTargetIndex]) {
           toVisitPointStack.push(adjacentPoint)
         }
       })
@@ -177,7 +172,7 @@ export class CanvasDataTransformer {
   }
 
   paintTargetPixel = ({ color, pixelIndex }: { color: RGBColor; pixelIndex: number }) => {
-    this.visitedPixelSets[Math.floor(pixelIndex / MAX_SET_SIZE)].add(pixelIndex)
+    this.visited[pixelIndex] = 1
 
     this.targetPixelArray[pixelIndex * 4] = color.r
     this.targetPixelArray[pixelIndex * 4 + 1] = color.g
