@@ -1,7 +1,7 @@
 pub mod game_of_life;
 mod utils;
+use hibitset::BitSet;
 use rand::Rng;
-use std::collections::HashSet;
 
 use wasm_bindgen::prelude::*;
 
@@ -18,21 +18,21 @@ macro_rules! console_log {
 #[wasm_bindgen]
 pub fn convert_pixels(source: &[u8], size: Size) -> Vec<u8> {
     console_log!("start-------");
-    let mut visited: HashSet<usize> = HashSet::new();
+    let mut visited: BitSet = BitSet::new();
 
     let mut target = vec![0; (size.width * size.height * 4) as usize];
 
     for i in 0..size.height {
         for j in 0..size.width {
-            let target_index = (i * size.width + j) as usize;
+            let target_index = i * size.width + j;
 
-            if visited.contains(&target_index) {
+            if visited.contains(target_index) {
                 continue;
             }
             let source_index =
-                utils::get_source_index_from_target_index(target_index, &size, &size, 1) as usize;
+                utils::get_source_index_from_target_index(target_index, &size, &size, 1);
 
-            let initial_color = create_color_from_index(&source, source_index);
+            let initial_color = create_color_from_index(&source, source_index as usize);
             let area_color = create_transformed_color(&initial_color);
 
             paint_current_area(
@@ -60,11 +60,11 @@ fn create_color_from_index(pixels: &[u8], index: usize) -> Color {
 }
 
 fn paint_current_area(
-    visited: &mut HashSet<usize>,
+    visited: &mut BitSet,
     target: &mut Vec<u8>,
     source: &[u8],
     size: &Size,
-    initial_target_index: usize,
+    initial_target_index: u32,
     area_color: &Color,
     initial_color: &Color,
 ) {
@@ -72,7 +72,10 @@ fn paint_current_area(
     stack.push(initial_target_index);
 
     while let Some(target_index) = stack.pop() {
-        visited.insert(target_index);
+        if target_index > 1000000 {
+            console_log!("paniiiiic");
+        }
+        visited.add(target_index);
 
         target[(target_index * 4) as usize] = area_color.r;
         target[(target_index * 4 + 1) as usize] = area_color.g;
@@ -85,7 +88,7 @@ fn paint_current_area(
             match adjacent_candidate {
                 Some(adjacent) => {
                     let adjacent_index = utils::get_pixel_index_from_point(&adjacent, size.width);
-                    if visited.contains(&adjacent_index) {
+                    if visited.contains(adjacent_index) {
                         continue;
                     }
                     let source_index =

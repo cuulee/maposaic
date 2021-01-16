@@ -13,14 +13,14 @@ pub fn set_panic_hook() {
     console_error_panic_hook::set_once();
 }
 
-pub fn get_point_from_pixel_index(index: usize, width: u32) -> Point {
+pub fn get_point_from_pixel_index(index: u32, width: u32) -> Point {
     Point {
         x: (index as u32) % width,
         y: (index as u32) / width,
     }
 }
-pub fn get_pixel_index_from_point(point: &Point, width: u32) -> usize {
-    (point.y * width + point.x) as usize
+pub fn get_pixel_index_from_point(point: &Point, width: u32) -> u32 {
+    point.y * width + point.x
 }
 
 fn get_source_point_from_target_point(point: &Point, size: &Size, ratio: u32) -> Point {
@@ -31,11 +31,11 @@ fn get_source_point_from_target_point(point: &Point, size: &Size, ratio: u32) ->
 }
 
 pub fn get_source_index_from_target_index(
-    target_pixel_index: usize,
+    target_pixel_index: u32,
     target_size: &Size,
     source_size: &Size,
     ratio: u32,
-) -> usize {
+) -> u32 {
     let target = get_point_from_pixel_index(target_pixel_index, target_size.width);
     let source = get_source_point_from_target_point(&target, &target_size, ratio);
 
