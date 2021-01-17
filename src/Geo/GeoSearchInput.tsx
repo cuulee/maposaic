@@ -41,7 +41,7 @@ const GeoSearch = ({
     const proximity = currentCenter ? `&proximity=${currentCenter.lng}%2C${currentCenter.lat}` : ''
     const request = `${GEOCODING_BASE_URL}/${value}.json?limit=10&language=fr-FR&access_token=${MAPBOX_TOKEN}${proximity}`
     const res = await fetch(request)
-    const body: GeocoderResult = await res.json()
+    const body = (await res.json()) as GeocoderResult
     setIsSearching(false)
     setOptions(body.features)
   }
