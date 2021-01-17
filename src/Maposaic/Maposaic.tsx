@@ -109,21 +109,23 @@ const MapboxGLMap = (): JSX.Element => {
   }, [currentCenter, map])
 
   useEffect(() => {
-    try {
-      if (wasmi() === 1) {
-        console.log('wasmi available')
-        isWasmAvailable = true
-      } else {
-        console.log('wasmi not available')
-        isWasmAvailable = false
-      }
-    } catch {
-      console.log('wasmi not available')
-      isWasmAvailable = false
-    }
+    // try {
+    //   if (wasmi() === 1) {
+    //     console.log('wasmi available')
+    //     isWasmAvailable = true
+    //   } else {
+    //     console.log('wasmi not available')
+    //     isWasmAvailable = false
+    //   }
+    // } catch {
+    //   console.log('wasmi not available')
+    //   isWasmAvailable = false
+    // }
     if (isWasmSuported()) {
+      isWasmAvailable = true
       console.log('wasm support')
     } else {
+      isWasmAvailable = false
       console.log('wasm not support')
     }
   }, [])
@@ -232,6 +234,7 @@ const MapboxGLMap = (): JSX.Element => {
         canvassRatio: DISPLAY_PIXEL_RATIO,
         maposaicColors: createMaposaicColors(colorConfig, specificColorTransforms),
         specificColorTransforms,
+        isWasmAvailable,
       })
 
       paintWorker.onmessage = function (e: { data: { pixels: number[]; paintedBoundsMin: number } }): void {
