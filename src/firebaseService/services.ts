@@ -53,11 +53,15 @@ export const postOrUpdatePicturesDocument = async ({
   }
 }
 
-const sanethizePayload = (payload: any) => {
-  const res: any = {}
+const sanethizePayload = (payload: Record<string, any>) => {
+  const res: Record<string, any> = {}
   Object.keys(payload).forEach((key) => {
+    // eslint-disable-next-line
+    // @ts-ignore
+    // eslint-disable-next-line
     const value = payload[key]
     if (value !== undefined) {
+      // eslint-disable-next-line
       res[key] = value
     }
   })

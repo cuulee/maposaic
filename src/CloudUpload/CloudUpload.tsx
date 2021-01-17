@@ -194,7 +194,7 @@ const CloudUpload = ({
           onError()
         }
       },
-    )
+    ) as () => void
     return () => unsubscribe()
   }, [uploadTask, memoizedOnComplete, fileId])
 

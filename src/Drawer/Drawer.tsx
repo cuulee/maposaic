@@ -58,9 +58,9 @@ const Drawer = ({
   }
 
   const handleOrientationChange = (e: RadioChangeEvent) => {
-    setIsLandscape(e.target.value)
+    setIsLandscape(e.target.value as boolean)
     onPosterSizeChange({
-      isLandscape: e.target.value,
+      isLandscape: e.target.value as boolean,
       pixelPerInchResolution: 300,
       longerPropertyCMLength: FORMAT_SIZE[format],
     })
