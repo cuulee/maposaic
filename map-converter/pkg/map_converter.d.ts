@@ -3,7 +3,7 @@
 /**
 * @returns {number}
 */
-export function wasmi(): number;
+export function say_wan(): number;
 /**
 * @param {Uint8Array} source
 * @param {Size} size

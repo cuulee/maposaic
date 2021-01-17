@@ -40,8 +40,8 @@ function getStringFromWasm0(ptr, len) {
 /**
 * @returns {number}
 */
-export function wasmi() {
-    var ret = wasm.wasmi();
+export function say_wan() {
+    var ret = wasm.say_wan();
     return ret;
 }
 

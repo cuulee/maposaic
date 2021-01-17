@@ -15,7 +15,7 @@ macro_rules! console_log {
 }
 
 #[wasm_bindgen]
-pub fn wasmi() -> u8 {
+pub fn say_wan() -> u8 {
     1
 }
 
