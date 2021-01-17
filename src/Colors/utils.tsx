@@ -128,7 +128,9 @@ export const createColorSettings = (
 ): ColorSettings => {
   const specific_transforms: Record<number, number> = {}
   for (const [colorHex, transform] of Object.entries(specificColorTransforms)) {
-    specific_transforms[hexToU32(colorHex)] = hexToU32(transform.color ?? '#000000')
+    if (transform.color) {
+      specific_transforms[hexToU32(colorHex)] = hexToU32(transform.color ?? '#000000')
+    }
   }
   return {
     is_random: mainColors === ColorConfigType.Random,
