@@ -40,7 +40,7 @@ export const getURLParamsFromColorConfig = (colorConfig: ColorConfig, urlParams:
 
   return urlParams
 }
-
+/* eslint-disable complexity */
 export const getColorConfigFromURLParams = (urlParams: URLSearchParams): null | ColorConfig => {
   const configType = urlParams.get(MaposaicColorURLParamKey.Color)
   if (configType === ColorConfigType.Random) {
@@ -94,3 +94,17 @@ export const getColorConfigFromURLParams = (urlParams: URLSearchParams): null | 
 
 export const roundCoord = (coord: number) => Math.floor(coord * 1000000) / 1000000
 export const roundZoom = (zoom: number) => Math.floor(zoom * 1000) / 1000
+
+export const isWasmSuported = () => {
+  try {
+    if (typeof WebAssembly === 'object' && typeof WebAssembly.instantiate === 'function') {
+      const module = new WebAssembly.Module(Uint8Array.of(0x0, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00))
+      if (module instanceof WebAssembly.Module) {
+        return new WebAssembly.Instance(module) instanceof WebAssembly.Instance
+      }
+    }
+  } catch (e) {
+    return false
+  }
+  return false
+}

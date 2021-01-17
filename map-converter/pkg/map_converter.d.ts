@@ -1,6 +1,10 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
+* @returns {number}
+*/
+export function wasmi(): number;
+/**
 * @param {Uint8Array} source
 * @param {Size} size
 * @returns {Uint8Array}
