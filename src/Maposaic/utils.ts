@@ -99,7 +99,7 @@ export const roundZoom = (zoom: number) => Math.floor(zoom * 1000) / 1000
 export const isWasmSuported = async () => {
   try {
     const wasm = await import('map-converter')
-    if (wasm.wasmi() === 1) {
+    if (wasm.say_wan() === 1) {
       return true
     } else {
       return false
