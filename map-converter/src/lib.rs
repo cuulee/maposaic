@@ -74,37 +74,74 @@ fn paint_current_area(
     stack.push(initial_target_index);
 
     while let Some(target_index) = stack.pop() {
-        visited[target_index / 64] |= (1 as u64) << (63 - (target_index % 64));
-
-        target[(target_index * 4) as usize] = area_color.r;
-        target[(target_index * 4 + 1) as usize] = area_color.g;
-        target[(target_index * 4 + 2) as usize] = area_color.b;
-        target[(target_index * 4 + 3) as usize] = area_color.a;
-
+        let source_index = utils::get_source_index_from_target_index(target_index, &size, &size, 1);
+        let source_color = create_color_from_index(source, source_index);
         let target_point = utils::get_point_from_pixel_index(target_index, size.width);
+
+        let adjacent_points = utils::get_adjacent_points(&target_point, &size);
+
+        // anti-aliasing
+        if !utils::are_colors_similar(&initial_color, &source_color) {
+            let mut similar_point_count = 0;
+            for adjacent_candidate in adjacent_points.iter() {
+                match adjacent_candidate {
+                    Some(adjacent) => {
+                        let adj_index = utils::get_pixel_index_from_point(&adjacent, size.width);
+                        if is_index_visited(visited, adj_index) {
+                            continue;
+                        }
+                        let adj_source_index =
+                            utils::get_source_index_from_target_index(adj_index, &size, &size, 1);
+                        let adj_source_color = create_color_from_index(source, adj_source_index);
+                        if utils::are_colors_similar(&adj_source_color, &source_color) {
+                            similar_point_count += 1;
+                        }
+                    }
+                    None => {}
+                }
+            }
+            if similar_point_count < 2 {
+                let ratio: f32 = source_color.r as f32 / initial_color.r as f32;
+                let anti_aliasing_color = Color {
+                    r: (area_color.r as f32 * ratio) as u8,
+                    g: (area_color.g as f32 * ratio) as u8,
+                    b: (area_color.b as f32 * ratio) as u8,
+                    a: 255,
+                };
+                paint_target_pixels(target, target_index, &anti_aliasing_color, visited);
+            }
+            continue;
+        }
+        // end anti-aliasing
+
+        paint_target_pixels(target, target_index, area_color, visited);
 
         for adjacent_candidate in utils::get_adjacent_points(&target_point, &size).iter() {
             match adjacent_candidate {
                 Some(adjacent) => {
                     let adjacent_index = utils::get_pixel_index_from_point(&adjacent, size.width);
-                    if (visited[adjacent_index / 64] & ((1 as u64) << (63 - (adjacent_index % 64))))
-                        != 0
-                    {
+                    if is_index_visited(visited, adjacent_index) {
                         continue;
                     }
-                    let source_index =
-                        utils::get_source_index_from_target_index(adjacent_index, &size, &size, 1)
-                            as usize;
-                    let source_color = create_color_from_index(source, source_index);
-
-                    if utils::are_colors_similar(&initial_color, &source_color) {
-                        stack.push(adjacent_index);
-                    }
+                    stack.push(adjacent_index);
                 }
                 None => {}
             }
         }
     }
+}
+
+fn is_index_visited(visited: &mut Vec<u64>, index: usize) -> bool {
+    (visited[index / 64] & ((1 as u64) << (63 - (index % 64)))) != 0
+}
+
+fn paint_target_pixels(target: &mut Vec<u8>, index: usize, color: &Color, visited: &mut Vec<u64>) {
+    visited[index / 64] |= (1 as u64) << (63 - (index % 64));
+
+    target[(index * 4) as usize] = color.r;
+    target[(index * 4 + 1) as usize] = color.g;
+    target[(index * 4 + 2) as usize] = color.b;
+    target[(index * 4 + 3) as usize] = color.a;
 }
 
 const WHITE: Color = Color {
