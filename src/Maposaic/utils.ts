@@ -7,6 +7,7 @@ import {
 } from 'Colors/constants'
 import { ColorConfig, ColorConfigType, PaletteOrigin, PaletteType, ShadingPresetName, ShadingType } from 'Colors/types'
 import { MaposaicColorURLParamKey, MaposaicGeoURLParamKey } from 'Maposaic/types'
+import { useEffect } from 'react'
 
 const COLORS_SEPARATOR = ','
 
@@ -95,16 +96,32 @@ export const getColorConfigFromURLParams = (urlParams: URLSearchParams): null | 
 export const roundCoord = (coord: number) => Math.floor(coord * 1000000) / 1000000
 export const roundZoom = (zoom: number) => Math.floor(zoom * 1000) / 1000
 
-export const isWasmSuported = () => {
+export const isWasmSuported = async () => {
   try {
-    if (typeof WebAssembly === 'object' && typeof WebAssembly.instantiate === 'function') {
-      const module = new WebAssembly.Module(Uint8Array.of(0x0, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00))
-      if (module instanceof WebAssembly.Module) {
-        return new WebAssembly.Instance(module) instanceof WebAssembly.Instance
-      }
+    const wasm = await import('map-converter')
+    if (wasm.wasmi() === 1) {
+      return true
+    } else {
+      return false
     }
-  } catch (e) {
+  } catch {
     return false
   }
-  return false
+}
+
+export const useCheckWasmAvailability = (setIsWasmAvailable: (wasm: boolean) => void) => {
+  const checkWasmAvailability = async () => {
+    if (await isWasmSuported()) {
+      console.log('wasm available')
+      setIsWasmAvailable(true)
+    } else {
+      console.log('wasm not available')
+      setIsWasmAvailable(false)
+    }
+  }
+
+  useEffect(() => {
+    void checkWasmAvailability()
+    // eslint-disable-next-line
+  }, [])
 }
