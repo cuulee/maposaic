@@ -15,6 +15,11 @@ macro_rules! console_log {
 }
 
 #[wasm_bindgen]
+pub fn wasmi() -> u8 {
+    1
+}
+
+#[wasm_bindgen]
 pub fn convert_pixels(source: &[u8], size: Size) -> Vec<u8> {
     let pixel_count = (size.height * size.width) as usize;
     let visited_len: usize = pixel_count / 64 + (if pixel_count % 64 == 0 { 0 } else { 1 });

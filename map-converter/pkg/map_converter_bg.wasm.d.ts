@@ -1,6 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export const memory: WebAssembly.Memory;
+export function wasmi(): number;
 export function convert_pixels(a: number, b: number, c: number, d: number): void;
 export function __wbg_size_free(a: number): void;
 export function size_new(a: number, b: number): number;

@@ -43,9 +43,14 @@ import PlaceName from 'PlaceName/PlaceName'
 import GeoSearch from 'Geo/GeoSearchInput'
 import { createMaposaicColors } from 'Colors/utils'
 import { MAPBOX_STYLES } from 'Maposaic/constants'
-import { getColorConfigFromURLParams, getURLParamsFromColorConfig, getURLParamsFromCoords } from 'Maposaic/utils'
+import {
+  getColorConfigFromURLParams,
+  getURLParamsFromColorConfig,
+  getURLParamsFromCoords,
+  isWasmSuported,
+} from 'Maposaic/utils'
 import { UploadButton } from 'CloudUpload/CloudUpload'
-import { convert_pixels, Size as WasmSize } from 'map-converter'
+import { convert_pixels, wasmi, Size as WasmSize } from 'map-converter'
 
 const CloudUpload = React.lazy(() => import('CloudUpload/CloudUpload'))
 
@@ -69,6 +74,7 @@ const computeTime: { pixelCount: number | null; milliseconds: number | null } = 
 }
 
 let lastStartDate = new Date()
+let isWasmAvailable = true
 
 const MapboxGLMap = (): JSX.Element => {
   const history = useHistory()
@@ -101,6 +107,26 @@ const MapboxGLMap = (): JSX.Element => {
     const urlParams = getURLParamsFromCoords(currentCenter, map.getZoom(), new URLSearchParams(window.location.search))
     window.history.replaceState({}, '', `${window.location.pathname}?${urlParams}`)
   }, [currentCenter, map])
+
+  useEffect(() => {
+    try {
+      if (wasmi() === 1) {
+        console.log('wasmi available')
+        isWasmAvailable = true
+      } else {
+        console.log('wasmi not available')
+        isWasmAvailable = false
+      }
+    } catch {
+      console.log('wasmi not available')
+      isWasmAvailable = false
+    }
+    if (isWasmSuported()) {
+      console.log('wasm support')
+    } else {
+      console.log('wasm not support')
+    }
+  }, [])
 
   useEffect(() => {
     if (!isInitialUrlParamsParsed) {
