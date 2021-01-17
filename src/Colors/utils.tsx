@@ -1,6 +1,7 @@
 import {
   ColorConfig,
   ColorConfigType,
+  ColorSettings,
   MaposaicColors,
   PaletteOrigin,
   PaletteType,
@@ -16,11 +17,11 @@ export const createRGB = (r: number, g: number, b: number): RGBColor => {
 }
 
 const hexToRgb = (hex: string) => {
-  return createRGB(
-    parseInt(hex.slice(1, 2), 16) * 16 + parseInt(hex.slice(2, 3), 16),
-    parseInt(hex.slice(3, 4), 16) * 16 + parseInt(hex.slice(4, 5), 16),
-    parseInt(hex.slice(5, 6), 16) * 16 + parseInt(hex.slice(6, 7), 16),
-  )
+  return createRGB(parseInt(hex.slice(1, 3), 16), parseInt(hex.slice(3, 5), 16), parseInt(hex.slice(5, 7), 16))
+}
+
+const hexToU32 = (hex: string) => {
+  return parseInt(hex.slice(1, 3), 16) * 256 * 256 + parseInt(hex.slice(3, 5), 16) * 256 + parseInt(hex.slice(5, 7), 16)
 }
 
 const HEXA = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f']
@@ -119,4 +120,19 @@ export const getInitialPresetPaletteIndex = (colorConfig: ColorConfig, origin: P
     colorConfig.origin === origin
     ? colorConfig.paletteIndex
     : 0
+}
+
+export const createColorSettings = (
+  mainColors: MaposaicColors,
+  specificColorTransforms: SpecificColorTransforms,
+): ColorSettings => {
+  const specific_transforms: Record<number, number> = {}
+  for (const [colorHex, transform] of Object.entries(specificColorTransforms)) {
+    specific_transforms[hexToU32(colorHex)] = hexToU32(transform.color ?? '#000000')
+  }
+  return {
+    is_random: mainColors === ColorConfigType.Random,
+    specific_transforms,
+    available_colors: mainColors === ColorConfigType.Random ? [] : mainColors.map(hexToU32),
+  }
 }
