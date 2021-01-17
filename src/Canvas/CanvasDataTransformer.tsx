@@ -76,13 +76,6 @@ export class CanvasDataTransformer {
       this.currentArea.bounds = { min: sourcePixelIndex, max: sourcePixelIndex }
 
       this.paintCurrentArea()
-
-      //   if (Math.random() > 0.8) {
-      //     postMessage({
-      //       pixels: targetPixelArray.slice(paintedBounds.min, paintedBounds.max + 1),
-      //       paintedBoundsMin: paintedBounds.min,
-      //     })
-      //   }
     }
   }
 

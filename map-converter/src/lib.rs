@@ -1,6 +1,10 @@
 pub mod game_of_life;
 mod utils;
+use rand::seq::SliceRandom;
+use rand::thread_rng;
 use rand::Rng;
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 use wasm_bindgen::prelude::*;
 
@@ -10,22 +14,19 @@ extern "C" {
     fn log(s: &str);
 }
 
-macro_rules! console_log {
-    ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
-}
-
 #[wasm_bindgen]
 pub fn say_wan() -> u8 {
     1
 }
 
 #[wasm_bindgen]
-pub fn convert_pixels(source: &[u8], size: Size) -> Vec<u8> {
+pub fn convert_pixels(source: &[u8], size: Size, color_settings: &JsValue) -> Vec<u8> {
     let pixel_count = (size.height * size.width) as usize;
     let visited_len: usize = pixel_count / 64 + (if pixel_count % 64 == 0 { 0 } else { 1 });
     let mut visited: Vec<u64> = vec![0; visited_len];
     let mut target = vec![0; pixel_count * 4];
     let mut visited_index: usize = 0;
+    let color_settings: ColorSettings = color_settings.into_serde().unwrap();
 
     loop {
         let bit_index = visited[visited_index].leading_ones();
@@ -41,7 +42,7 @@ pub fn convert_pixels(source: &[u8], size: Size) -> Vec<u8> {
 
         let source_index = utils::get_source_index_from_target_index(target_index, &size, &size, 1);
         let initial_color = create_color_from_index(&source, source_index as usize);
-        let area_color = create_transformed_color(&initial_color);
+        let area_color = create_transformed_color(&initial_color, &color_settings);
 
         paint_current_area(
             &mut visited,
@@ -106,7 +107,11 @@ fn paint_current_area(
                 }
             }
             if similar_point_count < 2 {
-                let ratio: f32 = source_color.r as f32 / initial_color.r as f32;
+                let ratio: f32 = if initial_color.r > 0 {
+                    source_color.r as f32 / initial_color.r as f32
+                } else {
+                    1.0
+                };
                 let anti_aliasing_color = Color {
                     r: (area_color.r as f32 * ratio) as u8,
                     g: (area_color.g as f32 * ratio) as u8,
@@ -149,23 +154,26 @@ fn paint_target_pixels(target: &mut Vec<u8>, index: usize, color: &Color, visite
     target[(index * 4 + 3) as usize] = color.a;
 }
 
-const WHITE: Color = Color {
-    r: 255,
-    g: 255,
-    b: 255,
-    a: 255,
-};
+fn create_transformed_color(initial_color: &Color, color_settings: &ColorSettings) -> Color {
+    let initial_u32 = utils::color_to_u32(initial_color);
 
-fn create_transformed_color(initial_color: &Color) -> Color {
-    if utils::are_colors_similar(&initial_color, &WHITE) {
-        WHITE.clone()
-    } else {
-        Color {
-            r: rand::thread_rng().gen_range(0, 255),
-            g: rand::thread_rng().gen_range(0, 255),
-            b: rand::thread_rng().gen_range(0, 255),
+    match color_settings.specific_transforms.get(&initial_u32) {
+        Some(transform) => return utils::u32_to_color(*transform),
+        None => {}
+    }
+
+    if color_settings.is_random {
+        return Color {
+            r: thread_rng().gen_range(0, 255),
+            g: thread_rng().gen_range(0, 255),
+            b: thread_rng().gen_range(0, 255),
             a: 255,
-        }
+        };
+    }
+
+    match color_settings.available_colors.choose(&mut thread_rng()) {
+        Some(color) => utils::u32_to_color(*color),
+        None => return utils::u32_to_color(0),
     }
 }
 
@@ -195,4 +203,15 @@ pub struct Color {
     g: u8,
     b: u8,
     a: u8,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ColorSettings {
+    specific_transforms: HashMap<u32, u32>,
+    is_random: bool,
+    available_colors: Vec<u32>,
+}
+
+macro_rules! console_log {
+    ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
 }

@@ -3,6 +3,8 @@ import { MaposaicColors } from 'Colors/types'
 import { CanvasDataTransformer } from 'Canvas/CanvasDataTransformer'
 import { SpecificColorTransforms } from 'Maposaic/types'
 
+const WHITE = 255 * 256 * 256 + 255 * 256 + 255
+
 onmessage = async ({
   data: {
     sourcePixelArray,
@@ -32,7 +34,11 @@ onmessage = async ({
   if (isWasmAvailable) {
     const wasm = await import('map-converter')
 
-    computedPixels = wasm.convert_pixels(sourcePixelArray, wasm.Size.new(sourceSize.w, sourceSize.h))
+    computedPixels = wasm.convert_pixels(sourcePixelArray, wasm.Size.new(sourceSize.w, sourceSize.h), {
+      specific_transforms: { [WHITE]: WHITE },
+      is_random: false,
+      available_colors: [Math.floor(Math.random() * WHITE), Math.floor(Math.random() * WHITE)],
+    })
   } else {
     const canvasDataTransformer = new CanvasDataTransformer(
       sourcePixelArray,

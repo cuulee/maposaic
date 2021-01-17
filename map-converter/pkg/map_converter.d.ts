@@ -7,9 +7,10 @@ export function say_wan(): number;
 /**
 * @param {Uint8Array} source
 * @param {Size} size
+* @param {any} color_settings
 * @returns {Uint8Array}
 */
-export function convert_pixels(source: Uint8Array, size: Size): Uint8Array;
+export function convert_pixels(source: Uint8Array, size: Size, color_settings: any): Uint8Array;
 /**
 */
 export enum Cell {

@@ -82,3 +82,16 @@ pub fn get_adjacent_points(point: &Point, size: &Size) -> [Option<Point>; 4] {
         },
     ]
 }
+
+pub fn u32_to_color(color: u32) -> Color {
+    Color {
+        r: ((color >> 16) & 255) as u8,
+        g: ((color >> 8) & 255) as u8,
+        b: ((color) & 255) as u8,
+        a: 255,
+    }
+}
+
+pub fn color_to_u32(color: &Color) -> u32 {
+    (color.r as u32) * 256 * 256 + (color.g as u32) * 256 + (color.b as u32)
+}
