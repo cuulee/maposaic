@@ -68,17 +68,6 @@ onmessage = async ({
 }) => {
   const t1 = new Date()
 
-  // const canvasDataTransformer = new CanvasDataTransformer(
-  //   sourcePixelArray,
-  //   targetPixelArray,
-  //   sourceSize,
-  //   targetSize,
-  //   canvassRatio,
-  //   maposaicColors,
-  //   specificColorTransforms,
-  // )
-  // canvasDataTransformer.paintTargetData()
-
   const wasm = await import('map-converter')
 
   const target = wasm.convert_pixels(sourcePixelArray, wasm.Size.new(sourceSize.w, sourceSize.h))
