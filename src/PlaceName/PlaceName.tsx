@@ -27,7 +27,7 @@ const PlaceName = ({
         return
       }
       setIsTextDisplayed(true)
-      setTimeout(() => setIsTextDisplayed(false), 3000)
+      setTimeout(() => setIsTextDisplayed(false), 4000)
     }
 
     showPlaceNameTriggerRef.current = showPlaceNameTrigger
