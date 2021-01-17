@@ -1,7 +1,7 @@
 export type RGBColor = { r: number; g: number; b: number }
 export type HexColor = string
 
-export type MaposaicColors = ColorConfigType.Random | ColorConfigType.Random | string[]
+export type MaposaicColors = ColorConfigType.Random | string[]
 
 export enum PaletteOrigin {
   Coolors = 'coolors',
