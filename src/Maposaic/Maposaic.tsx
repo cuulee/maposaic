@@ -47,10 +47,9 @@ import {
   getColorConfigFromURLParams,
   getURLParamsFromColorConfig,
   getURLParamsFromCoords,
-  isWasmSuported,
+  useCheckWasmAvailability,
 } from 'Maposaic/utils'
 import { UploadButton } from 'CloudUpload/CloudUpload'
-import { convert_pixels, wasmi, Size as WasmSize } from 'map-converter'
 
 const CloudUpload = React.lazy(() => import('CloudUpload/CloudUpload'))
 
@@ -74,10 +73,10 @@ const computeTime: { pixelCount: number | null; milliseconds: number | null } = 
 }
 
 let lastStartDate = new Date()
-let isWasmAvailable = true
 
 const MapboxGLMap = (): JSX.Element => {
   const history = useHistory()
+  const [isWasmAvailable, setIsWasmAvailable] = useState(false)
   const [isInitialUrlParamsParsed, setIsInitialUrlParamsParsed] = useState(false)
   const [map, setMap] = useState<mapboxgl.Map | null>(null)
   const mapboxContainer = useRef<HTMLDivElement | null>(null)
@@ -108,20 +107,7 @@ const MapboxGLMap = (): JSX.Element => {
     window.history.replaceState({}, '', `${window.location.pathname}?${urlParams}`)
   }, [currentCenter, map])
 
-  useEffect(() => {
-    try {
-      if (wasmi() === 1) {
-        console.log('wasm available')
-        isWasmAvailable = true
-      } else {
-        console.log('wasm not available')
-        isWasmAvailable = false
-      }
-    } catch {
-      console.log('wasm not available')
-      isWasmAvailable = false
-    }
-  }, [])
+  useCheckWasmAvailability(setIsWasmAvailable)
 
   useEffect(() => {
     if (!isInitialUrlParamsParsed) {
@@ -293,7 +279,7 @@ const MapboxGLMap = (): JSX.Element => {
       newMap.remove()
     }
     // eslint-disable-next-line
-  }, [mapboxStyle, colorConfig, sizeRender, sizeFactor, specificColorTransforms, initialCenter])
+  }, [mapboxStyle, colorConfig, sizeRender, sizeFactor, specificColorTransforms, initialCenter, isWasmAvailable])
 
   const changeMapStyle = (newStyle: MapboxStyle) => {
     toggleCanvasOpacity(true)
