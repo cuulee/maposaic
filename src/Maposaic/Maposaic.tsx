@@ -109,24 +109,17 @@ const MapboxGLMap = (): JSX.Element => {
   }, [currentCenter, map])
 
   useEffect(() => {
-    // try {
-    //   if (wasmi() === 1) {
-    //     console.log('wasmi available')
-    //     isWasmAvailable = true
-    //   } else {
-    //     console.log('wasmi not available')
-    //     isWasmAvailable = false
-    //   }
-    // } catch {
-    //   console.log('wasmi not available')
-    //   isWasmAvailable = false
-    // }
-    if (isWasmSuported()) {
-      isWasmAvailable = true
-      console.log('wasm support')
-    } else {
+    try {
+      if (wasmi() === 1) {
+        console.log('wasm available')
+        isWasmAvailable = true
+      } else {
+        console.log('wasm not available')
+        isWasmAvailable = false
+      }
+    } catch {
+      console.log('wasm not available')
       isWasmAvailable = false
-      console.log('wasm not support')
     }
   }, [])
 
