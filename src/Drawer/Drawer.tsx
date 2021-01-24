@@ -107,7 +107,12 @@ const Drawer = ({
               key={style}
             >
               <div>{MAPBOX_STYLES[style].name}</div>
-              <img width="80px" alt={style} src={MAPBOX_STYLES[style].imgPath} />
+              <img
+                className={`background-image${mapboxStyle === style ? ' background-image--selected' : ''}`}
+                width="80px"
+                alt={style}
+                src={MAPBOX_STYLES[style].imgPath}
+              />
             </div>
           )
         })}

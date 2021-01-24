@@ -89,7 +89,14 @@ const ColorConfigChoice = ({
               onClick={() => changeColorConfig(configName as ColorConfigType)}
             >
               <div>{config.name}</div>
-              <img width="80px" alt={configName} src={config.imgPath} />
+              <img
+                className={`color-config-image${
+                  colorConfig.type === configName ? ' color-config-image--selected' : ''
+                }`}
+                width="80px"
+                alt={configName}
+                src={config.imgPath}
+              />
             </div>
           )
         })}

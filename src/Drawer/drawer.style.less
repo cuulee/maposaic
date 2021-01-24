@@ -34,12 +34,18 @@
 
     &__background {
       cursor: pointer;
-      opacity: 0.5;
+      opacity: 0.7;
       &--selected {
         opacity: 1;
       }
       &:not(:first-child) {
         margin-left: 16px;
+      }
+      .background-image {
+        padding: 2px;
+        &--selected {
+          border: 2px solid @primary-color;
+        }
       }
     }
   }

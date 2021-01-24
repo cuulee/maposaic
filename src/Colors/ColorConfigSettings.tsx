@@ -18,6 +18,7 @@ import 'Colors/colorConfigSettings.style.less'
 import { Popover, Select } from 'antd'
 import { getInitialPresetPaletteIndex } from 'Colors/utils'
 
+/* eslint-disable complexity */
 const ColorConfigSettings = ({
   colorConfig,
   setColorConfig,
