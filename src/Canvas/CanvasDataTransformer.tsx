@@ -16,7 +16,7 @@ export class CanvasDataTransformer {
   targetColors: MaposaicColors
   specificColorTransforms: SpecificColorTransforms
 
-  visited: number[]
+  visited: boolean[]
 
   currentArea = {
     bounds: { min: 0, max: 0 },
@@ -46,7 +46,7 @@ export class CanvasDataTransformer {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     this.visited = new Array(visitedSize)
     for (let i = 0; i < visitedSize; ++i) {
-      this.visited[i] = 0
+      this.visited[i] = false
     }
   }
 
@@ -165,7 +165,7 @@ export class CanvasDataTransformer {
   }
 
   paintTargetPixel = ({ color, pixelIndex }: { color: RGBColor; pixelIndex: number }) => {
-    this.visited[pixelIndex] = 1
+    this.visited[pixelIndex] = true
 
     this.targetPixelArray[pixelIndex * 4] = color.r
     this.targetPixelArray[pixelIndex * 4 + 1] = color.g
