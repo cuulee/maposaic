@@ -49,7 +49,7 @@ import {
   getURLParamsFromCoords,
   useCheckWasmAvailability,
 } from 'Maposaic/utils'
-import { UploadButton } from 'CloudUpload/CloudUpload'
+import { UploadButton } from 'CloudUpload/UploadButton'
 
 const CloudUpload = React.lazy(() => import('CloudUpload/CloudUpload'))
 

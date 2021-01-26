@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { Button, Input, Modal, Progress, Tooltip } from 'antd'
-import { CheckCircleTwoTone, CloudUploadOutlined, LoadingOutlined, SendOutlined } from '@ant-design/icons'
+import { Input, Modal, Progress } from 'antd'
+import { CheckCircleTwoTone, LoadingOutlined, SendOutlined } from '@ant-design/icons'
 import { ProgressProps } from 'antd/lib/progress'
 import firebase from 'firebase/app'
 import { firebaseAuth } from 'firebaseService/initialize'
@@ -8,11 +8,11 @@ import { getPicturePathFromFileId, postOrUpdatePicturesDocument, uploadBlob } fr
 
 import { DISABLED_COLOR, PRIMARY_COLOR, SUCCESS_COLOR } from 'constants/colors'
 import 'CloudUpload/style.less'
-import { TOOLTIP_ENTER_DELAY } from 'constants/ux'
 import { useHistory } from 'react-router-dom'
 import { PICTURE_ID_PARAM } from 'Gallery/constants'
 import { ColorConfig } from 'Colors/types'
 import { MapboxStyle } from 'Maposaic/types'
+import { UploadButton } from 'CloudUpload/UploadButton'
 
 enum UploadStatus {
   Error = 'error',
@@ -60,20 +60,6 @@ const StatusMessage = ({ taskState, documentId }: { taskState: TaskState; docume
   return <div>Upload failed</div>
 }
 
-export const UploadButton = ({ isDisabled, onUploadClick }: { isDisabled: boolean; onUploadClick?: () => void }) => {
-  return (
-    <Tooltip title="Upload to public gallery" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
-      <Button
-        disabled={isDisabled}
-        type="default"
-        shape="circle"
-        onClick={onUploadClick}
-        icon={<CloudUploadOutlined />}
-      />
-    </Tooltip>
-  )
-}
-
 const CloudUpload = ({
   isDisabled,
   className,
@@ -103,7 +89,7 @@ const CloudUpload = ({
   const [anonymousUid, setAnonymousUid] = useState<string | null>(null)
 
   useEffect(() => {
-    firebaseAuth.signInAnonymously()
+    void firebaseAuth.signInAnonymously()
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
         setAnonymousUid(user.uid)

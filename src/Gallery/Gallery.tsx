@@ -19,6 +19,7 @@ const displayedName = (picture: Picture): string => {
 let xDown: null | number = null
 let yDown: null | number = null
 
+/* eslint-disable complexity */
 const Gallery = () => {
   const [pictures, setPictures] = useState<Picture[]>([])
   const [displayedIndex, setDisplayedIndex] = useState<number | null>(null)
