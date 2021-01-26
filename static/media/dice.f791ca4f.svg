@@ -1,0 +1,22 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg t="1605164056111" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3177" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200">
+    <defs>
+        <style type="text/css">@font-face { font-weight: 400; font-style: normal; font-family: Inter-Loom; src: url("https://cdn.loom.com/assets/fonts/inter/Inter-UI-Regular.woff2") format("woff2"); }
+@font-face { font-weight: 400; font-style: italic; font-family: Inter-Loom; src: url("https://cdn.loom.com/assets/fonts/inter/Inter-UI-Italic.woff2") format("woff2"); }
+@font-face { font-weight: 500; font-style: normal; font-family: Inter-Loom; src: url("https://cdn.loom.com/assets/fonts/inter/Inter-UI-Medium.woff2") format("woff2"); }
+@font-face { font-weight: 500; font-style: italic; font-family: Inter-Loom; src: url("https://cdn.loom.com/assets/fonts/inter/Inter-UI-MediumItalic.woff2") format("woff2"); }
+@font-face { font-weight: 700; font-style: normal; font-family: Inter-Loom; src: url("https://cdn.loom.com/assets/fonts/inter/Inter-UI-Bold.woff2") format("woff2"); }
+@font-face { font-weight: 700; font-style: italic; font-family: Inter-Loom; src: url("https://cdn.loom.com/assets/fonts/inter/Inter-UI-BoldItalic.woff2") format("woff2"); }
+@font-face { font-weight: 900; font-style: normal; font-family: Inter-Loom; src: url("https://cdn.loom.com/assets/fonts/inter/Inter-UI-Black.woff2") format("woff2"); }
+@font-face { font-weight: 900; font-style: italic; font-family: Inter-Loom; src: url("https://cdn.loom.com/assets/fonts/inter/Inter-UI-BlackItalic.woff2") format("woff2"); }
+</style>
+    </defs>
+    <path d="M281.6 819.2c-42.3424 0-76.8-34.4576-76.8-76.8s34.4576-76.8 76.8-76.8 76.8 34.4576 76.8 76.8-34.4576 76.8-76.8 76.8zM281.6 716.8c-14.1312 0-25.6 11.4688-25.6 25.6s11.4688 25.6 25.6 25.6 25.6-11.4688 25.6-25.6-11.4688-25.6-25.6-25.6z" p-id="3178"></path>
+    <path d="M281.6 614.4c-42.3424 0-76.8-34.4576-76.8-76.8s34.4576-76.8 76.8-76.8 76.8 34.4576 76.8 76.8-34.4576 76.8-76.8 76.8zM281.6 512c-14.1312 0-25.6 11.4688-25.6 25.6s11.4688 25.6 25.6 25.6 25.6-11.4688 25.6-25.6-11.4688-25.6-25.6-25.6z" p-id="3179"></path>
+    <path d="M281.6 409.6c-42.3424 0-76.8-34.4576-76.8-76.8s34.4576-76.8 76.8-76.8 76.8 34.4576 76.8 76.8-34.4576 76.8-76.8 76.8zM281.6 307.2c-14.1312 0-25.6 11.4688-25.6 25.6s11.4688 25.6 25.6 25.6 25.6-11.4688 25.6-25.6-11.4688-25.6-25.6-25.6z" p-id="3180"></path>
+    <path d="M691.2 409.6c-42.3424 0-76.8-34.4576-76.8-76.8s34.4576-76.8 76.8-76.8 76.8 34.4576 76.8 76.8-34.4576 76.8-76.8 76.8zM691.2 307.2c-14.1312 0-25.6 11.4688-25.6 25.6s11.4688 25.6 25.6 25.6 25.6-11.4688 25.6-25.6-11.4688-25.6-25.6-25.6z" p-id="3181"></path>
+    <path d="M691.2 614.4c-42.3424 0-76.8-34.4576-76.8-76.8s34.4576-76.8 76.8-76.8 76.8 34.4576 76.8 76.8-34.4576 76.8-76.8 76.8zM691.2 512c-14.1312 0-25.6 11.4688-25.6 25.6s11.4688 25.6 25.6 25.6 25.6-11.4688 25.6-25.6-11.4688-25.6-25.6-25.6z" p-id="3182"></path>
+    <path d="M691.2 819.2c-42.3424 0-76.8-34.4576-76.8-76.8s34.4576-76.8 76.8-76.8 76.8 34.4576 76.8 76.8-34.4576 76.8-76.8 76.8zM691.2 716.8c-14.1312 0-25.6 11.4688-25.6 25.6s11.4688 25.6 25.6 25.6 25.6-11.4688 25.6-25.6-11.4688-25.6-25.6-25.6z" p-id="3183"></path>
+    <path d="M793.6 972.8l-614.4 0c-70.5536 0-128-57.4464-128-128l0-614.4c0-70.5536 57.4464-128 128-128l614.4 0c70.5536 0 128 57.4464 128 128l0 614.4c0 70.5536-57.4464 128-128 128zM179.2 153.6c-42.3424 0-76.8 34.4576-76.8 76.8l0 614.4c0 42.3424 34.4576 76.8 76.8 76.8l614.4 0c42.3424 0 76.8-34.4576 76.8-76.8l0-614.4c0-42.3424-34.4576-76.8-76.8-76.8l-614.4 0z" p-id="3184"></path>
+</svg>
