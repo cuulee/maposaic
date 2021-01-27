@@ -1,4 +1,4 @@
-import React, { lazy, Suspense } from 'react'
+import React, { lazy, Suspense, useEffect } from 'react'
 import { Route, BrowserRouter as Router, Switch } from 'react-router-dom'
 import { Spin } from 'antd'
 import spinner from 'assets/spinner.png'
@@ -10,6 +10,10 @@ const Maposaic = lazy(() => import('Maposaic/Maposaic'))
 const GameOfLife = lazy(() => import('GameOfLife/GameOfLife'))
 
 function App() {
+  useEffect(() => {
+    void fetch('https://us-central1-maposaic-99785.cloudfunctions.net/fetch3Geonames') // warmup the api
+  }, [])
+
   return (
     <Router>
       <Suspense
