@@ -62,3 +62,29 @@ export const getRandomZoom = () => {
   // mapbox zoom range : 0 (most zoom out) - 22
   return Math.random() * 13 + 3
 }
+
+// to fetch a lot of random coords
+export const fetchRandom = () => {
+  const coords = []
+  const proms = []
+  for (let i = 0; i < 1000; i++) {
+    const prom = new Promise((resolve) => {
+      try {
+        const response = fetch('https://us-central1-maposaic-99785.cloudfunctions.net/fetch3Geonames')
+        void response.then((r) => {
+          void r
+            .json()
+            .then((data: GeonameData) =>
+              resolve([data.geodata.nearest[0]?.longt[0] ?? 2.338272, data.geodata.nearest[0]?.latt[0] ?? 48.858796]),
+            )
+        })
+      } catch {
+        resolve(null)
+      }
+    })
+    // eslint-disable-next-line
+      proms.push(prom)
+  }
+
+  void Promise.all(proms).then((p) => console.log(p))
+}
