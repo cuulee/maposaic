@@ -38,7 +38,7 @@ import {
 import { CM_PER_INCH, FORMAT_RATIO } from 'constants/dimensions'
 import { TOOLTIP_ENTER_DELAY } from 'constants/ux'
 import { MAPBOX_TOKEN } from 'constants/mapbox'
-import { fetchGeoRandom, getPlaceNameFromPosition, getRandomZoom } from 'Geo/utils'
+import { fetchGeoRandom, getPlaceNameFromPosition, getPrefetchedRandomCoords, getRandomZoom } from 'Geo/utils'
 import PlaceName from 'PlaceName/PlaceName'
 import GeoSearch from 'Geo/GeoSearchInput'
 import { createMaposaicColors } from 'Colors/utils'
@@ -126,9 +126,9 @@ const MapboxGLMap = (): JSX.Element => {
     window.history.replaceState({}, '', `${window.location.pathname}?${urlParams}`)
   }, [mapboxStyle, isInitialUrlParamsParsed])
 
-  const setRandomCoords = async (setZoom = true) => {
+  const setRandomCoords = async ({ setZoom, fetchFromApi }: { setZoom: boolean; fetchFromApi: boolean }) => {
     setIsLoading(true)
-    const randomCenter = await fetchGeoRandom()
+    const randomCenter = fetchFromApi ? await fetchGeoRandom() : getPrefetchedRandomCoords()
     setShowPlaceNameWhenFetched(true)
     if (initialZoom === null && setZoom) {
       setInitialZoom(getRandomZoom())
@@ -154,7 +154,7 @@ const MapboxGLMap = (): JSX.Element => {
     if (lat && lng) {
       setInitialCenter(new mapboxgl.LngLat(parseFloat(lng), parseFloat(lat)))
     } else {
-      setRandomCoords(!zoom)
+      void setRandomCoords({ setZoom: !zoom, fetchFromApi: false })
     }
     if (zoom) {
       setInitialZoom(parseFloat(zoom))
@@ -499,7 +499,7 @@ const MapboxGLMap = (): JSX.Element => {
               className="overmap__actions__button"
               style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
               shape="circle"
-              onClick={() => setRandomCoords(true)}
+              onClick={() => setRandomCoords({ setZoom: true, fetchFromApi: true })}
               icon={<img src={dice} width="16px" alt="dice" />}
             />
           </Tooltip>
