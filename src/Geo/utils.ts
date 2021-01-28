@@ -2,6 +2,7 @@ import { MAPBOX_TOKEN } from 'constants/mapbox'
 import { GeocodingData, GeonameData, PlaceType } from 'types/geo'
 import mapboxgl from 'mapbox-gl'
 import { GEOCODING_BASE_URL } from 'Geo/constants'
+import { PREFETCHED_RANDOM_COORDS } from 'Geo/geoRandom'
 
 export const PLACE_TYPE_RELEVANCE = [
   PlaceType.Place,
@@ -61,6 +62,11 @@ export const fetchGeoRandom = async (): Promise<mapboxgl.LngLat> => {
 export const getRandomZoom = () => {
   // mapbox zoom range : 0 (most zoom out) - 22
   return Math.random() * 13 + 3
+}
+
+export const getPrefetchedRandomCoords = () => {
+  const coords = PREFETCHED_RANDOM_COORDS[Math.floor(Math.random() * PREFETCHED_RANDOM_COORDS.length)]
+  return new mapboxgl.LngLat(coords[0], coords[1])
 }
 
 // to fetch a lot of random coords
