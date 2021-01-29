@@ -43,12 +43,7 @@ import PlaceName from 'PlaceName/PlaceName'
 import GeoSearch from 'Geo/GeoSearchInput'
 import { createMaposaicColors } from 'Colors/utils'
 import { MAPBOX_STYLES } from 'Maposaic/constants'
-import {
-  getColorConfigFromURLParams,
-  getURLParamsFromColorConfig,
-  getURLParamsFromCoords,
-  useCheckWasmAvailability,
-} from 'Maposaic/utils'
+import { getColorConfigFromURLParams, getURLParamsFromColorConfig, getURLParamsFromCoords } from 'Maposaic/utils'
 import { UploadButton } from 'CloudUpload/UploadButton'
 
 const CloudUpload = React.lazy(() => import('CloudUpload/CloudUpload'))
@@ -74,9 +69,8 @@ const computeTime: { pixelCount: number | null; milliseconds: number | null } = 
 
 let lastStartDate = new Date()
 
-const MapboxGLMap = (): JSX.Element => {
+const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): JSX.Element => {
   const history = useHistory()
-  const [isWasmAvailable, setIsWasmAvailable] = useState(false)
   const [isInitialUrlParamsParsed, setIsInitialUrlParamsParsed] = useState(false)
   const [map, setMap] = useState<mapboxgl.Map | null>(null)
   const mapboxContainer = useRef<HTMLDivElement | null>(null)
@@ -106,8 +100,6 @@ const MapboxGLMap = (): JSX.Element => {
     const urlParams = getURLParamsFromCoords(currentCenter, map.getZoom(), new URLSearchParams(window.location.search))
     window.history.replaceState({}, '', `${window.location.pathname}?${urlParams}`)
   }, [currentCenter, map])
-
-  useCheckWasmAvailability(setIsWasmAvailable)
 
   useEffect(() => {
     if (!isInitialUrlParamsParsed) {
@@ -231,6 +223,9 @@ const MapboxGLMap = (): JSX.Element => {
         }
         setEstimatedTime(duration)
       }
+    }
+    if (null === isWasmAvailable) {
+      return // avoid flashing at initalization
     }
     if (!initialCenter) {
       return
