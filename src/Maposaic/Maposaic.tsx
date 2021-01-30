@@ -255,10 +255,11 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
 
     newMap.on('render', () => {
       setMapboxDisplaySize()
+      paintWorker.terminate()
+
       if (!newMap.loaded() || newMap.isMoving() || newMap.isZooming()) {
         return
       }
-      paintWorker.terminate()
 
       const pixelCount = getMapboxPixelCount(newMap)
       setRemainingTime(Math.round(((computeTime.milliseconds || 0) * pixelCount) / (computeTime.pixelCount || 1)))
