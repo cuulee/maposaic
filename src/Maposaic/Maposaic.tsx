@@ -30,6 +30,7 @@ import {
 } from 'Maposaic/types'
 import { Size } from 'Canvas/types'
 import {
+  getPosterTargetSize,
   isMobile,
   resizeMapsContainer,
   setMapboxArtificialSize,
@@ -307,39 +308,15 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
     map.setCenter(center)
   }
 
-  const onPosterSizeChange = ({
-    isLandscape,
-    pixelPerInchResolution,
-    longerPropertyCMLength,
-  }: OnPosterSizeChangePayload) => {
-    const rootWrapper = document.getElementById('maps-wrapper')
-    if (!map || !rootWrapper) {
+  const onPosterSizeChange = (payload: OnPosterSizeChangePayload) => {
+    const { targetSize, newSizeFactor } = getPosterTargetSize({ mapboxResolutionRatio, ...payload })
+    if (!targetSize) {
       return
     }
-
-    const padding = rootWrapper.offsetWidth > 800 ? 64 : 16
-    const mapsContainerSize = { w: rootWrapper.offsetWidth - padding * 2, h: rootWrapper.offsetHeight - padding * 2 }
-
-    const longerProperty = isLandscape ? 'w' : 'h'
-    const smallerProperty = longerProperty === 'h' ? 'w' : 'h'
-
-    const targetSize = {
-      [smallerProperty]: Math.floor(mapsContainerSize[longerProperty] / FORMAT_RATIO),
-      [longerProperty]: mapsContainerSize[longerProperty],
-    } as Size
-
-    if (targetSize[smallerProperty] > mapsContainerSize[smallerProperty]) {
-      targetSize[smallerProperty] = mapsContainerSize[smallerProperty]
-      targetSize[longerProperty] = Math.floor(mapsContainerSize[smallerProperty] * FORMAT_RATIO)
-    }
-
     setIsLoading(true)
     resizeMapsContainer(targetSize)
     setSizeRender(sizeRender + 1)
 
-    const target1DPixelCount = (longerPropertyCMLength / CM_PER_INCH) * pixelPerInchResolution
-    const current1DPixelCount = targetSize[longerProperty] * (mapboxResolutionRatio ?? 1)
-    const newSizeFactor = target1DPixelCount / current1DPixelCount
     setSizeFactor(newSizeFactor)
     setHasBorder(true)
   }

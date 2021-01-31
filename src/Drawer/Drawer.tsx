@@ -57,10 +57,11 @@ const Drawer = ({
     setNewSizeFactor(localSizeFactor)
   }
 
-  const handleOrientationChange = (e: RadioChangeEvent) => {
-    setIsLandscape(e.target.value as boolean)
+  const handleOrientationChange = (newIsLandscape: boolean) => {
+    const newValue = newIsLandscape === isLandscape ? null : newIsLandscape
+    setIsLandscape(newValue)
     onPosterSizeChange({
-      isLandscape: e.target.value as boolean,
+      isLandscape: newValue,
       pixelPerInchResolution: 300,
       longerPropertyCMLength: FORMAT_SIZE[format],
     })
@@ -126,15 +127,19 @@ const Drawer = ({
         <Radio.Group
           style={{ display: 'flex', alignItems: 'center' }}
           name="preset"
-          onChange={handleOrientationChange}
           value={isLandscape}
           size="small"
           className="poster-options__landscape"
         >
-          <Radio.Button style={{ width: '29px', height: '21px', ...radioStyle }} value={true}>
+          <Radio.Button
+            style={{ width: '29px', height: '21px', ...radioStyle }}
+            onClick={() => handleOrientationChange(true)}
+            value={true}
+          >
             A
           </Radio.Button>
           <Radio.Button
+            onClick={() => handleOrientationChange(false)}
             style={{
               width: '21px',
               height: '29px',
