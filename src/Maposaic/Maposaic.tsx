@@ -30,6 +30,7 @@ import {
 } from 'Maposaic/types'
 import { Size } from 'Canvas/types'
 import {
+  isMobile,
   resizeMapsContainer,
   setMapboxArtificialSize,
   setMapboxDisplaySize,
@@ -311,7 +312,7 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
     pixelPerInchResolution,
     longerPropertyCMLength,
   }: OnPosterSizeChangePayload) => {
-    const rootWrapper = document.getElementById('root-wrapper')
+    const rootWrapper = document.getElementById('maps-wrapper')
     if (!map || !rootWrapper) {
       return
     }
@@ -416,36 +417,38 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
 
   return (
     <div className="root-wrapper" id="root-wrapper">
-      <div className="maps-container" id="maps-container">
-        <canvas className={`mosaic-canvas${hasBorder ? ' with-border' : ''}`} id="maposaic-canvas" />
-        <div
-          id="mapbox-wrapper"
-          className={`mapbox-wrapper${hasBorder ? ' with-border' : ''}`}
-          ref={(el) => (mapboxContainer.current = el)}
-        />
-        <Spin
-          className="maps-container__spin"
-          spinning={isLoading}
-          indicator={<img className="spinner" src={spinner} alt="spin" />}
-        />
+      <Drawer
+        visible={drawerVisible}
+        setDrawerVisible={setDrawerVisible}
+        changeMapStyle={changeMapStyle}
+        mapboxStyle={mapboxStyle}
+        colorConfig={colorConfig}
+        setColorConfig={setNewColorConfig}
+        sizeFactor={sizeFactor}
+        setNewSizeFactor={setNewSizeFactor}
+        specificColorTransforms={specificColorTransforms}
+        setNewSpecificColorTransforms={setNewSpecificColorTransforms}
+        remainingTime={remainingTime}
+        estimatedTime={estimatedTime}
+        updateEstimatedTime={updateEstimatedTime}
+        onPosterSizeChange={onPosterSizeChange}
+      />
+      <div className="maps-wrapper" id="maps-wrapper">
+        <div className="maps-container" id="maps-container">
+          <canvas className={`mosaic-canvas${hasBorder ? ' with-border' : ''}`} id="maposaic-canvas" />
+          <div
+            id="mapbox-wrapper"
+            className={`mapbox-wrapper${hasBorder ? ' with-border' : ''}`}
+            ref={(el) => (mapboxContainer.current = el)}
+          />
+          <Spin
+            className="maps-container__spin"
+            spinning={isLoading}
+            indicator={<img className="spinner" src={spinner} alt="spin" />}
+          />
+        </div>
       </div>
       <div className="overmap">
-        <Drawer
-          visible={drawerVisible}
-          setDrawerVisible={setDrawerVisible}
-          changeMapStyle={changeMapStyle}
-          mapboxStyle={mapboxStyle}
-          colorConfig={colorConfig}
-          setColorConfig={setNewColorConfig}
-          sizeFactor={sizeFactor}
-          setNewSizeFactor={setNewSizeFactor}
-          specificColorTransforms={specificColorTransforms}
-          setNewSpecificColorTransforms={setNewSpecificColorTransforms}
-          remainingTime={remainingTime}
-          estimatedTime={estimatedTime}
-          updateEstimatedTime={updateEstimatedTime}
-          onPosterSizeChange={onPosterSizeChange}
-        />
         <div className="overmap__actions">
           <Tooltip title="Settings" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
             <Button
@@ -458,6 +461,8 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
               icon={<SettingOutlined />}
             />
           </Tooltip>
+        </div>
+        <div className="overmap__actions">
           <Tooltip title="Download" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
             <Button
               className="overmap__actions__button"
@@ -489,8 +494,6 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
               icon={<PictureOutlined />}
             />
           </Tooltip>
-        </div>
-        <div className="overmap__actions">
           <GeoSearch
             className="overmap__actions__button"
             flyTo={flyTo}

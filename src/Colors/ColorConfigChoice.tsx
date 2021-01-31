@@ -93,7 +93,7 @@ const ColorConfigChoice = ({
                 className={`color-config-image${
                   colorConfig.type === configName ? ' color-config-image--selected' : ''
                 }`}
-                width="80px"
+                width="60px"
                 alt={configName}
                 src={config.imgPath}
               />

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Drawer as AntDrawer, Button, Divider, InputNumber, Radio, Select, Tooltip } from 'antd'
 import { RadioChangeEvent } from 'antd/lib/radio'
 import Title from 'antd/lib/typography/Title'
-import { FormatPainterOutlined, InfoCircleOutlined } from '@ant-design/icons'
+import { FormatPainterOutlined, InfoCircleOutlined, LeftOutlined, SettingOutlined } from '@ant-design/icons'
 import { Badge } from 'antd'
 import { ClockCircleOutlined } from '@ant-design/icons'
 
@@ -79,13 +79,7 @@ const Drawer = ({
   }
 
   return (
-    <AntDrawer
-      visible={visible}
-      placement="left"
-      onClose={() => setDrawerVisible(false)}
-      closable={true}
-      width="min(100%,333px)"
-    >
+    <div className="drawer">
       <Title level={4}>Colors</Title>
       <ColorConfig
         colorConfig={colorConfig}
@@ -109,7 +103,7 @@ const Drawer = ({
               <div>{MAPBOX_STYLES[style].name}</div>
               <img
                 className={`background-image${mapboxStyle === style ? ' background-image--selected' : ''}`}
-                width="80px"
+                width="60px"
                 alt={style}
                 src={MAPBOX_STYLES[style].imgPath}
               />
@@ -184,7 +178,7 @@ const Drawer = ({
           </Badge>
         )}
       </div>
-    </AntDrawer>
+    </div>
   )
 }
 

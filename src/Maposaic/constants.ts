@@ -15,7 +15,7 @@ export const MAPBOX_STYLES = {
   },
   [MapboxStyle.Water]: {
     url: 'mapbox://styles/cartapuce/ck8ynyj0x022h1hpmffi87im9',
-    name: 'Water land',
+    name: 'Water',
     imgPath:
       'https://firebasestorage.googleapis.com/v0/b/maposaic-99785.appspot.com/o/app_assets%2Fwater-loire.png?alt=media&token=1b986519-854e-433e-bbc0-81b974a77a39',
   },

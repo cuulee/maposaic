@@ -45,3 +45,12 @@ export const resizeMapsContainer = (size: Size) => {
   mosaicCanvas.style.width = size.w.toString() + 'px'
   mosaicCanvas.style.height = size.h.toString() + 'px'
 }
+
+export const isMobile = () => {
+  const rootWrapper = document.getElementById('root-wrapper')
+  if (!rootWrapper) {
+    return true
+  }
+  console.log('ismobil', rootWrapper.offsetWidth)
+  return rootWrapper.offsetWidth < 800
+}
