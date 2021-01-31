@@ -92,6 +92,7 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
     [ROAD_SIMPLE_WHITE]: { color: ROAD_WHITE, isEditable: true, name: 'roads' },
     [WATER_CYAN]: { color: null, isEditable: true, name: 'water' },
   })
+  const [hasBorder, setHasBorder] = useState(false)
 
   useEffect(() => {
     if (!currentCenter || !map) {
@@ -310,12 +311,13 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
     pixelPerInchResolution,
     longerPropertyCMLength,
   }: OnPosterSizeChangePayload) => {
-    if (!map) {
+    const rootWrapper = document.getElementById('root-wrapper')
+    if (!map || !rootWrapper) {
       return
     }
 
-    const rootWrapper = document.getElementById('root-wrapper')
-    const mapsContainerSize = { w: rootWrapper?.offsetWidth || 0, h: rootWrapper?.offsetHeight || 0 }
+    const padding = rootWrapper.offsetWidth > 800 ? 64 : 16
+    const mapsContainerSize = { w: rootWrapper.offsetWidth - padding * 2, h: rootWrapper.offsetHeight - padding * 2 }
 
     const longerProperty = isLandscape ? 'w' : 'h'
     const smallerProperty = longerProperty === 'h' ? 'w' : 'h'
@@ -335,9 +337,10 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
     setSizeRender(sizeRender + 1)
 
     const target1DPixelCount = (longerPropertyCMLength / CM_PER_INCH) * pixelPerInchResolution
-    const current1DPixelCount = targetSize[longerProperty] * (mapboxResolutionRatio || 1)
+    const current1DPixelCount = targetSize[longerProperty] * (mapboxResolutionRatio ?? 1)
     const newSizeFactor = target1DPixelCount / current1DPixelCount
     setSizeFactor(newSizeFactor)
+    setHasBorder(true)
   }
 
   useEffect(() => {
@@ -414,8 +417,12 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
   return (
     <div className="root-wrapper" id="root-wrapper">
       <div className="maps-container" id="maps-container">
-        <canvas className="mosaic-canvas" id="maposaic-canvas" />
-        <div id="mapbox-wrapper" className="mapbox-wrapper" ref={(el) => (mapboxContainer.current = el)} />
+        <canvas className={`mosaic-canvas${hasBorder ? ' with-border' : ''}`} id="maposaic-canvas" />
+        <div
+          id="mapbox-wrapper"
+          className={`mapbox-wrapper${hasBorder ? ' with-border' : ''}`}
+          ref={(el) => (mapboxContainer.current = el)}
+        />
         <Spin
           className="maps-container__spin"
           spinning={isLoading}
