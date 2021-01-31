@@ -86,7 +86,7 @@ const Drawer = ({
       closable={true}
       width="min(100%,333px)"
     >
-      <Title level={3}>Colors</Title>
+      <Title level={4}>Colors</Title>
       <ColorConfig
         colorConfig={colorConfig}
         setColorConfig={setColorConfig}
@@ -95,7 +95,7 @@ const Drawer = ({
       />
 
       <Divider />
-      <Title level={3}>Background</Title>
+      <Title level={4}>Background</Title>
       <div className="drawer__backgroungs">
         {Object.values(MapboxStyle).map((style) => {
           return (
@@ -118,7 +118,7 @@ const Drawer = ({
         })}
       </div>
       <Divider />
-      <Title level={3}>Poster</Title>
+      <Title level={4}>Poster</Title>
       <div className="poster-options">
         <Select value={format} onSelect={handleFormatChange}>
           {FORMATS.map((format) => {
@@ -155,7 +155,7 @@ const Drawer = ({
       </div>
 
       <Divider />
-      <Title level={3}>
+      <Title level={4}>
         Scale
         <Tooltip className="scale-tooltip" title="Increase size and... waiting time">
           <InfoCircleOutlined />

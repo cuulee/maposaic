@@ -112,7 +112,7 @@ const ColorConfigChoice = ({
       <Divider />
 
       <div className="specific-colors">
-        <Title level={4}>Color Overrides</Title>
+        <Title level={5}>Color Overrides</Title>
         <div className="specific-colors__content">
           {Object.entries(specificColorTransforms).map(([colorKey, transform]) => (
             <div key={colorKey} className="specific-colors__color">
