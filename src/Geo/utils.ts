@@ -36,13 +36,14 @@ export const getPlaceNameFromGeoname = (data: GeonameData) => {
   const city = data.geodata.nearest[0]?.city[0]
   const timezone = data.geodata.nearest[0]?.timezone[0]
   const prov = data.geodata.nearest[0]?.prov[0]
-  const isCity = city && city.length
-  const isTimezone = timezone && timezone.length
-  const isProv = prov && prov.length
+  const isCity = !!city?.length
+  const isTimezone = !!timezone?.length
+  const isProv = !!prov?.length
 
   if (!isCity && !isTimezone && !isProv) {
     return null
   }
+  // eslint-disable-next-line
   return `${city}${isProv && ', '}${prov}${isTimezone && ', '}${timezone}`
 }
 
@@ -71,7 +72,6 @@ export const getPrefetchedRandomCoords = () => {
 
 // to fetch a lot of random coords
 export const fetchRandom = () => {
-  const coords = []
   const proms = []
   for (let i = 0; i < 1000; i++) {
     const prom = new Promise((resolve) => {
@@ -92,5 +92,6 @@ export const fetchRandom = () => {
       proms.push(prom)
   }
 
+  // eslint-disable-next-line no-console
   void Promise.all(proms).then((p) => console.log(p))
 }

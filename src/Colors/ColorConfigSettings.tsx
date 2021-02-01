@@ -233,7 +233,7 @@ const ColorConfigSettings = ({
                         disableAlpha
                       />
                     }
-                    key={paletteIndex}
+                    key={color}
                     placement="bottom"
                   >
                     <div className="palette-colors__color">
@@ -251,7 +251,11 @@ const ColorConfigSettings = ({
             >
               {PRESET_PALETTES[paletteOrigin].palettes.map((palette, index) => {
                 return (
-                  <Select.Option value={index} key={index} dropdownStyle={{ display: 'flex', alignItems: 'center' }}>
+                  <Select.Option
+                    value={index}
+                    key={palette.join('')}
+                    dropdownStyle={{ display: 'flex', alignItems: 'center' }}
+                  >
                     <div className="palette-colors">
                       {palette.map((hexColor) => {
                         return (

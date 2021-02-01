@@ -27,7 +27,8 @@ const CanvasDemo = (): JSX.Element => {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const onRender = async (map: mapboxgl.Map): Promise<void> => {
+    const onRender = (map: mapboxgl.Map) => {
+      // eslint-disable-next-line no-console
       console.log('render')
       setIsLoading(true)
       const mosaicCanvas = document.getElementById('mosaic-canvas') as HTMLCanvasElement
@@ -63,6 +64,7 @@ const CanvasDemo = (): JSX.Element => {
       const payload: WorkerPayload = { targetPixelArray: mosaicData.data, sourcePixelArray: mapboxPixels, size }
       worker.postMessage(payload)
       worker.onmessage = ({ data }: { data: WorkerResponse }) => {
+        // eslint-disable-next-line no-console
         console.log('received')
         mosaicData.data.set(data)
         mosaicContext.putImageData(mosaicData, 0, 0)

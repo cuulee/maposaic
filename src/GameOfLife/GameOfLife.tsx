@@ -16,16 +16,14 @@ const logArray = (arr: number[] | Uint8Array) => {
     }
     res.push(r)
   }
+  // eslint-disable-next-line no-console
   console.log('object', res)
 }
 
 const GameOfLife = () => {
   const [gameResult, setGameResult] = useState<null | string>(null)
   const loadMapConverter = () => {
-    // eslint-disable-next-line
-
     const universe = Universe.new()
-    // run()
     const size = Size.new(SIZE.w, SIZE.h)
 
     const a = convert_pixels(new Uint8Array(EXAMPLE), size, {
@@ -36,8 +34,6 @@ const GameOfLife = () => {
 
     logArray(EXAMPLE)
     logArray(a)
-
-    // console.log('convert_pixels', EXAMPLE, a)
 
     const renderLoop = () => {
       setGameResult(universe.render())
@@ -52,7 +48,6 @@ const GameOfLife = () => {
     loadMapConverter()
   }, [])
 
-  //   console.log(mapConverter)
   return (
     <div>
       <pre>{gameResult ?? "le jeu n'est pas disponible"}</pre>

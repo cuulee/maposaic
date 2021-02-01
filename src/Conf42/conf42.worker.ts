@@ -8,6 +8,7 @@ export type WorkerResponse = Uint8ClampedArray
 
 // Respond to message from parent thread
 ctx.onmessage = ({ data: { sourcePixelArray, targetPixelArray, size } }: { data: WorkerPayload }) => {
+  // eslint-disable-next-line no-console
   console.log('worker')
   const transformer = new CanvasDataTransformer(sourcePixelArray, targetPixelArray, size)
   transformer.paintTargetData()

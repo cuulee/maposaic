@@ -58,13 +58,14 @@ const Gallery = () => {
       })
       setPictures(newPictures)
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.log(e)
     }
   }
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search)
     const initialPictureId = urlParams.get(PICTURE_ID_PARAM)
-    fetchData(initialPictureId)
+    void fetchData(initialPictureId)
   }, [])
 
   useEffect(() => {
@@ -75,7 +76,7 @@ const Gallery = () => {
     } else {
       urlParams.set(PICTURE_ID_PARAM, pictureId)
     }
-    window.history.replaceState({}, '', `${window.location.pathname}?${urlParams}`)
+    window.history.replaceState({}, '', `${window.location.pathname}?${urlParams.toString()}`)
   }, [displayedIndex, pictures])
 
   const incrementPictureIndex = (increment: -1 | 1) => {
@@ -158,7 +159,7 @@ const Gallery = () => {
     if (!showMaposaicLink(picture) || !urlParams) {
       return
     }
-    window.open(`${window.location.origin}/?${urlParams}`)
+    window.open(`${window.location.origin}/?${urlParams.toString()}`)
   }
 
   return (

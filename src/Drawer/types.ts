@@ -1,6 +1,5 @@
 import { ColorConfig } from 'Colors/types'
 import { MapboxStyle, OnPosterSizeChangePayload, SpecificColorTransforms } from 'Maposaic/types'
-import { Dispatch, SetStateAction } from 'react'
 
 export type DrawerPropsType = {
   visible: boolean

@@ -152,6 +152,7 @@ const CloudUpload = ({
       setTaskState(UploadStatus.Error)
     }
   }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const memoizedOnComplete = useCallback(onComplete, [pictureDocumentId, anonymousUid])
 
   const onSnapshot = (snapshot: firebase.storage.UploadTaskSnapshot) => {
@@ -186,7 +187,7 @@ const CloudUpload = ({
 
   const onModalOk = () => {
     if (!isFormSubmitDisabled && !isFormUploaded) {
-      submitForm()
+      void submitForm()
     }
     setModalVisible(false)
   }

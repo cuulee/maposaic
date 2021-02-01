@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Button, Divider, InputNumber, Radio, Select, Tooltip } from 'antd'
+import { Button, InputNumber, Radio, Select, Tooltip } from 'antd'
 import Title from 'antd/lib/typography/Title'
 
 import { CloseOutlined, FormatPainterOutlined, InfoCircleOutlined } from '@ant-design/icons'
@@ -196,7 +196,7 @@ const Drawer = ({
             </Button>
             {(remainingTime || estimatedTime) && (
               <Badge className="scale__time" count={<ClockCircleOutlined style={{ color: PRIMARY_COLOR }} />}>
-                <span className="scale__time__box">{millisecondsToText(remainingTime || estimatedTime)}</span>
+                <span className="scale__time__box">{millisecondsToText(remainingTime ?? estimatedTime)}</span>
               </Badge>
             )}
           </div>

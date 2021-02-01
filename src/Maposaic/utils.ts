@@ -112,9 +112,11 @@ export const isWasmSuported = async () => {
 export const useCheckWasmAvailability = (setIsWasmAvailable: (wasm: boolean) => void) => {
   const checkWasmAvailability = async () => {
     if (await isWasmSuported()) {
+      // eslint-disable-next-line no-console
       console.log('wasm available')
       setIsWasmAvailable(true)
     } else {
+      // eslint-disable-next-line no-console
       console.log('wasm not available')
       setIsWasmAvailable(false)
     }

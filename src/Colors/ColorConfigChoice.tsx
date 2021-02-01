@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Button, Checkbox, Divider, Popover } from 'antd'
+import { Button, Checkbox, Popover } from 'antd'
 import { ChromePicker, ColorResult } from 'react-color'
 import Title from 'antd/lib/typography/Title'
 import {

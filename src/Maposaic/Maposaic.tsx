@@ -99,7 +99,7 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
       return
     }
     const urlParams = getURLParamsFromCoords(currentCenter, map.getZoom(), new URLSearchParams(window.location.search))
-    window.history.replaceState({}, '', `${window.location.pathname}?${urlParams}`)
+    window.history.replaceState({}, '', `${window.location.pathname}?${urlParams.toString()}`)
   }, [currentCenter, map])
 
   useEffect(() => {
@@ -107,7 +107,7 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
       return
     }
     const urlParams = getURLParamsFromColorConfig(colorConfig, new URLSearchParams(window.location.search))
-    window.history.replaceState({}, '', `${window.location.pathname}?${urlParams}`)
+    window.history.replaceState({}, '', `${window.location.pathname}?${urlParams.toString()}`)
   }, [colorConfig, isInitialUrlParamsParsed])
 
   useEffect(() => {
@@ -116,7 +116,7 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
     }
     const urlParams = new URLSearchParams(window.location.search)
     urlParams.set(MAPOSAIC_STYLE_URL_PARAM_KEY, mapboxStyle)
-    window.history.replaceState({}, '', `${window.location.pathname}?${urlParams}`)
+    window.history.replaceState({}, '', `${window.location.pathname}?${urlParams.toString()}`)
   }, [mapboxStyle, isInitialUrlParamsParsed])
 
   const setRandomCoords = async ({ setZoom, fetchFromApi }: { setZoom: boolean; fetchFromApi: boolean }) => {
@@ -174,7 +174,6 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
       const maposaicCanvas = document.getElementById('maposaic-canvas') as HTMLCanvasElement
 
       if (!gl || !gl.drawingBufferWidth || !maposaicCanvas) {
-        console.log('pas de gl')
         return
       }
       const mapboxCanvasSize = { w: gl.drawingBufferWidth, h: gl.drawingBufferHeight }
@@ -182,7 +181,7 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
 
       if (null === mapboxResolutionRatio) {
         // mapbox render with *2 resolution on some screens (like retina ones)
-        mapboxResolutionRatio = gl.drawingBufferWidth / (mapboxWrapper?.offsetWidth || 1)
+        mapboxResolutionRatio = gl.drawingBufferWidth / (mapboxWrapper?.offsetWidth ?? 1)
       }
 
       maposaicCanvas.setAttribute('width', maposaicCanvasSize.w.toString())
@@ -339,7 +338,7 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
     }
     const pixelCount = getMapboxPixelCount(map)
     setEstimatedTime(
-      Math.round(((computeTime.milliseconds || 0) * pixelCount) / (computeTime.pixelCount || 1)) *
+      Math.round(((computeTime.milliseconds ?? 0) * pixelCount) / (computeTime.pixelCount ?? 1)) *
         Math.pow(pendingSizeFactor / sizeFactor, 2),
     )
   }
@@ -353,10 +352,8 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
     }
   }
 
-  useEffect(() => {
-    onCurrentCenterChange()
-    // eslint-disable-next-line
-  }, [currentCenter])
+  // eslint-disable-next-line
+  useEffect(() => void onCurrentCenterChange(), [currentCenter])
 
   useEffect(() => {
     setShowPlaceNameTrigger(false)
@@ -382,7 +379,6 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
     setIsLoading(true)
     if (!navigator.geolocation) {
       setIsLoading(false)
-      console.log('Geolocation is not supported by your browser')
     } else {
       navigator.geolocation.getCurrentPosition(
         (position) => {

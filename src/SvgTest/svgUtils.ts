@@ -96,9 +96,9 @@ export type Path = {
 
 export const isColorSimilar = (color1: RGBColor, color2: RGBColor, similarColorTolerance?: number): boolean => {
   return (
-    Math.abs(color1.r - color2.r) < (similarColorTolerance || 1) &&
-    Math.abs(color1.g - color2.g) < (similarColorTolerance || 1) &&
-    Math.abs(color1.b - color2.b) < (similarColorTolerance || 1)
+    Math.abs(color1.r - color2.r) < (similarColorTolerance ?? 1) &&
+    Math.abs(color1.g - color2.g) < (similarColorTolerance ?? 1) &&
+    Math.abs(color1.b - color2.b) < (similarColorTolerance ?? 1)
   )
 }
 

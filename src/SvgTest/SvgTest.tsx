@@ -22,7 +22,6 @@ const SvgTest = () => {
     // svgElement?.setAttribute('height', canvasWidth.toString())
     const imageData = ctx?.getImageData(0, 0, canvasWidth, canvasWidth)
     if (!imageData) {
-      console.log('pas de ctx')
       return
     }
     const data = imageData.data
@@ -47,7 +46,6 @@ const SvgTest = () => {
     const canvasPath = new CanvasDataPath(data, canvasWidth, canvasWidth)
     const paths = canvasPath.getCanvasPaths()
     setPaths(paths)
-    // console.log('paths', paths)
   }, [])
   return (
     <div>

@@ -14,6 +14,7 @@ import {
   RGBColor,
 } from './svgUtils'
 
+/* eslint-disable  */
 export class CanvasDataPath {
   data: Uint8ClampedArray
   width: number
@@ -133,6 +134,7 @@ export class CanvasDataPath {
           this.toVisitBorderMap.set(adjacentPixel, adjacent.adjDeptCorner)
         }
         if (adjacentIndex === 3) {
+
           console.log(path)
           throw 'no adjacent found'
         }

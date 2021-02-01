@@ -29,6 +29,7 @@ export const postOrUpdatePicturesDocument = async ({
   anonymousUid,
 }: {
   documentId: string | null
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   payload: Record<string, any>
   anonymousUid: string | null
 }) => {
@@ -37,7 +38,7 @@ export const postOrUpdatePicturesDocument = async ({
 
   if (documentId) {
     const docRef = db.collection(PICTURE_COLLECTION_ID).doc(documentId)
-    docRef.update(sanethizedPayload)
+    void docRef.update(sanethizedPayload)
 
     return documentId
   }
@@ -48,20 +49,16 @@ export const postOrUpdatePicturesDocument = async ({
       .add({ ...sanethizedPayload, anonymousUid, timestamp: firebase.firestore.FieldValue.serverTimestamp() })
     return response.id
   } catch (e) {
-    console.log(e)
     return null
   }
 }
 
+/* eslint-disable */
 const sanethizePayload = (payload: Record<string, any>) => {
   const res: Record<string, any> = {}
   Object.keys(payload).forEach((key) => {
-    // eslint-disable-next-line
-    // @ts-ignore
-    // eslint-disable-next-line
     const value = payload[key]
     if (value !== undefined) {
-      // eslint-disable-next-line
       res[key] = value
     }
   })

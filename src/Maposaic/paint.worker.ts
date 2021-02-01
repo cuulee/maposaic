@@ -4,8 +4,6 @@ import { CanvasDataTransformer } from 'Canvas/CanvasDataTransformer'
 import { SpecificColorTransforms } from 'Maposaic/types'
 import { createColorSettings } from 'Colors/utils'
 
-const WHITE = 255 * 256 * 256 + 255 * 256 + 255
-
 onmessage = async ({
   data: {
     sourcePixelArray,
@@ -29,7 +27,6 @@ onmessage = async ({
     isWasmAvailable: boolean
   }
 }) => {
-  const t1 = new Date()
   let computedPixels: Uint8Array | Uint8ClampedArray = new Uint8Array()
 
   if (isWasmAvailable) {
@@ -53,8 +50,7 @@ onmessage = async ({
     canvasDataTransformer.paintTargetData()
     computedPixels = canvasDataTransformer.targetPixelArray
   }
-  const t2 = new Date()
-  console.log('fin', t2.getTime() - t1.getTime())
+
   // eslint-disable-next-line
   // @ts-ignore
   postMessage({ pixels: computedPixels, paintedBoundsMin: 0 })
