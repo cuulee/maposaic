@@ -37,6 +37,8 @@
   transition: transform 0.4s;
   position: absolute;
   left: 0;
+  overflow: scroll;
+  box-shadow: ~'0px 0px 10px rgb(0 0 0 / 10%)';
 
   &--hidden {
     transform: translateX(-100%);
@@ -61,12 +63,22 @@
     }
   }
   &__content {
-    padding: 16px 24px;
+    padding: 32px 16px;
     height: 100%;
     width: 100%;
+    background-color: @light-grey;
+    &__card {
+      padding: 16px;
+      background-color: white;
+      &:not(:first-child) {
+        margin-top: 32px;
+      }
+    }
   }
   &__backgroungs {
     display: flex;
+    width: 100%;
+    justify-content: space-around;
 
     &__background {
       cursor: pointer;

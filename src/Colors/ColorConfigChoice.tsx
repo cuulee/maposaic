@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Checkbox, Divider, Popover } from 'antd'
+import { Button, Checkbox, Divider, Popover } from 'antd'
 import { ChromePicker, ColorResult } from 'react-color'
 import Title from 'antd/lib/typography/Title'
 import {
@@ -28,6 +28,7 @@ const ColorConfigChoice = ({
   colorConfig: ColorConfig
   setColorConfig: (colorConfig: ColorConfig) => void
 }) => {
+  const [showOverrides, setShowOverrides] = useState(false)
   const [shadingColorConfig, setShadingColorConfig] = useState<ShadingColorConfig>(
     colorConfig.type === ColorConfigType.Shading ? colorConfig : DEFAULT_SHADING_CONFIG,
   )
@@ -109,48 +110,56 @@ const ColorConfigChoice = ({
         paletteColorConfig={paletteColorConfig}
         setPaletteColorConfig={setPaletteColorConfig}
       />
-      <Divider />
-
-      <div className="specific-colors">
-        <Title level={5}>Color Overrides</Title>
-        <div className="specific-colors__content">
-          {Object.entries(specificColorTransforms).map(([colorKey, transform]) => (
-            <div key={colorKey} className="specific-colors__color">
-              <Checkbox
-                checked={transform.color !== null}
-                onChange={(e) => onColorTransformChange(colorKey, e)}
-                className="specific-color-checks__check"
-              >
-                {`Same color for ${transform.name}`}
-              </Checkbox>
-              {transform.color && (
-                <Popover
-                  content={
-                    <ChromePicker
-                      color={specificColorPicks[colorKey]}
-                      onChange={(c) => {
-                        onSpecificColorPickerChange(c, colorKey)
-                      }}
-                      onChangeComplete={(c) => {
-                        onSpecificColorPickerChangeComplete(c, colorKey)
-                      }}
-                      disableAlpha
-                    />
-                  }
+      <Button
+        onClick={() => setShowOverrides(!showOverrides)}
+        className="color-choice__advanced"
+        style={{ paddingLeft: 0 }}
+        type="link"
+      >
+        Advanced
+      </Button>
+      {showOverrides && (
+        <div className="specific-colors specific-colors--animated">
+          <Title level={5}>Color Overrides</Title>
+          <div className="specific-colors__content">
+            {Object.entries(specificColorTransforms).map(([colorKey, transform]) => (
+              <div key={colorKey} className="specific-colors__color">
+                <Checkbox
+                  checked={transform.color !== null}
+                  onChange={(e) => onColorTransformChange(colorKey, e)}
+                  className="specific-color-checks__check"
                 >
-                  <div className="palette-colors__color">
-                    <div
-                      className="palette-colors__color__fill"
-                      style={{ backgroundColor: specificColorPicks[colorKey] }}
-                    />
-                  </div>
-                </Popover>
-              )}
-              <br />
-            </div>
-          ))}
+                  {`Same color for ${transform.name}`}
+                </Checkbox>
+                {transform.color && (
+                  <Popover
+                    content={
+                      <ChromePicker
+                        color={specificColorPicks[colorKey]}
+                        onChange={(c) => {
+                          onSpecificColorPickerChange(c, colorKey)
+                        }}
+                        onChangeComplete={(c) => {
+                          onSpecificColorPickerChangeComplete(c, colorKey)
+                        }}
+                        disableAlpha
+                      />
+                    }
+                  >
+                    <div className="palette-colors__color">
+                      <div
+                        className="palette-colors__color__fill"
+                        style={{ backgroundColor: specificColorPicks[colorKey] }}
+                      />
+                    </div>
+                  </Popover>
+                )}
+                <br />
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

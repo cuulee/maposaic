@@ -1,6 +1,8 @@
 .color-choice {
   &__configs {
     display: flex;
+    width: 100%;
+    justify-content: space-around;
     &__config {
       cursor: pointer;
       opacity: 0.7;
@@ -18,13 +20,29 @@
       }
     }
   }
+  &__advanced {
+    margin-top: 16px;
+  }
 }
 
 .specific-colors {
   margin-top: 16px;
 
+  &--animated {
+    animation: magic-appear 1s;
+  }
+
   &__color {
     display: flex;
     align-items: center;
+  }
+}
+
+@keyframes magic-appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
