@@ -28,16 +28,13 @@ import {
   OnPosterSizeChangePayload,
   SpecificColorTransforms,
 } from 'Maposaic/types'
-import { Size } from 'Canvas/types'
 import {
   getPosterTargetSize,
-  isMobile,
   resizeMapsContainer,
   setMapboxArtificialSize,
   setMapboxDisplaySize,
   toggleCanvasOpacity,
 } from 'Maposaic/elementHelpers'
-import { CM_PER_INCH, FORMAT_RATIO } from 'constants/dimensions'
 import { TOOLTIP_ENTER_DELAY } from 'constants/ux'
 import { MAPBOX_TOKEN } from 'constants/mapbox'
 import { fetchGeoRandom, getPlaceNameFromPosition, getPrefetchedRandomCoords, getRandomZoom } from 'Geo/utils'
@@ -61,7 +58,7 @@ let paintWorker = new PaintWorker()
 const getMapboxPixelCount = (map: mapboxgl.Map) => {
   const mapboxCanvas = map.getCanvas()
   const gl = mapboxCanvas.getContext('webgl')
-  return (gl?.drawingBufferWidth ?? 0) * (gl?.drawingBufferHeight || 0)
+  return (gl?.drawingBufferWidth ?? 0) * (gl?.drawingBufferHeight ?? 0)
 }
 
 const computeTime: { pixelCount: number | null; milliseconds: number | null } = {
@@ -392,6 +389,15 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
 
   return (
     <div className="root-wrapper" id="root-wrapper">
+      <div className="maps-container" id="maps-container">
+        <canvas className="mosaic-canvas" id="maposaic-canvas" />
+        <div id="mapbox-wrapper" className="mapbox-wrapper" ref={(el) => (mapboxContainer.current = el)} />
+        <Spin
+          className="maps-container__spin"
+          spinning={isLoading}
+          indicator={<img className="spinner" src={spinner} alt="spin" />}
+        />
+      </div>
       <Drawer
         visible={drawerVisible}
         setDrawerVisible={setDrawerVisible}
@@ -408,17 +414,6 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
         updateEstimatedTime={updateEstimatedTime}
         onPosterSizeChange={onPosterSizeChange}
       />
-      <div className="maps-wrapper" id="maps-wrapper">
-        <div className="maps-container" id="maps-container">
-          <canvas className="mosaic-canvas" id="maposaic-canvas" />
-          <div id="mapbox-wrapper" className="mapbox-wrapper" ref={(el) => (mapboxContainer.current = el)} />
-          <Spin
-            className="maps-container__spin"
-            spinning={isLoading}
-            indicator={<img className="spinner" src={spinner} alt="spin" />}
-          />
-        </div>
-      </div>
       <div className="overmap">
         <div className="overmap__actions">
           <Tooltip title="Settings" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
@@ -426,9 +421,7 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
               className="overmap__actions__button"
               type="primary"
               shape="circle"
-              onClick={() => {
-                setDrawerVisible(true)
-              }}
+              onClick={() => setDrawerVisible(true)}
               icon={<SettingOutlined />}
             />
           </Tooltip>

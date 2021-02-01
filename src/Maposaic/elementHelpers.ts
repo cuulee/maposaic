@@ -48,22 +48,13 @@ export const resizeMapsContainer = (size: Size) => {
   mosaicCanvas.style.height = size.h.toString() + 'px'
 }
 
-export const isMobile = () => {
-  const rootWrapper = document.getElementById('root-wrapper')
-  if (!rootWrapper) {
-    return true
-  }
-  console.log('ismobil', rootWrapper.offsetWidth)
-  return rootWrapper.offsetWidth < 800
-}
-
 export const getPosterTargetSize = ({
   isLandscape,
   longerPropertyCMLength,
   pixelPerInchResolution,
   mapboxResolutionRatio,
 }: OnPosterSizeChangePayload & { mapboxResolutionRatio: number | null }) => {
-  const mapsWrapper = document.getElementById('maps-wrapper')
+  const mapsWrapper = document.getElementById('root-wrapper')
   if (!mapsWrapper) {
     return { targetSize: null, newSizeFactor: 1 }
   }

@@ -30,11 +30,41 @@
 
 .drawer {
   height: 100%;
-  padding: 32px;
   background-color: white;
   z-index: 1;
   width: ~'min(100%, 288px)';
   min-width: ~'min(100%, 288px)';
+  transition: transform 0.4s;
+  position: absolute;
+  left: 0;
+
+  &--hidden {
+    transform: translateX(-100%);
+  }
+
+  &__header {
+    height: 48px;
+    padding: 16px 16px 16px 24px;
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
+    &__title {
+      display: flex;
+      align-items: center;
+    }
+    &__text {
+      margin-left: 8px;
+      font-weight: 600;
+      font-size: 20px;
+    }
+  }
+  &__content {
+    padding: 16px 24px;
+    height: 100%;
+    width: 100%;
+  }
   &__backgroungs {
     display: flex;
 
