@@ -30,6 +30,7 @@ import {
 } from 'Maposaic/types'
 import {
   getPosterTargetSize,
+  isMobile,
   resizeMapsContainer,
   setMapboxArtificialSize,
   setMapboxDisplaySize,
@@ -54,6 +55,7 @@ const DISPLAY_PIXEL_RATIO = 1
 
 let mapboxResolutionRatio: number | null = null
 let paintWorker = new PaintWorker()
+let isFirstRender = true
 
 const getMapboxPixelCount = (map: mapboxgl.Map) => {
   const mapboxCanvas = map.getCanvas()
@@ -224,7 +226,7 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
       }
     }
     if (null === isWasmAvailable) {
-      return // avoid flashing at initalization
+      return // avoid flash at initalization
     }
     if (!initialCenter) {
       return
@@ -242,13 +244,17 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
       center,
       maxTileCacheSize: 0,
     })
+
     newMap.on('load', () => {
+      if (isFirstRender) {
+        isFirstRender = false
+        if (!isMobile()) {
+          setDrawerVisible(true)
+        }
+      }
       setMap(newMap)
     })
-
-    newMap.on('resize', () => {
-      setSizeRender((s) => s + 1)
-    })
+    newMap.on('resize', () => setSizeRender((s) => s + 1))
     newMap.on('dragstart', toggleCanvasOpacity)
     newMap.on('zoomstart', toggleCanvasOpacity)
 
@@ -261,7 +267,7 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
       }
 
       const pixelCount = getMapboxPixelCount(newMap)
-      setRemainingTime(Math.round(((computeTime.milliseconds || 0) * pixelCount) / (computeTime.pixelCount || 1)))
+      setRemainingTime(Math.round(((computeTime.milliseconds ?? 0) * pixelCount) / (computeTime.pixelCount ?? 1)))
 
       lastStartDate = new Date()
       paintWorker = new PaintWorker()
