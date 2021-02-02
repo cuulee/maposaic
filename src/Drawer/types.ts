@@ -16,4 +16,5 @@ export type DrawerPropsType = {
   onPosterSizeChange: (p: OnPosterSizeChangePayload) => void
   colorConfig: ColorConfig
   setColorConfig: (colorConfig: ColorConfig) => void
+  isMobile: boolean
 }

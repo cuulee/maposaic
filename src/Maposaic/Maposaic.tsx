@@ -30,7 +30,6 @@ import {
 } from 'Maposaic/types'
 import {
   getPosterTargetSize,
-  isMobile,
   resizeMapsContainer,
   setMapboxArtificialSize,
   setMapboxDisplaySize,
@@ -43,7 +42,12 @@ import PlaceName from 'PlaceName/PlaceName'
 import GeoSearch from 'Geo/GeoSearchInput'
 import { createMaposaicColors } from 'Colors/utils'
 import { MAPBOX_STYLES } from 'Maposaic/constants'
-import { getColorConfigFromURLParams, getURLParamsFromColorConfig, getURLParamsFromCoords } from 'Maposaic/utils'
+import {
+  getColorConfigFromURLParams,
+  getURLParamsFromColorConfig,
+  getURLParamsFromCoords,
+  useCheckMobileScreen,
+} from 'Maposaic/utils'
 import { UploadButton } from 'CloudUpload/UploadButton'
 
 const CloudUpload = React.lazy(() => import('CloudUpload/CloudUpload'))
@@ -72,6 +76,7 @@ let lastStartDate = new Date()
 
 const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): JSX.Element => {
   const history = useHistory()
+  const [isMobile, setIsMobile] = useState(false)
   const [isInitialUrlParamsParsed, setIsInitialUrlParamsParsed] = useState(false)
   const [map, setMap] = useState<mapboxgl.Map | null>(null)
   const mapboxContainer = useRef<HTMLDivElement | null>(null)
@@ -93,6 +98,8 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
     [ROAD_SIMPLE_WHITE]: { color: ROAD_WHITE, isEditable: true, name: 'roads' },
     [WATER_CYAN]: { color: null, isEditable: true, name: 'water' },
   })
+
+  useCheckMobileScreen({ setIsMobile })
 
   useEffect(() => {
     if (!currentCenter || !map) {
@@ -247,7 +254,7 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
     newMap.on('load', () => {
       if (isFirstRender) {
         isFirstRender = false
-        if (!isMobile()) {
+        if (!isMobile) {
           setDrawerVisible(true)
         }
       }
@@ -415,6 +422,7 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
         estimatedTime={estimatedTime}
         updateEstimatedTime={updateEstimatedTime}
         onPosterSizeChange={onPosterSizeChange}
+        isMobile={isMobile}
       />
       <div className="overmap">
         <div className="overmap__actions">

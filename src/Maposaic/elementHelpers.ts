@@ -84,7 +84,3 @@ export const getPosterTargetSize = ({
 
   return { targetSize, newSizeFactor }
 }
-
-export const isMobile = () => {
-  return window.innerWidth < 800
-}

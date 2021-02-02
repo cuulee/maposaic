@@ -127,3 +127,13 @@ export const useCheckWasmAvailability = (setIsWasmAvailable: (wasm: boolean) => 
     // eslint-disable-next-line
   }, [])
 }
+
+export const useCheckMobileScreen = ({ setIsMobile }: { setIsMobile: (isMobile: boolean) => void }) => {
+  useEffect(() => {
+    window.addEventListener('resize', () => setIsMobile(window.innerWidth <= 768))
+    return () => {
+      window.removeEventListener('resize', () => setIsMobile(window.innerWidth <= 768))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+}

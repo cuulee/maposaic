@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Button, InputNumber, Radio, Select, Tooltip } from 'antd'
+import { Drawer as AntDrawer, Button, InputNumber, Radio, Select, Tooltip } from 'antd'
 import Title from 'antd/lib/typography/Title'
 
 import { CloseOutlined, FormatPainterOutlined, InfoCircleOutlined } from '@ant-design/icons'
@@ -40,6 +40,7 @@ const Drawer = ({
   estimatedTime,
   updateEstimatedTime,
   onPosterSizeChange,
+  isMobile,
 }: DrawerPropsType) => {
   const [localSizeFactor, setLocalSizeFactor] = useState(sizeFactor)
   const [isLandscape, setIsLandscape] = useState<boolean | null>(null)
@@ -81,18 +82,21 @@ const Drawer = ({
   }
 
   return (
-    <div className={`drawer${visible ? '' : ' drawer--hidden'}`}>
+    <AntDrawer
+      visible={visible}
+      placement="left"
+      onClose={() => setDrawerVisible(false)}
+      closable={true}
+      width="min(100%,333px)"
+      bodyStyle={{ padding: 0 }}
+      mask={isMobile}
+      closeIcon={<CloseOutlined style={{ color: PRIMARY_COLOR }} />}
+    >
       <div className="drawer__header">
         <div className="drawer__header__title">
           <img width="16px" src={spinner} alt="logo" />
           <div className="drawer__header__text">Settings</div>
         </div>
-        <Button
-          onClick={() => setDrawerVisible(false)}
-          shape="circle"
-          icon={<CloseOutlined style={{ color: PRIMARY_COLOR }} />}
-          type="text"
-        />
       </div>
       <div className="drawer__content">
         <div className="drawer__content__card">
@@ -202,7 +206,8 @@ const Drawer = ({
           </div>
         </div>
       </div>
-    </div>
+      {/* </div> */}
+    </AntDrawer>
   )
 }
 
