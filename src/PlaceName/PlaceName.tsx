@@ -1,36 +1,18 @@
 import { CompassOutlined } from '@ant-design/icons'
 import { Button } from 'antd'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import 'PlaceName/placeName.style.less'
 
-const PlaceName = ({
-  placeName,
-  showPlaceNameTrigger,
-}: {
-  placeName: string | null
-  showPlaceNameTrigger: boolean
-}) => {
+const PlaceName = ({ placeName, showPlaceNameTrigger }: { placeName: string | null; showPlaceNameTrigger: number }) => {
   const [isTextDisplayed, setIsTextDisplayed] = useState(false)
-  const [isFirstRender, setIsFirstRender] = useState(true)
-
   useEffect(() => {
-    if (showPlaceNameTrigger) {
-      setIsFirstRender(false)
+    if (!showPlaceNameTrigger || isTextDisplayed) {
+      return
     }
-  }, [isFirstRender, showPlaceNameTrigger])
+    setIsTextDisplayed(true)
+    setTimeout(() => setIsTextDisplayed(false), 4000)
 
-  const showPlaceNameTriggerRef = useRef<undefined | boolean>()
-  useEffect(() => {
-    if (!showPlaceNameTriggerRef.current && showPlaceNameTrigger) {
-      if (isTextDisplayed) {
-        return
-      }
-      setIsTextDisplayed(true)
-      setTimeout(() => setIsTextDisplayed(false), 4000)
-    }
-
-    showPlaceNameTriggerRef.current = showPlaceNameTrigger
     // eslint-disable-next-line
   }, [showPlaceNameTrigger])
 
@@ -42,7 +24,7 @@ const PlaceName = ({
     if (isTextDisplayed) {
       return 'place-name--displayed'
     }
-    if (isFirstRender) {
+    if (!showPlaceNameTrigger) {
       return 'place-name--hidden'
     }
     return 'place-name--hidden place-name--hidden--animation'

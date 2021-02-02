@@ -60,6 +60,7 @@ const DISPLAY_PIXEL_RATIO = 1
 let mapboxResolutionRatio: number | null = null
 let paintWorker = new PaintWorker()
 let isFirstRender = true
+let lastFetchedPlaceNameCenter: mapboxgl.LngLat | null = null
 
 const getMapboxPixelCount = (map: mapboxgl.Map) => {
   const mapboxCanvas = map.getCanvas()
@@ -92,8 +93,7 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
   const [sizeFactor, setSizeFactor] = useState(INITIAL_SIZE_FACTOR)
   const [initialCenter, setInitialCenter] = useState<null | mapboxgl.LngLat>(null)
   const [initialZoom, setInitialZoom] = useState<number>(getRandomZoom())
-  const [showPlaceNameTrigger, setShowPlaceNameTrigger] = useState(false)
-  const [showPlaceNameWhenFetched, setShowPlaceNameWhenFetched] = useState(false)
+  const [showPlaceNameTrigger, setShowPlaceNameTrigger] = useState(0)
   const [specificColorTransforms, setSpecificColorTransforms] = useState<SpecificColorTransforms>({
     [ROAD_SIMPLE_WHITE]: { color: ROAD_WHITE, isEditable: true, name: 'roads' },
     [WATER_CYAN]: { color: null, isEditable: true, name: 'water' },
@@ -128,7 +128,8 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
   const setRandomCoords = async ({ setZoom, fetchFromApi }: { setZoom: boolean; fetchFromApi: boolean }) => {
     setIsLoading(true)
     const randomCenter = fetchFromApi ? await fetchGeoRandom() : getPrefetchedRandomCoords()
-    setShowPlaceNameWhenFetched(true)
+    void fetchAndSetPlaceName({ showPlaceName: true, center: randomCenter })
+
     if (initialZoom === null && setZoom) {
       setInitialZoom(getRandomZoom())
     }
@@ -151,7 +152,9 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
     const lng = urlParams.get(MaposaicGeoURLParamKey.Lng)
     const zoom = urlParams.get(MaposaicGeoURLParamKey.Zoom)
     if (lat && lng) {
-      setInitialCenter(new mapboxgl.LngLat(parseFloat(lng), parseFloat(lat)))
+      const center = new mapboxgl.LngLat(parseFloat(lng), parseFloat(lat))
+      void fetchAndSetPlaceName({ showPlaceName: true, center })
+      setInitialCenter(center)
     } else {
       void setRandomCoords({ setZoom: !zoom, fetchFromApi: false })
     }
@@ -349,21 +352,33 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
     )
   }
 
-  const onCurrentCenterChange = async () => {
-    const placeName = await getPlaceNameFromPosition(currentCenter)
+  const fetchAndSetPlaceName = async ({
+    showPlaceName,
+    center,
+  }: {
+    showPlaceName: boolean
+    center: mapboxgl.LngLat | null
+  }) => {
+    if (
+      !center ||
+      (lastFetchedPlaceNameCenter &&
+        Math.abs(lastFetchedPlaceNameCenter.lat - (center?.lat || 0)) < 0.0001 &&
+        Math.abs(lastFetchedPlaceNameCenter.lng - (center?.lng || 0)) < 0.0001)
+    ) {
+      return
+    }
+    lastFetchedPlaceNameCenter = center
+    const placeName = await getPlaceNameFromPosition(center)
     setPlaceName(placeName)
-    if (showPlaceNameWhenFetched) {
-      setShowPlaceNameTrigger(true)
-      setShowPlaceNameWhenFetched(false)
+    if (showPlaceName) {
+      setShowPlaceNameTrigger(showPlaceNameTrigger + 1)
     }
   }
 
-  // eslint-disable-next-line
-  useEffect(() => void onCurrentCenterChange(), [currentCenter])
-
   useEffect(() => {
-    setShowPlaceNameTrigger(false)
-  }, [showPlaceNameTrigger])
+    void fetchAndSetPlaceName({ showPlaceName: false, center: currentCenter })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentCenter])
 
   const download = () => {
     const mosaicElement = document.getElementById('maposaic-canvas') as HTMLCanvasElement | null
