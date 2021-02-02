@@ -100,7 +100,6 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
   })
 
   useCheckMobileScreen({ setIsMobile })
-
   useEffect(() => {
     if (!currentCenter || !map) {
       return

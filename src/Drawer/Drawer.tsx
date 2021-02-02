@@ -200,7 +200,9 @@ const Drawer = ({
             </Button>
             {(remainingTime || estimatedTime) && (
               <Badge className="scale__time" count={<ClockCircleOutlined style={{ color: PRIMARY_COLOR }} />}>
-                <span className="scale__time__box">{millisecondsToText(remainingTime ?? estimatedTime)}</span>
+                <span className="scale__time__box">
+                  {millisecondsToText(remainingTime ? remainingTime : estimatedTime)}
+                </span>
               </Badge>
             )}
           </div>
