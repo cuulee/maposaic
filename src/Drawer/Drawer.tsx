@@ -15,6 +15,7 @@ import { MapboxStyle } from 'Maposaic/types'
 import { MAPBOX_STYLES } from 'Maposaic/constants'
 import spinner from 'assets/spinner.png'
 import githubMark from 'assets/GitHub-Mark.png'
+import { TOOLTIP_ENTER_DELAY } from 'constants/ux'
 
 const millisecondsToText = (millis: number | null) => {
   const min = Math.floor((millis ?? 0) / 60000)
@@ -215,7 +216,9 @@ const Drawer = ({
             onClick={() => window.open('https://github.com/viconnex/maposaic', '_blank')}
             className="drawer__content__footer"
           >
-            <img className="drawer__content__footer__image" width="24px" src={githubMark} alt="github-link" />
+            <Tooltip title="Source code" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
+              <img className="drawer__content__footer__image" width="24px" src={githubMark} alt="github-link" />
+            </Tooltip>
           </div>
         </div>
       </div>
