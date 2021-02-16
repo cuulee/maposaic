@@ -14,6 +14,7 @@ import { DrawerPropsType } from 'Drawer/types'
 import { MapboxStyle } from 'Maposaic/types'
 import { MAPBOX_STYLES } from 'Maposaic/constants'
 import spinner from 'assets/spinner.png'
+import githubMark from 'assets/GitHub-Mark.png'
 
 const millisecondsToText = (millis: number | null) => {
   const min = Math.floor((millis ?? 0) / 60000)
@@ -92,123 +93,132 @@ const Drawer = ({
       mask={isMobile}
       closeIcon={<CloseOutlined style={{ color: PRIMARY_COLOR }} />}
     >
-      <div className="drawer__header">
-        <div className="drawer__header__title">
-          <img width="16px" src={spinner} alt="logo" />
-          <div className="drawer__header__text">Settings</div>
+      <div className="drawer">
+        <div className="drawer__header">
+          <div className="drawer__header__title">
+            <img width="16px" src={spinner} alt="logo" />
+            <div className="drawer__header__text">Settings</div>
+          </div>
         </div>
-      </div>
-      <div className="drawer__content">
-        <div className="drawer__content__card">
-          <Title level={5}>Colors</Title>
-          <ColorConfig
-            colorConfig={colorConfig}
-            setColorConfig={setColorConfig}
-            specificColorTransforms={specificColorTransforms}
-            setNewSpecificColorTransforms={setNewSpecificColorTransforms}
-          />
-        </div>
-        <div className="drawer__content__card">
-          <Title level={5}>Background</Title>
-          <div className="drawer__backgroungs">
-            {Object.values(MapboxStyle).map((style) => {
-              return (
-                <div
-                  className={`drawer__backgroungs__background${
-                    mapboxStyle === style ? ' drawer__backgroungs__background--selected' : ''
-                  }`}
-                  onClick={() => changeMapStyle(style)}
-                  key={style}
+        <div className="drawer__content">
+          <div className="drawer__content__cards">
+            <div className="drawer__content__cards__card">
+              <Title level={5}>Colors</Title>
+              <ColorConfig
+                colorConfig={colorConfig}
+                setColorConfig={setColorConfig}
+                specificColorTransforms={specificColorTransforms}
+                setNewSpecificColorTransforms={setNewSpecificColorTransforms}
+              />
+            </div>
+            <div className="drawer__content__cards__card">
+              <Title level={5}>Background</Title>
+              <div className="drawer__backgroungs">
+                {Object.values(MapboxStyle).map((style) => {
+                  return (
+                    <div
+                      className={`drawer__backgroungs__background${
+                        mapboxStyle === style ? ' drawer__backgroungs__background--selected' : ''
+                      }`}
+                      onClick={() => changeMapStyle(style)}
+                      key={style}
+                    >
+                      <div>{MAPBOX_STYLES[style].name}</div>
+                      <img
+                        className={`background-image${mapboxStyle === style ? ' background-image--selected' : ''}`}
+                        width="60px"
+                        alt={style}
+                        src={MAPBOX_STYLES[style].imgPath}
+                      />
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+            <div className="drawer__content__cards__card">
+              <Title level={5}>Poster</Title>
+              <div className="poster-options">
+                <Select value={format} onSelect={handleFormatChange}>
+                  {FORMATS.map((format) => {
+                    return (
+                      <Select.Option value={format} key={format}>
+                        {format}
+                      </Select.Option>
+                    )
+                  })}
+                </Select>
+                <Radio.Group
+                  style={{ display: 'flex', alignItems: 'center' }}
+                  name="preset"
+                  value={isLandscape}
+                  size="small"
+                  className="poster-options__landscape"
                 >
-                  <div>{MAPBOX_STYLES[style].name}</div>
-                  <img
-                    className={`background-image${mapboxStyle === style ? ' background-image--selected' : ''}`}
-                    width="60px"
-                    alt={style}
-                    src={MAPBOX_STYLES[style].imgPath}
-                  />
-                </div>
-              )
-            })}
-          </div>
-        </div>
-        <div className="drawer__content__card">
-          <Title level={5}>Poster</Title>
-          <div className="poster-options">
-            <Select value={format} onSelect={handleFormatChange}>
-              {FORMATS.map((format) => {
-                return (
-                  <Select.Option value={format} key={format}>
-                    {format}
-                  </Select.Option>
-                )
-              })}
-            </Select>
-            <Radio.Group
-              style={{ display: 'flex', alignItems: 'center' }}
-              name="preset"
-              value={isLandscape}
-              size="small"
-              className="poster-options__landscape"
-            >
-              <Radio.Button
-                style={{ width: '29px', height: '21px', ...radioStyle }}
-                onClick={() => handleOrientationChange(true)}
-                value={true}
-              >
-                A
-              </Radio.Button>
-              <Radio.Button
-                onClick={() => handleOrientationChange(false)}
-                style={{
-                  width: '21px',
-                  height: '29px',
-                  marginLeft: '12px',
-                  ...radioStyle,
-                }}
-                value={false}
-              >
-                A
-              </Radio.Button>
-            </Radio.Group>
-          </div>
-        </div>
+                  <Radio.Button
+                    style={{ width: '29px', height: '21px', ...radioStyle }}
+                    onClick={() => handleOrientationChange(true)}
+                    value={true}
+                  >
+                    A
+                  </Radio.Button>
+                  <Radio.Button
+                    onClick={() => handleOrientationChange(false)}
+                    style={{
+                      width: '21px',
+                      height: '29px',
+                      marginLeft: '12px',
+                      ...radioStyle,
+                    }}
+                    value={false}
+                  >
+                    A
+                  </Radio.Button>
+                </Radio.Group>
+              </div>
+            </div>
 
-        <div className="drawer__content__card">
-          <Title level={5}>
-            Scale
-            <Tooltip className="scale-tooltip" title="Increase size and... waiting time">
-              <InfoCircleOutlined />
-            </Tooltip>
-          </Title>
-          <div className="scale">
-            <InputNumber
-              min={0}
-              max={10}
-              step={0.1}
-              value={Math.round(localSizeFactor * 10) / 10}
-              onChange={onScaleChange}
-              style={{ width: '68px' }}
-            />
-            <Button
-              className="scale__paint"
-              disabled={sizeFactor === localSizeFactor}
-              onClick={applyGranularity}
-              icon={<FormatPainterOutlined />}
-            >
-              Apply
-            </Button>
-            {(remainingTime || estimatedTime) && (
-              <Badge className="scale__time" count={<ClockCircleOutlined style={{ color: PRIMARY_COLOR }} />}>
-                <span className="scale__time__box">
-                  {millisecondsToText(remainingTime ? remainingTime : estimatedTime)}
-                </span>
-              </Badge>
-            )}
+            <div className="drawer__content__cards__card">
+              <Title level={5}>
+                Scale
+                <Tooltip className="scale-tooltip" title="Increase size and... waiting time">
+                  <InfoCircleOutlined />
+                </Tooltip>
+              </Title>
+              <div className="scale">
+                <InputNumber
+                  min={0}
+                  max={10}
+                  step={0.1}
+                  value={Math.round(localSizeFactor * 10) / 10}
+                  onChange={onScaleChange}
+                  style={{ width: '68px' }}
+                />
+                <Button
+                  className="scale__paint"
+                  disabled={sizeFactor === localSizeFactor}
+                  onClick={applyGranularity}
+                  icon={<FormatPainterOutlined />}
+                >
+                  Apply
+                </Button>
+                {(remainingTime || estimatedTime) && (
+                  <Badge className="scale__time" count={<ClockCircleOutlined style={{ color: PRIMARY_COLOR }} />}>
+                    <span className="scale__time__box">
+                      {millisecondsToText(remainingTime ? remainingTime : estimatedTime)}
+                    </span>
+                  </Badge>
+                )}
+              </div>
+            </div>
+          </div>
+          <div
+            onClick={() => window.open('https://github.com/viconnex/maposaic', '_blank')}
+            className="drawer__content__footer"
+          >
+            <img className="drawer__content__footer__image" width="24px" src={githubMark} alt="github-link" />
           </div>
         </div>
       </div>
-      {/* </div> */}
     </AntDrawer>
   )
 }
