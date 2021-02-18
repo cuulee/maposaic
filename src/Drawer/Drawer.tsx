@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react'
-import { Drawer as AntDrawer, Button, InputNumber, Radio, Select, Tooltip } from 'antd'
+import React, { useState } from 'react'
+import { Drawer as AntDrawer, Radio, Select, Tooltip } from 'antd'
 import Title from 'antd/lib/typography/Title'
 
-import { CloseOutlined, FormatPainterOutlined, InfoCircleOutlined } from '@ant-design/icons'
+import { CloseOutlined, InfoCircleOutlined } from '@ant-design/icons'
 import { Badge } from 'antd'
 import { ClockCircleOutlined } from '@ant-design/icons'
 
@@ -32,34 +32,17 @@ const Drawer = ({
   setDrawerVisible,
   mapboxStyle,
   changeMapStyle,
-  sizeFactor,
-  setNewSizeFactor,
   colorConfig,
   setColorConfig,
   specificColorTransforms,
   setNewSpecificColorTransforms,
   remainingTime,
   estimatedTime,
-  updateEstimatedTime,
   onPosterSizeChange,
   isMobile,
 }: DrawerPropsType) => {
-  const [localSizeFactor, setLocalSizeFactor] = useState(sizeFactor)
   const [isLandscape, setIsLandscape] = useState<boolean | null>(null)
   const [format, setFormat] = useState<Format>(Format.A4)
-
-  useEffect(() => setLocalSizeFactor(sizeFactor), [sizeFactor])
-
-  const onScaleChange = (value: number | undefined | string) => {
-    if (value !== undefined && typeof value !== 'string') {
-      updateEstimatedTime(value)
-      setLocalSizeFactor(value)
-    }
-  }
-
-  const applyGranularity = () => {
-    setNewSizeFactor(localSizeFactor)
-  }
 
   const handleOrientationChange = (newIsLandscape: boolean) => {
     const newValue = newIsLandscape === isLandscape ? null : newIsLandscape
@@ -137,74 +120,54 @@ const Drawer = ({
               </div>
             </div>
             <div className="drawer__content__cards__card">
-              <Title level={5}>Poster</Title>
-              <div className="poster-options">
-                <Select value={format} onSelect={handleFormatChange}>
-                  {FORMATS.map((format) => {
-                    return (
-                      <Select.Option value={format} key={format}>
-                        {format}
-                      </Select.Option>
-                    )
-                  })}
-                </Select>
-                <Radio.Group
-                  style={{ display: 'flex', alignItems: 'center' }}
-                  name="preset"
-                  value={isLandscape}
-                  size="small"
-                  className="poster-options__landscape"
-                >
-                  <Radio.Button
-                    style={{ width: '29px', height: '21px', ...radioStyle }}
-                    onClick={() => handleOrientationChange(true)}
-                    value={true}
-                  >
-                    A
-                  </Radio.Button>
-                  <Radio.Button
-                    onClick={() => handleOrientationChange(false)}
-                    style={{
-                      width: '21px',
-                      height: '29px',
-                      marginLeft: '12px',
-                      ...radioStyle,
-                    }}
-                    value={false}
-                  >
-                    A
-                  </Radio.Button>
-                </Radio.Group>
-              </div>
-            </div>
-
-            <div className="drawer__content__cards__card">
               <Title level={5}>
-                Scale
-                <Tooltip className="scale-tooltip" title="Increase size and... waiting time">
+                Poster
+                <Tooltip className="poster-tooltip" title="300 pixels per inch">
                   <InfoCircleOutlined />
                 </Tooltip>
               </Title>
-              <div className="scale">
-                <InputNumber
-                  min={0}
-                  max={10}
-                  step={0.1}
-                  value={Math.round(localSizeFactor * 10) / 10}
-                  onChange={onScaleChange}
-                  style={{ width: '68px' }}
-                />
-                <Button
-                  className="scale__paint"
-                  disabled={sizeFactor === localSizeFactor}
-                  onClick={applyGranularity}
-                  icon={<FormatPainterOutlined />}
-                >
-                  Apply
-                </Button>
+              <div className="poster">
+                <div className="poster__settings">
+                  <Select value={format} onSelect={handleFormatChange}>
+                    {FORMATS.map((format) => {
+                      return (
+                        <Select.Option value={format} key={format}>
+                          {format}
+                        </Select.Option>
+                      )
+                    })}
+                  </Select>
+                  <Radio.Group
+                    style={{ display: 'flex', alignItems: 'center' }}
+                    name="preset"
+                    value={isLandscape}
+                    size="small"
+                    className="poster__settings__landscape"
+                  >
+                    <Radio.Button
+                      style={{ width: '29px', height: '21px', ...radioStyle }}
+                      onClick={() => handleOrientationChange(true)}
+                      value={true}
+                    >
+                      A
+                    </Radio.Button>
+                    <Radio.Button
+                      onClick={() => handleOrientationChange(false)}
+                      style={{
+                        width: '21px',
+                        height: '29px',
+                        marginLeft: '12px',
+                        ...radioStyle,
+                      }}
+                      value={false}
+                    >
+                      A
+                    </Radio.Button>
+                  </Radio.Group>
+                </div>
                 {(remainingTime || estimatedTime) && (
-                  <Badge className="scale__time" count={<ClockCircleOutlined style={{ color: PRIMARY_COLOR }} />}>
-                    <span className="scale__time__box">
+                  <Badge className="poster__time" count={<ClockCircleOutlined style={{ color: PRIMARY_COLOR }} />}>
+                    <span className="poster__time__box">
                       {millisecondsToText(remainingTime ? remainingTime : estimatedTime)}
                     </span>
                   </Badge>

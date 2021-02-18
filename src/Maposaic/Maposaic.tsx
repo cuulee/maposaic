@@ -428,13 +428,10 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
         mapboxStyle={mapboxStyle}
         colorConfig={colorConfig}
         setColorConfig={setNewColorConfig}
-        sizeFactor={sizeFactor}
-        setNewSizeFactor={setNewSizeFactor}
         specificColorTransforms={specificColorTransforms}
         setNewSpecificColorTransforms={setNewSpecificColorTransforms}
         remainingTime={remainingTime}
         estimatedTime={estimatedTime}
-        updateEstimatedTime={updateEstimatedTime}
         onPosterSizeChange={onPosterSizeChange}
         isMobile={isMobile}
       />

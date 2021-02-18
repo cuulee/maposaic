@@ -1,9 +1,16 @@
-.scale-tooltip {
+.poster-tooltip {
   margin-left: 8px;
 }
-.scale {
+
+.poster {
   display: flex;
-  align-items: center;
+  justify-content: space-between;
+  &__settings {
+    display: flex;
+    &__landscape {
+      margin-left: 16px;
+    }
+  }
   &__time {
     margin-left: 16px;
     &__box {
@@ -16,15 +23,6 @@
       align-items: center;
       padding: 0 4px;
     }
-  }
-  &__paint {
-    margin-left: 16px;
-  }
-}
-.poster-options {
-  display: flex;
-  &__landscape {
-    margin-left: 16px;
   }
 }
 

@@ -6,13 +6,10 @@ export type DrawerPropsType = {
   setDrawerVisible: (visible: boolean) => void
   mapboxStyle: string
   changeMapStyle: (style: MapboxStyle) => void
-  sizeFactor: number
-  setNewSizeFactor: (sizeFactor: number) => void
   specificColorTransforms: SpecificColorTransforms
   setNewSpecificColorTransforms: (colors: SpecificColorTransforms) => void
   remainingTime: number | null
   estimatedTime: number | null
-  updateEstimatedTime: (sizeFactor: number) => void
   onPosterSizeChange: (p: OnPosterSizeChangePayload) => void
   colorConfig: ColorConfig
   setColorConfig: (colorConfig: ColorConfig) => void
