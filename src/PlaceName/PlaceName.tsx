@@ -11,7 +11,6 @@ const PlaceName = ({ placeName, showPlaceNameTrigger }: { placeName: string | nu
       return
     }
     setIsTextDisplayed(true)
-    setTimeout(() => setIsTextDisplayed(false), 5555)
 
     // eslint-disable-next-line
   }, [showPlaceNameTrigger])
