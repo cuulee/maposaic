@@ -3,6 +3,7 @@ import { GeocodingData, GeonameData, PlaceType } from 'types/geo'
 import mapboxgl from 'mapbox-gl'
 import { GEOCODING_BASE_URL } from 'Geo/constants'
 import { PREFETCHED_RANDOM_COORDS } from 'Geo/geoRandom'
+import { CITIES } from 'Geo/cities'
 
 export const PLACE_TYPE_RELEVANCE = [
   PlaceType.Place,
@@ -67,6 +68,11 @@ export const getRandomZoom = () => {
 
 export const getPrefetchedRandomCoords = () => {
   const coords = PREFETCHED_RANDOM_COORDS[Math.floor(Math.random() * PREFETCHED_RANDOM_COORDS.length)]
+  return new mapboxgl.LngLat(coords[0], coords[1])
+}
+
+export const getRandomCityCoords = () => {
+  const coords = CITIES[Math.floor(Math.random() * CITIES.length)]
   return new mapboxgl.LngLat(coords[0], coords[1])
 }
 

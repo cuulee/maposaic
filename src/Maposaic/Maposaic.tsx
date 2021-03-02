@@ -37,7 +37,13 @@ import {
 } from 'Maposaic/elementHelpers'
 import { TOOLTIP_ENTER_DELAY } from 'constants/ux'
 import { MAPBOX_TOKEN } from 'constants/mapbox'
-import { fetchGeoRandom, getPlaceNameFromPosition, getPrefetchedRandomCoords, getRandomZoom } from 'Geo/utils'
+import {
+  fetchGeoRandom,
+  getPlaceNameFromPosition,
+  getPrefetchedRandomCoords,
+  getRandomCityCoords,
+  getRandomZoom,
+} from 'Geo/utils'
 import PlaceName from 'PlaceName/PlaceName'
 import GeoSearch from 'Geo/GeoSearchInput'
 import { createMaposaicColors } from 'Colors/utils'
@@ -127,7 +133,7 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
 
   const setRandomCoords = async ({ setZoom, fetchFromApi }: { setZoom: boolean; fetchFromApi: boolean }) => {
     setIsLoading(true)
-    const randomCenter = fetchFromApi ? await fetchGeoRandom() : getPrefetchedRandomCoords()
+    const randomCenter = fetchFromApi ? await fetchGeoRandom() : getRandomCityCoords()
     void fetchAndSetPlaceName({ showPlaceName: true, center: randomCenter })
 
     if (initialZoom === null && setZoom) {
