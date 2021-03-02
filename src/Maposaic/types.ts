@@ -20,8 +20,8 @@ export type OnPosterSizeChangePayload = {
 }
 
 export enum MapboxStyle {
-  Relief = 'relief',
   Road = 'road',
+  Relief = 'relief',
   Water = 'water',
 }
 
