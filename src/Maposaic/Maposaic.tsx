@@ -37,13 +37,7 @@ import {
 } from 'Maposaic/elementHelpers'
 import { TOOLTIP_ENTER_DELAY } from 'constants/ux'
 import { MAPBOX_TOKEN } from 'constants/mapbox'
-import {
-  fetchGeoRandom,
-  getPlaceNameFromPosition,
-  getPrefetchedRandomCoords,
-  getRandomCityCoords,
-  getRandomZoom,
-} from 'Geo/utils'
+import { fetchGeoRandom, getPlaceNameFromPosition, getRandomCityCoords, getRandomZoom } from 'Geo/utils'
 import PlaceName from 'PlaceName/PlaceName'
 import GeoSearch from 'Geo/GeoSearchInput'
 import { createMaposaicColors } from 'Colors/utils'
@@ -306,10 +300,7 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
     setColorConfig(colorConfig)
     setIsLoading(true)
   }
-  const setNewSizeFactor = (sizeFactor: number) => {
-    setSizeFactor(sizeFactor)
-    setIsLoading(true)
-  }
+
   const setNewSpecificColorTransforms = (colorTransforms: SpecificColorTransforms) => {
     setSpecificColorTransforms(colorTransforms)
     setIsLoading(true)
@@ -346,17 +337,6 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
     }, 200)
     return () => clearInterval(interval)
   }, [remainingTime])
-
-  const updateEstimatedTime = (pendingSizeFactor: number) => {
-    if (!map) {
-      return
-    }
-    const pixelCount = getMapboxPixelCount(map)
-    setEstimatedTime(
-      Math.round(((computeTime.milliseconds ?? 0) * pixelCount) / (computeTime.pixelCount ?? 1)) *
-        Math.pow(pendingSizeFactor / sizeFactor, 2),
-    )
-  }
 
   const fetchAndSetPlaceName = async ({
     showPlaceName,
@@ -496,7 +476,7 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
               className="overmap__actions__button"
               style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
               shape="circle"
-              onClick={() => setRandomCoords({ setZoom: true, fetchFromApi: true })}
+              onClick={() => setRandomCoords({ setZoom: true, fetchFromApi: false })}
               icon={<img src={dice} width="16px" alt="dice" />}
             />
           </Tooltip>
