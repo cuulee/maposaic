@@ -23,6 +23,7 @@ import { ROAD_SIMPLE_WHITE, WATER_CYAN } from 'Colors/mapbox'
 import { RANDOM_CONFIG, ROAD_WHITE } from 'Colors/constants'
 import {
   MapboxStyle,
+  MAPOSAIC_HIDE_DRAWER_PARAM_KEY,
   MAPOSAIC_STYLE_URL_PARAM_KEY,
   MaposaicGeoURLParamKey,
   OnPosterSizeChangePayload,
@@ -49,6 +50,7 @@ import {
   useCheckMobileScreen,
 } from 'Maposaic/utils'
 import { UploadButton } from 'CloudUpload/UploadButton'
+import { TRUE_URL_PARAM_VALUE } from 'constants/navigation'
 
 const CloudUpload = React.lazy(() => import('CloudUpload/CloudUpload'))
 
@@ -256,7 +258,10 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
     newMap.on('load', () => {
       if (isFirstRender) {
         isFirstRender = false
-        if (!isMobile) {
+        if (
+          !isMobile &&
+          new URLSearchParams(window.location.search)?.get(MAPOSAIC_HIDE_DRAWER_PARAM_KEY) !== TRUE_URL_PARAM_VALUE
+        ) {
           setDrawerVisible(true)
         }
       }
