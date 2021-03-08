@@ -178,12 +178,12 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
 
   const changePlacePeriodically = useCallback(() => {
     void setRandomCoords({ setZoom: true, fetchFromApi: false })
-    setTimeout(changePlacePeriodically, 33333)
+    setTimeout(changePlacePeriodically, 55555)
   }, [map])
 
   useEffect(() => {
     if (new URLSearchParams(window.location.search)?.get(MAPOSAIC_SCREENSAVER_PARAM_KEY) === TRUE_URL_PARAM_VALUE) {
-      const changePlace = setTimeout(changePlacePeriodically, 33333)
+      const changePlace = setTimeout(changePlacePeriodically, 55555)
       return () => clearTimeout(changePlace)
     }
   }, [changePlacePeriodically])
