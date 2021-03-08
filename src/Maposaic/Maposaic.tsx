@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useRef, useState } from 'react'
+import React, { Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { Button, Tooltip } from 'antd'
@@ -24,6 +24,7 @@ import { RANDOM_CONFIG, ROAD_WHITE } from 'Colors/constants'
 import {
   MapboxStyle,
   MAPOSAIC_HIDE_DRAWER_PARAM_KEY,
+  MAPOSAIC_SCREENSAVER_PARAM_KEY,
   MAPOSAIC_STYLE_URL_PARAM_KEY,
   MaposaicGeoURLParamKey,
   OnPosterSizeChangePayload,
@@ -175,6 +176,18 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
     // eslint-disable-next-line
   }, [])
 
+  const changePlacePeriodically = useCallback(() => {
+    void setRandomCoords({ setZoom: true, fetchFromApi: false })
+    setTimeout(changePlacePeriodically, 33333)
+  }, [map])
+
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search)?.get(MAPOSAIC_SCREENSAVER_PARAM_KEY) === TRUE_URL_PARAM_VALUE) {
+      const changePlace = setTimeout(changePlacePeriodically, 33333)
+      return () => clearTimeout(changePlace)
+    }
+  }, [changePlacePeriodically])
+
   useEffect(() => {
     const paintMosaic = (newMap: mapboxgl.Map): void => {
       setIsLoading(true)
@@ -258,9 +271,11 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
     newMap.on('load', () => {
       if (isFirstRender) {
         isFirstRender = false
+        const urlParams = new URLSearchParams(window.location.search)
         if (
           !isMobile &&
-          new URLSearchParams(window.location.search)?.get(MAPOSAIC_HIDE_DRAWER_PARAM_KEY) !== TRUE_URL_PARAM_VALUE
+          urlParams.get(MAPOSAIC_HIDE_DRAWER_PARAM_KEY) !== TRUE_URL_PARAM_VALUE &&
+          urlParams.get(MAPOSAIC_SCREENSAVER_PARAM_KEY) !== TRUE_URL_PARAM_VALUE
         ) {
           setDrawerVisible(true)
         }

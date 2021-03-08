@@ -27,6 +27,7 @@ export enum MapboxStyle {
 
 export const MAPOSAIC_STYLE_URL_PARAM_KEY = 'style'
 export const MAPOSAIC_HIDE_DRAWER_PARAM_KEY = 'hide_drawer'
+export const MAPOSAIC_SCREENSAVER_PARAM_KEY = 'screensaver'
 
 export enum MaposaicGeoURLParamKey {
   Lat = 'lat',
