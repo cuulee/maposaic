@@ -1,7 +1,5 @@
-import { MAPBOX_TOKEN } from 'constants/mapbox'
-import { GeocodingData, GeonameData, PlaceType } from 'types/geo'
+import { GeonameData, PlaceType } from 'types/geo'
 import mapboxgl from 'mapbox-gl'
-import { GEOCODING_BASE_URL } from 'Geo/constants'
 import { CITIES } from 'Geo/cities'
 
 export const PLACE_TYPE_RELEVANCE = [
@@ -14,22 +12,22 @@ export const PLACE_TYPE_RELEVANCE = [
   PlaceType.Neighborhood,
 ]
 
-export const getPlaceNameFromPosition = async (center: mapboxgl.LngLat | null) => {
+export const getPlaceNameFromPosition = (center: mapboxgl.LngLat | null) => {
   if (!center) {
     return null
   }
-  const geoResponse = await fetch(`${GEOCODING_BASE_URL}/${center.lng},${center.lat}.json?access_token=${MAPBOX_TOKEN}`)
-  const geoCoding = (await geoResponse.json()) as GeocodingData
-  for (const nextRelevantPlaceType of PLACE_TYPE_RELEVANCE) {
-    for (const feature of geoCoding.features) {
-      for (const foundPlaceType of feature.place_type) {
-        if (foundPlaceType === nextRelevantPlaceType) {
-          return feature.place_name
-        }
-      }
-    }
-  }
   return null
+  // const geoResponse = await fetch(`${GEOCODING_BASE_URL}/${center.lng},${center.lat}.json?access_token=${MAPBOX_TOKEN}`)
+  // const geoCoding = (await geoResponse.json()) as GeocodingData
+  // for (const nextRelevantPlaceType of PLACE_TYPE_RELEVANCE) {
+  //   for (const feature of geoCoding.features) {
+  //     for (const foundPlaceType of feature.place_type) {
+  //       if (foundPlaceType === nextRelevantPlaceType) {
+  //         return feature.place_name
+  //       }
+  //     }
+  //   }
+  // }
 }
 
 export const getPlaceNameFromGeoname = (data: GeonameData) => {
