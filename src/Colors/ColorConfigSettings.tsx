@@ -15,7 +15,7 @@ import {
   ShadingType,
 } from 'Colors/types'
 import 'Colors/colorConfigSettings.style.less'
-import { Popover, Select } from 'antd'
+import { InputNumber, Popover, Select } from 'antd'
 import { getInitialPresetPaletteIndex } from 'Colors/utils'
 
 /* eslint-disable complexity */
@@ -122,8 +122,8 @@ const ColorConfigSettings = ({
     changeColorConfig({ type: ColorConfigType.Palette, paletteType: PaletteType.Custom, colors: newPalette })
   }
 
-  const onPaletteSizeChange = (value: number | undefined) => {
-    if (!value) {
+  const onPaletteSizeChange = (value: number | undefined | string) => {
+    if (!value || typeof value === 'string') {
       return
     }
     const newPalette = [
@@ -204,20 +204,7 @@ const ColorConfigSettings = ({
         <div>
           {paletteOrigin === PaletteType.Custom ? (
             <div className="palette-settings__custom-palette">
-              <Select
-                className="custom-palette-number"
-                value={customPaletteColors.length}
-                onChange={onPaletteSizeChange}
-                style={{ fontSize: '16px' }}
-              >
-                {Array.from({ length: 10 }, (_, i) => {
-                  return (
-                    <Select.Option key={i} value={i + 1} style={{ fontSize: '16px' }}>
-                      {i + 1}
-                    </Select.Option>
-                  )
-                })}
-              </Select>
+              <InputNumber min={1} onChange={onPaletteSizeChange} size="large" value={customPaletteColors.length} />
               <div className="palette-settings__custom-palette__colors palette-colors">
                 {customPaletteColors.map((color, paletteIndex) => (
                   <Popover
