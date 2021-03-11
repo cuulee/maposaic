@@ -233,7 +233,8 @@ const ColorConfigSettings = ({
                         disableAlpha
                       />
                     }
-                    key={color}
+                    // eslint-disable-next-line
+                    key={paletteIndex}
                     placement="bottom"
                   >
                     <div className="palette-colors__color">
