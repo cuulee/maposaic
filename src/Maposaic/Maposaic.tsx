@@ -128,26 +128,30 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
     window.history.replaceState({}, '', `${window.location.pathname}?${urlParams.toString()}`)
   }, [mapboxStyle, isInitialUrlParamsParsed])
 
-  const setRandomCoords = async ({ setZoom, fetchFromApi }: { setZoom: boolean; fetchFromApi: boolean }) => {
-    setIsLoading(true)
-    const randomCenter = fetchFromApi ? await fetchGeoRandom() : getRandomCityCoords()
-    void fetchAndSetPlaceName({ showPlaceName: true, center: randomCenter })
+  const setRandomCoords = useCallback(
+    async ({ setZoom, fetchFromApi }: { setZoom: boolean; fetchFromApi: boolean }) => {
+      setIsLoading(true)
+      const randomCenter = fetchFromApi ? await fetchGeoRandom() : getRandomCityCoords()
+      void fetchAndSetPlaceName({ showPlaceName: true, center: randomCenter })
 
-    if (initialZoom === null && setZoom) {
-      setInitialZoom(getRandomZoom())
-    }
-    if (!initialCenter) {
-      setInitialCenter(randomCenter)
-      return
-    }
-    if (!map) {
-      return
-    }
-    map.setCenter(randomCenter)
-    if (setZoom) {
-      map.setZoom(getRandomZoom())
-    }
-  }
+      if (initialZoom === null && setZoom) {
+        setInitialZoom(getRandomZoom())
+      }
+      if (!initialCenter) {
+        setInitialCenter(randomCenter)
+        return
+      }
+      if (!map) {
+        return
+      }
+      map.setCenter(randomCenter)
+      if (setZoom) {
+        map.setZoom(getRandomZoom())
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [map],
+  )
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search)
@@ -179,7 +183,7 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
   const changePlacePeriodically = useCallback(() => {
     void setRandomCoords({ setZoom: true, fetchFromApi: false })
     setTimeout(changePlacePeriodically, 55555)
-  }, [map])
+  }, [setRandomCoords])
 
   useEffect(() => {
     if (new URLSearchParams(window.location.search)?.get(MAPOSAIC_SCREENSAVER_PARAM_KEY) === TRUE_URL_PARAM_VALUE) {
