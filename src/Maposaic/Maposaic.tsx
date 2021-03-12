@@ -40,7 +40,6 @@ import {
 import { TOOLTIP_ENTER_DELAY } from 'constants/ux'
 import { MAPBOX_TOKEN } from 'constants/mapbox'
 import { fetchGeoRandom, getPlaceNameFromPosition, getRandomCityCoords, getRandomZoom } from 'Geo/utils'
-import PlaceName from 'PlaceName/PlaceName'
 import GeoSearch from 'Geo/GeoSearchInput'
 import { createMaposaicColors } from 'Colors/utils'
 import { MAPBOX_STYLES } from 'Maposaic/constants'
@@ -362,7 +361,7 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
     return () => clearInterval(interval)
   }, [remainingTime])
 
-  const fetchAndSetPlaceName = async ({
+  const fetchAndSetPlaceName = ({
     showPlaceName,
     center,
   }: {
@@ -378,7 +377,7 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
       return
     }
     lastFetchedPlaceNameCenter = center
-    const placeName = await getPlaceNameFromPosition(center)
+    const placeName = getPlaceNameFromPosition(center)
     setPlaceName(placeName)
     if (showPlaceName) {
       setShowPlaceNameTrigger(showPlaceNameTrigger + 1)
@@ -512,7 +511,7 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
           />
         </div>
       </div>
-      <PlaceName showPlaceNameTrigger={showPlaceNameTrigger} placeName={placeName} />
+      {/* <PlaceName showPlaceNameTrigger={showPlaceNameTrigger} placeName={placeName} /> */}
     </div>
   )
 }
