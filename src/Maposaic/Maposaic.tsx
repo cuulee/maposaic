@@ -39,7 +39,7 @@ import {
 } from 'Maposaic/elementHelpers'
 import { TOOLTIP_ENTER_DELAY } from 'constants/ux'
 import { MAPBOX_TOKEN } from 'constants/mapbox'
-import { fetchGeoRandom, getPlaceNameFromPosition, getRandomCityCoords, getRandomZoom } from 'Geo/utils'
+import { fetchGeoRandom, getRandomCityCoords, getRandomZoom } from 'Geo/utils'
 import GeoSearch from 'Geo/GeoSearchInput'
 import { createMaposaicColors } from 'Colors/utils'
 import { MAPBOX_STYLES } from 'Maposaic/constants'
@@ -377,7 +377,7 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
       return
     }
     lastFetchedPlaceNameCenter = center
-    const placeName = getPlaceNameFromPosition(center)
+    // const placeName = getPlaceNameFromPosition(center)
     setPlaceName(placeName)
     if (showPlaceName) {
       setShowPlaceNameTrigger(showPlaceNameTrigger + 1)
