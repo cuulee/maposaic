@@ -39,7 +39,7 @@ import {
 } from 'Maposaic/elementHelpers'
 import { TOOLTIP_ENTER_DELAY } from 'constants/ux'
 import { MAPBOX_TOKEN } from 'constants/mapbox'
-import { fetchGeoRandom, getRandomCityCoords, getRandomZoom } from 'Geo/utils'
+import { fetchGeoRandom, getPlaceNameFromPosition, getRandomCityCoords, getRandomZoom } from 'Geo/utils'
 import GeoSearch from 'Geo/GeoSearchInput'
 import { createMaposaicColors } from 'Colors/utils'
 import { MAPBOX_STYLES } from 'Maposaic/constants'
@@ -51,6 +51,7 @@ import {
 } from 'Maposaic/utils'
 import { UploadButton } from 'CloudUpload/UploadButton'
 import { TRUE_URL_PARAM_VALUE } from 'constants/navigation'
+import PlaceName from 'PlaceName/PlaceName'
 
 const CloudUpload = React.lazy(() => import('CloudUpload/CloudUpload'))
 
@@ -361,7 +362,7 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
     return () => clearInterval(interval)
   }, [remainingTime])
 
-  const fetchAndSetPlaceName = ({
+  const fetchAndSetPlaceName = async ({
     showPlaceName,
     center,
   }: {
@@ -377,7 +378,7 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
       return
     }
     lastFetchedPlaceNameCenter = center
-    // const placeName = getPlaceNameFromPosition(center)
+    const placeName = await getPlaceNameFromPosition(center)
     setPlaceName(placeName)
     if (showPlaceName) {
       setShowPlaceNameTrigger(showPlaceNameTrigger + 1)
@@ -511,7 +512,7 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
           />
         </div>
       </div>
-      {/* <PlaceName showPlaceNameTrigger={showPlaceNameTrigger} placeName={placeName} /> */}
+      <PlaceName showPlaceNameTrigger={showPlaceNameTrigger} placeName={placeName} />
     </div>
   )
 }

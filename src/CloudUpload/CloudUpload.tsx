@@ -13,7 +13,6 @@ import { PICTURE_ID_PARAM } from 'Gallery/constants'
 import { ColorConfig } from 'Colors/types'
 import { MapboxStyle } from 'Maposaic/types'
 import { UploadButton } from 'CloudUpload/UploadButton'
-import { getPlaceNameFromPosition } from 'Geo/utils'
 
 enum UploadStatus {
   Error = 'error',
@@ -88,9 +87,6 @@ const CloudUpload = ({
   const [isUploadingForm, setIsUploadingForm] = useState(false)
   const [pictureDocumentId, setPictureDocumentId] = useState<string | null>(null)
   const [anonymousUid, setAnonymousUid] = useState<string | null>(null)
-  const [temporaryPlaceName, setTemporaryPlaceName] = useState<string | null>(null)
-
-  const fetchTemporaryPlaceName = async () => setTemporaryPlaceName(await getPlaceNameFromPosition(mapCenter ?? null))
 
   useEffect(() => {
     void firebaseAuth.signInAnonymously()
@@ -112,9 +108,6 @@ const CloudUpload = ({
     setUploadTask(null)
     setPictureDocumentId(null)
     setPictureName(placeName ?? '')
-    if (!placeName) {
-      void fetchTemporaryPlaceName()
-    }
 
     const mosaicElement = document.getElementById('maposaic-canvas') as HTMLCanvasElement | null
     if (!mosaicElement) {
@@ -148,7 +141,7 @@ const CloudUpload = ({
         mapCenter: mapCenter?.toArray() ?? '',
         colorConfig,
         mapZoom,
-        placeName: placeName ?? temporaryPlaceName,
+        placeName,
         mapboxStyle,
       },
     })
@@ -216,12 +209,6 @@ const CloudUpload = ({
   }
 
   useEffect(() => setIsFormUploaded(false), [pictureName])
-
-  useEffect(() => {
-    if (!modalVisible) {
-      setTemporaryPlaceName(null)
-    }
-  }, [modalVisible])
 
   const isFormSubmitDisabled =
     !pictureName.length ||
