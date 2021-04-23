@@ -107,7 +107,7 @@ const CloudUpload = ({
     setTaskState(null)
     setUploadTask(null)
     setPictureDocumentId(null)
-    setPictureName(placeName ?? '')
+    setPictureName('')
 
     const mosaicElement = document.getElementById('maposaic-canvas') as HTMLCanvasElement | null
     if (!mosaicElement) {
@@ -269,10 +269,10 @@ const CloudUpload = ({
           </React.Fragment>
         )}
         <div className="form">
-          <div className="form__title">Picture name (optional)</div>
+          <div className="form__title">Picture name</div>
           <div className="form__field">
             <Input
-              placeholder="Picture name"
+              placeholder="Optional"
               value={pictureName}
               onChange={(e) => setPictureName(e.target.value)}
               suffix={<InputSuffix />}
