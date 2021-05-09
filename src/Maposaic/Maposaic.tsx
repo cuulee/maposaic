@@ -512,6 +512,7 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
           />
         </div>
       </div>
+
       <PlaceName showPlaceNameTrigger={showPlaceNameTrigger} placeName={placeName} />
     </div>
   )

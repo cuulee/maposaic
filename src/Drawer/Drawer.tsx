@@ -179,8 +179,11 @@ const Drawer = ({
             onClick={() => window.open('https://github.com/viconnex/maposaic', '_blank')}
             className="drawer__content__footer"
           >
+            <div className="footer__logo">
+              <img className="footer__logo__image" src={process.env.PUBLIC_URL + '/m-a-p-o-s-a-i-c.png'} alt="logo" />
+            </div>
             <Tooltip title="Source code" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
-              <img className="drawer__content__footer__image" width="24px" src={githubMark} alt="github-link" />
+              <img className="footer__source__image" src={githubMark} alt="github-link" />
             </Tooltip>
           </div>
         </div>
