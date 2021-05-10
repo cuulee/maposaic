@@ -13,7 +13,6 @@ import { PRIMARY_COLOR } from 'constants/colors'
 import { DrawerPropsType } from 'Drawer/types'
 import { MapboxStyle } from 'Maposaic/types'
 import { MAPBOX_STYLES } from 'Maposaic/constants'
-import spinner from 'assets/spinner.png'
 import githubMark from 'assets/GitHub-Mark.png'
 import { TOOLTIP_ENTER_DELAY } from 'constants/ux'
 
@@ -80,8 +79,13 @@ const Drawer = ({
       <div className="drawer">
         <div className="drawer__header">
           <div className="drawer__header__title">
-            <img width="16px" src={spinner} alt="logo" />
-            <div className="drawer__header__text">Settings</div>
+            <div className="header__logo" onClick={() => setDrawerVisible(false)}>
+              <img
+                className="header__logo__image"
+                src={process.env.PUBLIC_URL + '/m-a-p-o-s-a-i-c-black.png'}
+                alt="logo"
+              />
+            </div>
           </div>
         </div>
         <div className="drawer__content">
@@ -179,9 +183,6 @@ const Drawer = ({
             onClick={() => window.open('https://github.com/viconnex/maposaic', '_blank')}
             className="drawer__content__footer"
           >
-            <div className="footer__logo">
-              <img className="footer__logo__image" src={process.env.PUBLIC_URL + '/m-a-p-o-s-a-i-c.png'} alt="logo" />
-            </div>
             <Tooltip title="Source code" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
               <img className="footer__source__image" src={githubMark} alt="github-link" />
             </Tooltip>

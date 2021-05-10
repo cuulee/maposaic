@@ -33,7 +33,7 @@
   width: 100%;
   &__header {
     height: 56px;
-    padding: 16px 16px 16px 24px;
+    padding: 16px;
     display: flex;
     width: 100%;
     justify-content: space-between;
@@ -47,6 +47,12 @@
       margin-left: 8px;
       font-weight: 600;
       font-size: 20px;
+    }
+    .header__logo {
+      cursor: pointer;
+      &__image {
+        height: 40px;
+      }
     }
   }
   &__content {
@@ -78,11 +84,6 @@
             cursor: pointer;
             width: 24px;
             height: 24px;
-          }
-        }
-        &__logo {
-          &__image {
-            height: 30px;
           }
         }
       }
