@@ -15,6 +15,7 @@ import { MapboxStyle } from 'Maposaic/types'
 import { MAPBOX_STYLES } from 'Maposaic/constants'
 import githubMark from 'assets/GitHub-Mark.png'
 import { TOOLTIP_ENTER_DELAY } from 'constants/ux'
+import Logo from 'Logo/Logo'
 
 const millisecondsToText = (millis: number | null) => {
   const min = Math.floor((millis ?? 0) / 60000)
@@ -80,11 +81,7 @@ const Drawer = ({
         <div className="drawer__header">
           <div className="drawer__header__title">
             <div className="header__logo" onClick={() => setDrawerVisible(false)}>
-              <img
-                className="header__logo__image"
-                src={process.env.PUBLIC_URL + '/m-a-p-o-s-a-i-c-black.png'}
-                alt="logo"
-              />
+              <Logo colorConfig={colorConfig} specificColorTransforms={specificColorTransforms} />
             </div>
           </div>
         </div>

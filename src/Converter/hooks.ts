@@ -27,13 +27,12 @@ export const useConversion = ({
       const outputCanvas = document.getElementById('output-canvas') as HTMLCanvasElement
       const size = { w: image.width, h: image.height }
 
-      inputCanvas.setAttribute('width', size.w.toString())
-      inputCanvas.setAttribute('height', size.h.toString())
-
       inputCanvas.width = size.w
       inputCanvas.height = size.h
-      outputCanvas.width = size.w
-      outputCanvas.height = size.h
+      if (outputCanvas.width !== size.w || outputCanvas.height !== size.h) {
+        outputCanvas.width = size.w
+        outputCanvas.height = size.h
+      }
 
       const inputCanvasContext = inputCanvas.getContext('2d')
       const outputCanvasContext = outputCanvas.getContext('2d')
@@ -44,11 +43,12 @@ export const useConversion = ({
 
       inputCanvasContext.drawImage(image, 0, 0, size.w, size.h)
 
-      const imageData = inputCanvasContext.getImageData(0, 0, size.w, size.h)
+      const inputImageData = inputCanvasContext.getImageData(0, 0, size.w, size.h)
       const outputImageData = outputCanvasContext.getImageData(0, 0, size.w, size.h)
+      console.log('inputImageData', inputImageData)
 
       paintWorker.postMessage({
-        sourcePixelArray: imageData.data,
+        sourcePixelArray: inputImageData.data,
         targetPixelArray: outputImageData.data,
         sourceSize: size,
         targetSize: size,
