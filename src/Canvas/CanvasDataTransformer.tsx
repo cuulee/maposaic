@@ -8,7 +8,7 @@ import { SpecificColorTransforms } from 'Maposaic/types'
 const SIMILAR_COLOR_TOLERANCE = 1
 
 export class CanvasDataTransformer {
-  sourcePixelArray: Uint8Array
+  sourcePixelArray: Uint8Array | Uint8ClampedArray
   targetPixelArray: Uint8ClampedArray
   sourceSize: Size
   targetSize: Size
@@ -26,7 +26,7 @@ export class CanvasDataTransformer {
   }
 
   constructor(
-    sourcePixelArray: Uint8Array,
+    sourcePixelArray: Uint8Array | Uint8ClampedArray,
     targetPixelArray: Uint8ClampedArray,
     sourceSize: Size,
     targetSize: Size,

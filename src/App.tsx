@@ -9,6 +9,7 @@ import { useCheckWasmAvailability } from 'Maposaic/utils'
 const Gallery = lazy(() => import('Gallery/Gallery'))
 const Maposaic = lazy(() => import('Maposaic/Maposaic'))
 const GameOfLife = lazy(() => import('GameOfLife/GameOfLife'))
+const Converter = lazy(() => import('Converter/Converter'))
 
 function App() {
   useEffect(() => {
@@ -32,6 +33,9 @@ function App() {
         <Switch>
           <Route path="/gallery">
             <Gallery />
+          </Route>
+          <Route path="/convert">
+            <Converter />
           </Route>
           <Route path="/game-of-life">
             <GameOfLife />

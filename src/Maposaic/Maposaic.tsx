@@ -12,7 +12,7 @@ import gps from 'assets/gps.svg'
 import Drawer from 'Drawer/Drawer'
 
 // eslint-disable-next-line
-import PaintWorker from 'worker-loader!./paint.worker'
+import PaintWorker from 'worker-loader!../Converter/paint.worker'
 
 import 'Maposaic/maposaic.style.less'
 import 'spinner.style.less'
