@@ -56,6 +56,7 @@ export const useConversion = ({
         maposaicColors: createMaposaicColors(colorConfig, specificColorTransforms),
         specificColorTransforms,
         isWasmAvailable: false,
+        hasAxialTransfo: false,
       })
 
       paintWorker.onmessage = function (e: { data: { pixels: number[]; paintedBoundsMin: number } }): void {

@@ -15,6 +15,7 @@ export class CanvasDataTransformer {
   canvassRatio: number
   targetColors: MaposaicColors
   specificColorTransforms: SpecificColorTransforms
+  hasAxialTransfo: boolean | undefined
 
   visited: boolean[]
 
@@ -33,6 +34,7 @@ export class CanvasDataTransformer {
     canvassRatio: number,
     targetColors: MaposaicColors,
     specificColorTransforms: SpecificColorTransforms,
+    hasAxialTransfo: boolean | undefined,
   ) {
     this.sourcePixelArray = sourcePixelArray
     this.targetPixelArray = targetPixelArray
@@ -41,6 +43,7 @@ export class CanvasDataTransformer {
     this.canvassRatio = canvassRatio
     this.specificColorTransforms = specificColorTransforms
     this.targetColors = targetColors
+    this.hasAxialTransfo = hasAxialTransfo
 
     const visitedSize = targetSize.h * targetSize.w
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -60,6 +63,7 @@ export class CanvasDataTransformer {
         targetSize: this.targetSize,
         sourceSize: this.sourceSize,
         canvassRatio: this.canvassRatio,
+        hasAxialTransfo: this.hasAxialTransfo,
       })
 
       this.currentArea.initialColor = createRGB(
@@ -99,6 +103,7 @@ export class CanvasDataTransformer {
         targetSize: this.targetSize,
         canvassRatio: this.canvassRatio,
         sourceSize: this.sourceSize,
+        hasAxialTransfo: this.hasAxialTransfo,
       })
 
       const targetPointColor = createRGB(
@@ -124,6 +129,7 @@ export class CanvasDataTransformer {
             targetSize: this.targetSize,
             canvassRatio: this.canvassRatio,
             sourceSize: this.sourceSize,
+            hasAxialTransfo: this.hasAxialTransfo,
           })
 
           return isColorSimilar(

@@ -7,10 +7,15 @@ export const getPixelIndexFromPoint = (point: imagePoint, canvasWidth: number): 
   return point.y * canvasWidth + point.x
 }
 
-export const getSourcePointFromTargetPoint = (targetPoint: imagePoint, targetSize: Size, canvassRatio: number) => {
+export const getSourcePointFromTargetPoint = (
+  targetPoint: imagePoint,
+  targetSize: Size,
+  canvassRatio: number,
+  hasAxialTransfo: boolean,
+) => {
   return {
     x: canvassRatio * targetPoint.x,
-    y: canvassRatio * (targetSize.h - 1 - targetPoint.y),
+    y: hasAxialTransfo ? canvassRatio * (targetSize.h - 1 - targetPoint.y) : canvassRatio * targetPoint.y,
   }
 }
 
@@ -19,14 +24,16 @@ export const getSourcePixelIndexFromTargetPixelIndex = ({
   targetSize,
   sourceSize,
   canvassRatio,
+  hasAxialTransfo,
 }: {
   targetPixelIndex: number
   targetSize: Size
   sourceSize: Size
   canvassRatio: number
+  hasAxialTransfo?: boolean
 }) => {
   const targetPoint = getPointFromPixelIndex(targetPixelIndex, targetSize.w)
-  const sourcePoint = getSourcePointFromTargetPoint(targetPoint, targetSize, canvassRatio)
+  const sourcePoint = getSourcePointFromTargetPoint(targetPoint, targetSize, canvassRatio, hasAxialTransfo ?? true)
   return getPixelIndexFromPoint(sourcePoint, sourceSize.w)
 }
 
