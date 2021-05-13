@@ -12,12 +12,12 @@ import { SpecificColorTransforms } from 'Maposaic/types'
 import { generate } from '@ant-design/colors'
 import { AntColors, PRESET_PALETTES } from 'Colors/constants'
 
-export const createRGB = (r: number, g: number, b: number): RGBColor => {
-  return { r, g, b }
+export const createRGB = (r: number, g: number, b: number, a: number): RGBColor => {
+  return { r, g, b, a }
 }
 
 const hexToRgb = (hex: string) => {
-  return createRGB(parseInt(hex.slice(1, 3), 16), parseInt(hex.slice(3, 5), 16), parseInt(hex.slice(5, 7), 16))
+  return createRGB(parseInt(hex.slice(1, 3), 16), parseInt(hex.slice(3, 5), 16), parseInt(hex.slice(5, 7), 16), 255)
 }
 
 const hexToU32 = (hex: string) => {
@@ -35,7 +35,12 @@ export const rgbToHex = (rgb: RGBColor) => {
 
 export const createColor = (colors: MaposaicColors | string) => {
   if (colors === ColorConfigType.Random) {
-    return createRGB(Math.floor(Math.random() * 256), Math.floor(Math.random() * 256), Math.floor(Math.random() * 256))
+    return createRGB(
+      Math.floor(Math.random() * 256),
+      Math.floor(Math.random() * 256),
+      Math.floor(Math.random() * 256),
+      255,
+    )
   }
   if (typeof colors === 'string') {
     return hexToRgb(colors)

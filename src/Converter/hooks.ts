@@ -45,7 +45,6 @@ export const useConversion = ({
 
       const inputImageData = inputCanvasContext.getImageData(0, 0, size.w, size.h)
       const outputImageData = outputCanvasContext.getImageData(0, 0, size.w, size.h)
-      console.log('inputImageData', inputImageData)
 
       paintWorker.postMessage({
         sourcePixelArray: inputImageData.data,

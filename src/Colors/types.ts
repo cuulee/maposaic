@@ -1,4 +1,4 @@
-export type RGBColor = { r: number; g: number; b: number }
+export type RGBColor = { r: number; g: number; b: number; a: number }
 export type HexColor = string
 
 export type MaposaicColors = ColorConfigType.Random | string[]

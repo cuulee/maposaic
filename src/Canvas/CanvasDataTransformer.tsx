@@ -22,8 +22,8 @@ export class CanvasDataTransformer {
   currentArea = {
     bounds: { min: 0, max: 0 },
     initialTargetPoint: { x: 0, y: 0 },
-    initialColor: { r: 0, g: 0, b: 0 },
-    targetColor: { r: 0, g: 0, b: 0 },
+    initialColor: { r: 0, g: 0, b: 0, a: 0 },
+    targetColor: { r: 0, g: 0, b: 0, a: 0 },
   }
 
   constructor(
@@ -70,6 +70,7 @@ export class CanvasDataTransformer {
         this.sourcePixelArray[sourcePixelIndex * 4],
         this.sourcePixelArray[sourcePixelIndex * 4 + 1],
         this.sourcePixelArray[sourcePixelIndex * 4 + 2],
+        this.sourcePixelArray[sourcePixelIndex * 4 + 3],
       )
       this.currentArea.targetColor = transformInitialColor(
         this.currentArea.initialColor,
@@ -106,16 +107,17 @@ export class CanvasDataTransformer {
         hasAxialTransfo: this.hasAxialTransfo,
       })
 
-      const targetPointColor = createRGB(
+      const sourcePointColor = createRGB(
         this.sourcePixelArray[sourcePixelIndex * 4],
         this.sourcePixelArray[sourcePixelIndex * 4 + 1],
         this.sourcePixelArray[sourcePixelIndex * 4 + 2],
+        this.sourcePixelArray[sourcePixelIndex * 4 + 3],
       )
 
       const adjacentTargetPoints = getAdjacentPoints({ point: targetPoint, canvasSize: this.targetSize })
 
       // anti-aliasing
-      if (!isColorSimilar(targetPointColor, initialColor, SIMILAR_COLOR_TOLERANCE)) {
+      if (!isColorSimilar(sourcePointColor, initialColor, SIMILAR_COLOR_TOLERANCE)) {
         const similarPointCount = Object.values(adjacentTargetPoints).filter((adjacentTargetPoint) => {
           if (!adjacentTargetPoint) {
             return false
@@ -137,18 +139,20 @@ export class CanvasDataTransformer {
               this.sourcePixelArray[adjSourceIndex * 4],
               this.sourcePixelArray[adjSourceIndex * 4 + 1],
               this.sourcePixelArray[adjSourceIndex * 4 + 2],
+              this.sourcePixelArray[adjSourceIndex * 4 + 3],
             ),
-            targetPointColor,
+            sourcePointColor,
             SIMILAR_COLOR_TOLERANCE,
           )
         }).length
 
         if (similarPointCount < 2) {
-          const colorRatio = initialColor.r ? targetPointColor.r / initialColor.r : 1
+          const colorRatio = initialColor.r ? sourcePointColor.r / initialColor.r : 1
           const antiAliasingColor = createRGB(
             targetColor.r * colorRatio,
             targetColor.g * colorRatio,
             targetColor.b * colorRatio,
+            255,
           )
 
           this.paintTargetPixel({ color: antiAliasingColor, pixelIndex: targetPixelIndex })
@@ -156,7 +160,7 @@ export class CanvasDataTransformer {
         continue
       }
 
-      this.paintTargetPixel({ color: targetColor, pixelIndex: targetPixelIndex })
+      this.paintTargetPixel({ color: targetColor, pixelIndex: targetPixelIndex, alpha: sourcePointColor.a })
 
       Object.values(adjacentTargetPoints).forEach((adjacentPoint) => {
         if (!adjacentPoint) {
@@ -170,13 +174,13 @@ export class CanvasDataTransformer {
     }
   }
 
-  paintTargetPixel = ({ color, pixelIndex }: { color: RGBColor; pixelIndex: number }) => {
+  paintTargetPixel = ({ color, pixelIndex, alpha }: { color: RGBColor; pixelIndex: number; alpha?: number }) => {
     this.visited[pixelIndex] = true
 
     this.targetPixelArray[pixelIndex * 4] = color.r
     this.targetPixelArray[pixelIndex * 4 + 1] = color.g
     this.targetPixelArray[pixelIndex * 4 + 2] = color.b
-    this.targetPixelArray[pixelIndex * 4 + 3] = 255
+    this.targetPixelArray[pixelIndex * 4 + 3] = alpha ?? color.a
 
     if (pixelIndex < this.currentArea.bounds.min) {
       this.currentArea.bounds.min = pixelIndex
