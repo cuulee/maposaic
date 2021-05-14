@@ -102,16 +102,19 @@ export const getMaposaicColorsWithoutSpecific = (
   return colors
 }
 
-export const getMaposaicColorsFromColorConfig = (colorConfig: ColorConfig) => {
+export const getMaposaicColorsFromColorConfig = (colorConfig: ColorConfig, isBrightColor?: boolean) => {
   if (colorConfig.type === ColorConfigType.Random) {
     return ColorConfigType.Random
   }
   if (colorConfig.type === ColorConfigType.Shading) {
-    if (colorConfig.shadingType === ShadingType.Custom) {
-      return generate(colorConfig.seedColor)
-    } else {
-      return AntColors[colorConfig.seedColor]
-    }
+    const shadingColors =
+      colorConfig.shadingType === ShadingType.Custom
+        ? generate(colorConfig.seedColor)
+        : AntColors[colorConfig.seedColor]
+
+    return isBrightColor
+      ? shadingColors.slice(Math.min(shadingColors.length - 3, 3), shadingColors.length)
+      : shadingColors
   }
   if (colorConfig.paletteType === PaletteType.Preset) {
     return PRESET_PALETTES[colorConfig.origin].palettes[colorConfig.paletteIndex]
@@ -120,8 +123,15 @@ export const getMaposaicColorsFromColorConfig = (colorConfig: ColorConfig) => {
   return colorConfig.colors
 }
 
-export const createMaposaicColors = (colorConfig: ColorConfig, specificColorTransforms: SpecificColorTransforms) => {
-  return getMaposaicColorsWithoutSpecific(getMaposaicColorsFromColorConfig(colorConfig), specificColorTransforms)
+export const createMaposaicColors = (
+  colorConfig: ColorConfig,
+  specificColorTransforms: SpecificColorTransforms,
+  isBrightColor?: boolean,
+) => {
+  return getMaposaicColorsWithoutSpecific(
+    getMaposaicColorsFromColorConfig(colorConfig, isBrightColor),
+    specificColorTransforms,
+  )
 }
 
 export const getInitialPresetPaletteIndex = (colorConfig: ColorConfig, origin: PaletteOrigin) => {

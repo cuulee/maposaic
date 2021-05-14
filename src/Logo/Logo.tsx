@@ -18,6 +18,7 @@ const Logo = ({ colorConfig }: { colorConfig: ColorConfig }) => {
     colorConfig: colorConfig,
     specificColorTransforms: SPECIFIC_COLOR_TRANSFORMS,
     imageWidth: 1000,
+    isBrightColor: true,
   })
 
   return (

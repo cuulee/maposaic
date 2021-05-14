@@ -61,7 +61,7 @@ export const useConversion = ({
         sourceSize: size,
         targetSize: size,
         canvassRatio: 1,
-        maposaicColors: createMaposaicColors(colorConfig, specificColorTransforms),
+        maposaicColors: createMaposaicColors(colorConfig, specificColorTransforms, isBrightColor),
         specificColorTransforms,
         isWasmAvailable: false,
         hasAxialTransfo: false,
