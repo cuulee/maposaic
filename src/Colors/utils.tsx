@@ -13,7 +13,8 @@ import { generate } from '@ant-design/colors'
 import { AntColors, PRESET_PALETTES } from 'Colors/constants'
 
 export const createRGB = (r: number, g: number, b: number, a: number): RGBColor => {
-  return { r, g, b, a }
+  // beware of cheeseNaN
+  return { r: r || 0, g: g || 0, b: b || 0, a: a || 0 }
 }
 
 const hexToRgb = (hex: string) => {
@@ -33,8 +34,11 @@ export const rgbToHex = (rgb: RGBColor) => {
   return `#${intToHex(rgb.r)}${intToHex(rgb.g)}${intToHex(rgb.b)}`
 }
 
-export const createColor = (colors: MaposaicColors | string) => {
+export const createColor = (colors: MaposaicColors | string, isBrightColor?: boolean) => {
   if (colors === ColorConfigType.Random) {
+    if (isBrightColor) {
+      return hslToRGB(Math.floor(Math.random() * 360), 100, 50)
+    }
     return createRGB(
       Math.floor(Math.random() * 256),
       Math.floor(Math.random() * 256),
@@ -52,6 +56,7 @@ export const transformInitialColor = (
   initialColor: RGBColor,
   mainColor: MaposaicColors,
   specificColorTransforms: SpecificColorTransforms,
+  isBrightColor: boolean,
 ) => {
   const initialColorHex = rgbToHex(initialColor)
   if (initialColorHex in specificColorTransforms) {
@@ -61,7 +66,7 @@ export const transformInitialColor = (
     }
   }
 
-  return createColor(mainColor)
+  return createColor(mainColor, isBrightColor)
 }
 
 export const isColorSimilar = (color1: RGBColor, color2: RGBColor, similarColorTolerance: number): boolean => {
@@ -142,4 +147,48 @@ export const createColorSettings = (
     specific_transforms,
     available_colors: mainColors === ColorConfigType.Random ? [] : mainColors.map(hexToU32),
   }
+}
+
+// from https://css-tricks.com/converting-color-spaces-in-javascript/
+const hslToRGB = (h: number, s0: number, l0: number) => {
+  const s = s0 / 100
+  const l = l0 / 100
+
+  const c = (1 - Math.abs(2 * l - 1)) * s
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1))
+  const m = l - c / 2
+  let r = 0
+  let g = 0
+  let b = 0
+
+  if (0 <= h && h < 60) {
+    r = c
+    g = x
+    b = 0
+  } else if (60 <= h && h < 120) {
+    r = x
+    g = c
+    b = 0
+  } else if (120 <= h && h < 180) {
+    r = 0
+    g = c
+    b = x
+  } else if (180 <= h && h < 240) {
+    r = 0
+    g = x
+    b = c
+  } else if (240 <= h && h < 300) {
+    r = x
+    g = 0
+    b = c
+  } else if (300 <= h && h < 360) {
+    r = c
+    g = 0
+    b = x
+  }
+  r = Math.round((r + m) * 255)
+  g = Math.round((g + m) * 255)
+  b = Math.round((b + m) * 255)
+
+  return createRGB(r, g, b, 255)
 }

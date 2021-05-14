@@ -11,11 +11,13 @@ export const useConversion = ({
   colorConfig,
   specificColorTransforms,
   imageWidth,
+  isBrightColor,
 }: {
   imageUrl: string | null
   colorConfig: ColorConfig
   specificColorTransforms: SpecificColorTransforms
   imageWidth?: number
+  isBrightColor?: boolean
 }) => {
   useEffect(() => {
     if (!imageUrl) {
@@ -63,6 +65,7 @@ export const useConversion = ({
         specificColorTransforms,
         isWasmAvailable: false,
         hasAxialTransfo: false,
+        isBrightColor,
       })
 
       paintWorker.onmessage = function (e: { data: { pixels: number[]; paintedBoundsMin: number } }): void {
@@ -71,5 +74,5 @@ export const useConversion = ({
       }
     }
     return () => paintWorker.terminate()
-  }, [colorConfig, specificColorTransforms, imageUrl, imageWidth])
+  }, [colorConfig, specificColorTransforms, imageUrl, imageWidth, isBrightColor])
 }

@@ -15,7 +15,8 @@ export class CanvasDataTransformer {
   canvassRatio: number
   targetColors: MaposaicColors
   specificColorTransforms: SpecificColorTransforms
-  hasAxialTransfo: boolean | undefined
+  hasAxialTransfo: boolean
+  isBrightColor: boolean
 
   visited: boolean[]
 
@@ -26,16 +27,27 @@ export class CanvasDataTransformer {
     targetColor: { r: 0, g: 0, b: 0, a: 0 },
   }
 
-  constructor(
-    sourcePixelArray: Uint8Array | Uint8ClampedArray,
-    targetPixelArray: Uint8ClampedArray,
-    sourceSize: Size,
-    targetSize: Size,
-    canvassRatio: number,
-    targetColors: MaposaicColors,
-    specificColorTransforms: SpecificColorTransforms,
-    hasAxialTransfo: boolean | undefined,
-  ) {
+  constructor({
+    sourcePixelArray,
+    targetPixelArray,
+    sourceSize,
+    targetSize,
+    canvassRatio,
+    targetColors,
+    specificColorTransforms,
+    hasAxialTransfo,
+    isBrightColor,
+  }: {
+    sourcePixelArray: Uint8Array | Uint8ClampedArray
+    targetPixelArray: Uint8ClampedArray
+    sourceSize: Size
+    targetSize: Size
+    canvassRatio: number
+    targetColors: MaposaicColors
+    specificColorTransforms: SpecificColorTransforms
+    hasAxialTransfo?: boolean
+    isBrightColor?: boolean
+  }) {
     this.sourcePixelArray = sourcePixelArray
     this.targetPixelArray = targetPixelArray
     this.sourceSize = sourceSize
@@ -43,7 +55,8 @@ export class CanvasDataTransformer {
     this.canvassRatio = canvassRatio
     this.specificColorTransforms = specificColorTransforms
     this.targetColors = targetColors
-    this.hasAxialTransfo = hasAxialTransfo
+    this.hasAxialTransfo = hasAxialTransfo ?? true
+    this.isBrightColor = !!isBrightColor
 
     const visitedSize = targetSize.h * targetSize.w
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -76,6 +89,7 @@ export class CanvasDataTransformer {
         this.currentArea.initialColor,
         this.targetColors,
         this.specificColorTransforms,
+        this.isBrightColor,
       )
       this.currentArea.initialTargetPoint = getPointFromPixelIndex(targetPixelIndex, this.targetSize.w)
       this.currentArea.bounds = { min: sourcePixelIndex, max: sourcePixelIndex }

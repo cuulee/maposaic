@@ -69,11 +69,11 @@ const ColorConfigChoice = ({
 
   const changeColorConfig = (configType: ColorConfigType) => {
     if (configType === ColorConfigType.Random) {
-      setColorConfig(RANDOM_CONFIG)
+      setColorConfig({ ...RANDOM_CONFIG })
     } else if (configType === ColorConfigType.Shading) {
-      setColorConfig(shadingColorConfig)
+      setColorConfig({ ...shadingColorConfig })
     } else {
-      setColorConfig(paletteColorConfig)
+      setColorConfig({ ...paletteColorConfig })
     }
   }
 

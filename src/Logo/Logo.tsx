@@ -13,7 +13,12 @@ const SPECIFIC_COLOR_TRANSFORMS = {
 }
 
 const Logo = ({ colorConfig }: { colorConfig: ColorConfig }) => {
-  useConversion({ imageUrl: URL, colorConfig, specificColorTransforms: SPECIFIC_COLOR_TRANSFORMS, imageWidth: 600 })
+  useConversion({
+    imageUrl: URL,
+    colorConfig: colorConfig,
+    specificColorTransforms: SPECIFIC_COLOR_TRANSFORMS,
+    imageWidth: 1000,
+  })
 
   return (
     <div className="logo">

@@ -48,7 +48,7 @@ export const PRESET_PALETTES: { [key in PaletteOrigin]: { name: string; palettes
 
 export const ROAD_WHITE = '#ffffff'
 
-export const ColorConfigNamesAndImage: { [key in ColorConfigType]: { name: string; imgPath: string } } = {
+export const ColorConfigNamesAndImage = {
   [ColorConfigType.Random]: {
     name: 'Random',
     imgPath:
