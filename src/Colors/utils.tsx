@@ -37,7 +37,7 @@ export const rgbToHex = (rgb: RGBColor) => {
 export const createColor = (colors: MaposaicColors | string, isBrightColor?: boolean) => {
   if (colors === ColorConfigType.Random) {
     if (isBrightColor) {
-      return hslToRGB(Math.floor(Math.random() * 360), 100, 50)
+      return hslToRGB((Math.floor(Math.random() * 240) + 180) % 360, 100, 50)
     }
     return createRGB(
       Math.floor(Math.random() * 256),
