@@ -1,7 +1,7 @@
 import { ColorConfig } from 'Colors/types'
 import { createMaposaicColors } from 'Colors/utils'
 import { SpecificColorTransforms } from 'Maposaic/types'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 // eslint-disable-next-line
 import PaintWorker from 'worker-loader!../Converter/paint.worker'
@@ -13,6 +13,7 @@ export const useConversion = ({
   imageWidth,
   isBrightColor,
   canvasElementsIds,
+  similarColorTolerance,
 }: {
   imageUrl: string | null
   colorConfig: ColorConfig
@@ -23,11 +24,14 @@ export const useConversion = ({
     input?: string
     output?: string
   }
+  similarColorTolerance?: number
 }) => {
+  const [isLoading, setIsLoading] = useState(false)
   useEffect(() => {
     if (!imageUrl) {
       return
     }
+    setIsLoading(true)
     const paintWorker = new PaintWorker()
     const image = new Image()
     image.src = imageUrl
@@ -52,6 +56,7 @@ export const useConversion = ({
       const outputCanvasContext = outputCanvas.getContext('2d')
 
       if (!inputCanvasContext || !outputCanvasContext) {
+        setIsLoading(false)
         return
       }
 
@@ -71,13 +76,28 @@ export const useConversion = ({
         isWasmAvailable: false,
         hasAxialTransfo: false,
         isBrightColor,
+        similarColorTolerance,
       })
 
       paintWorker.onmessage = function (e: { data: { pixels: number[]; paintedBoundsMin: number } }): void {
+        setIsLoading(false)
         outputImageData.data.set(e.data.pixels, e.data.paintedBoundsMin)
         outputCanvasContext.putImageData(outputImageData, 0, 0)
       }
     }
-    return () => paintWorker.terminate()
-  }, [colorConfig, specificColorTransforms, imageUrl, imageWidth, isBrightColor, canvasElementsIds])
+    return () => {
+      paintWorker.terminate()
+      setIsLoading(false)
+    }
+  }, [
+    colorConfig,
+    specificColorTransforms,
+    imageUrl,
+    imageWidth,
+    isBrightColor,
+    canvasElementsIds,
+    similarColorTolerance,
+  ])
+
+  return { isLoading }
 }

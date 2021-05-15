@@ -17,6 +17,7 @@ export class CanvasDataTransformer {
   specificColorTransforms: SpecificColorTransforms
   hasAxialTransfo: boolean
   isBrightColor: boolean
+  similarColorTolerance: number
 
   visited: boolean[]
 
@@ -37,6 +38,7 @@ export class CanvasDataTransformer {
     specificColorTransforms,
     hasAxialTransfo,
     isBrightColor,
+    similarColorTolerance,
   }: {
     sourcePixelArray: Uint8Array | Uint8ClampedArray
     targetPixelArray: Uint8ClampedArray
@@ -47,6 +49,7 @@ export class CanvasDataTransformer {
     specificColorTransforms: SpecificColorTransforms
     hasAxialTransfo?: boolean
     isBrightColor?: boolean
+    similarColorTolerance?: number
   }) {
     this.sourcePixelArray = sourcePixelArray
     this.targetPixelArray = targetPixelArray
@@ -57,6 +60,7 @@ export class CanvasDataTransformer {
     this.targetColors = targetColors
     this.hasAxialTransfo = hasAxialTransfo ?? true
     this.isBrightColor = !!isBrightColor
+    this.similarColorTolerance = similarColorTolerance ?? SIMILAR_COLOR_TOLERANCE
 
     const visitedSize = targetSize.h * targetSize.w
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -131,7 +135,7 @@ export class CanvasDataTransformer {
       const adjacentTargetPoints = getAdjacentPoints({ point: targetPoint, canvasSize: this.targetSize })
 
       // anti-aliasing
-      if (!isColorSimilar(sourcePointColor, initialColor, SIMILAR_COLOR_TOLERANCE)) {
+      if (!isColorSimilar(sourcePointColor, initialColor, this.similarColorTolerance)) {
         const similarPointCount = Object.values(adjacentTargetPoints).filter((adjacentTargetPoint) => {
           if (!adjacentTargetPoint) {
             return false
@@ -156,7 +160,7 @@ export class CanvasDataTransformer {
               this.sourcePixelArray[adjSourceIndex * 4 + 3],
             ),
             sourcePointColor,
-            SIMILAR_COLOR_TOLERANCE,
+            this.similarColorTolerance,
           )
         }).length
 

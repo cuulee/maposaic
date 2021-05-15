@@ -16,6 +16,7 @@ onmessage = async ({
     isWasmAvailable,
     hasAxialTransfo,
     isBrightColor,
+    similarColorTolerance,
   },
 }: {
   data: {
@@ -29,6 +30,7 @@ onmessage = async ({
     isWasmAvailable: boolean
     hasAxialTransfo?: boolean
     isBrightColor?: boolean
+    similarColorTolerance?: number
   }
 }) => {
   let computedPixels: Uint8Array | Uint8ClampedArray = new Uint8Array()
@@ -52,6 +54,7 @@ onmessage = async ({
       specificColorTransforms,
       hasAxialTransfo,
       isBrightColor,
+      similarColorTolerance,
     })
     canvasDataTransformer.paintTargetData()
     computedPixels = canvasDataTransformer.targetPixelArray

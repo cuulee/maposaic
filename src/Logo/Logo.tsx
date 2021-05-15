@@ -1,7 +1,7 @@
 import { ROAD_WHITE } from 'Colors/constants'
 import { ROAD_SIMPLE_WHITE } from 'Colors/mapbox'
 import { ColorConfig } from 'Colors/types'
-import { useConversion } from 'Converter/hooks'
+import { useConversion } from 'Converter/useConversion'
 import React from 'react'
 
 import './logo.less'
