@@ -81,7 +81,7 @@ const Drawer = ({
         <div className="drawer__header">
           <div className="drawer__header__title">
             <div className="header__logo" onClick={() => setDrawerVisible(false)}>
-              <Logo colorConfig={colorConfig} specificColorTransforms={specificColorTransforms} />
+              <Logo colorConfig={colorConfig} />
             </div>
           </div>
         </div>

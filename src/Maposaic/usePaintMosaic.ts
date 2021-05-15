@@ -129,7 +129,7 @@ export const usePaintMosaic = ({
         setRemainingTime(0)
 
         const outputCanvas = document.getElementById(OUTPUT_CANVAS_ID) as HTMLCanvasElement | null
-        if (outputCanvas) {
+        if (outputCanvas && !isMobile) {
           maposaicContext.drawImage(outputCanvas, 30, 30, 300, (outputCanvas.height * 300) / outputCanvas.width)
         }
 
