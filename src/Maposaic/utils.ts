@@ -109,7 +109,9 @@ export const isWasmSuported = async () => {
   }
 }
 
-export const useCheckWasmAvailability = (setIsWasmAvailable: (wasm: boolean) => void) => {
+export const useCheckWasmAvailability = () => {
+  const [isWasmAvailable, setIsWasmAvailable] = useState<boolean | null>(null)
+
   const checkWasmAvailability = async () => {
     if (await isWasmSuported()) {
       // eslint-disable-next-line no-console
@@ -126,6 +128,8 @@ export const useCheckWasmAvailability = (setIsWasmAvailable: (wasm: boolean) => 
     void checkWasmAvailability()
     // eslint-disable-next-line
   }, [])
+
+  return { isWasmAvailable }
 }
 
 export const useCheckMobileScreen = ({ setIsMobile }: { setIsMobile: (isMobile: boolean) => void }) => {

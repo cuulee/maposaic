@@ -16,8 +16,7 @@ function App() {
     void fetch('https://us-central1-maposaic-99785.cloudfunctions.net/fetch3Geonames') // warmup the api
   }, [])
 
-  const [isWasmAvailable, setIsWasmAvailable] = useState<boolean | null>(null)
-  useCheckWasmAvailability(setIsWasmAvailable)
+  const { isWasmAvailable } = useCheckWasmAvailability()
 
   return (
     <Router>
