@@ -2,7 +2,13 @@ import React, { Suspense, useCallback, useEffect, useRef, useState } from 'react
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { Button, Tooltip } from 'antd'
-import { CloudDownloadOutlined, PictureOutlined, SettingOutlined } from '@ant-design/icons'
+import {
+  CloudDownloadOutlined,
+  FullscreenExitOutlined,
+  FullscreenOutlined,
+  PictureOutlined,
+  SettingOutlined,
+} from '@ant-design/icons'
 import { useHistory } from 'react-router-dom'
 import { Spin } from 'antd'
 import spinner from 'assets/spinner.png'
@@ -35,6 +41,7 @@ import {
   getURLParamsFromColorConfig,
   getURLParamsFromCoords,
   useCheckMobileScreen,
+  useIsFullScreen,
 } from 'Maposaic/utils'
 import { UploadButton } from 'CloudUpload/UploadButton'
 import { TRUE_URL_PARAM_VALUE } from 'constants/navigation'
@@ -290,6 +297,15 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
       )
     }
   }
+  const { isFullScreen } = useIsFullScreen()
+  const onFullScreenClick = () => {
+    if (isFullScreen) {
+      void document.exitFullscreen()
+    } else {
+      void document.documentElement.requestFullscreen()
+      setDrawerVisible(false)
+    }
+  }
 
   return (
     <div className="root-wrapper" id="root-wrapper">
@@ -333,6 +349,13 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
           )}
         </div>
         <div className="overmap__actions">
+          <Tooltip title="Full screen" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
+            <Button
+              onClick={onFullScreenClick}
+              shape="circle"
+              icon={isFullScreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
+            />
+          </Tooltip>
           <Tooltip title="Download" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
             <Button
               className="overmap__actions__button"
