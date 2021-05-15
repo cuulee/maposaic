@@ -11,38 +11,25 @@ import gps from 'assets/gps.svg'
 
 import Drawer from 'Drawer/Drawer'
 
-// eslint-disable-next-line
-import PaintWorker from 'worker-loader!../Converter/paint.worker'
-
 import 'Maposaic/maposaic.style.less'
 import 'spinner.style.less'
 
 import { ColorConfig } from 'Colors/types'
-import { getTargetSizeFromSourceSize } from 'Canvas/utils'
 import { ROAD_SIMPLE_WHITE, WATER_CYAN } from 'Colors/mapbox'
 import { RANDOM_CONFIG, ROAD_WHITE } from 'Colors/constants'
 import {
   MapboxStyle,
-  MAPOSAIC_HIDE_DRAWER_PARAM_KEY,
   MAPOSAIC_SCREENSAVER_PARAM_KEY,
   MAPOSAIC_STYLE_URL_PARAM_KEY,
   MaposaicGeoURLParamKey,
   OnPosterSizeChangePayload,
   SpecificColorTransforms,
 } from 'Maposaic/types'
-import {
-  getPosterTargetSize,
-  resizeMapsContainer,
-  setMapboxArtificialSize,
-  setMapboxDisplaySize,
-  toggleCanvasOpacity,
-} from 'Maposaic/elementHelpers'
+import { getPosterTargetSize, resizeMapsContainer, toggleCanvasOpacity } from 'Maposaic/elementHelpers'
 import { TOOLTIP_ENTER_DELAY } from 'constants/ux'
 import { MAPBOX_TOKEN } from 'constants/mapbox'
 import { fetchGeoRandom, getPlaceNameFromPosition, getRandomCityCoords, getRandomZoom } from 'Geo/utils'
 import GeoSearch from 'Geo/GeoSearchInput'
-import { createMaposaicColors } from 'Colors/utils'
-import { MAPBOX_STYLES } from 'Maposaic/constants'
 import {
   getColorConfigFromURLParams,
   getURLParamsFromColorConfig,
@@ -52,31 +39,15 @@ import {
 import { UploadButton } from 'CloudUpload/UploadButton'
 import { TRUE_URL_PARAM_VALUE } from 'constants/navigation'
 import PlaceName from 'PlaceName/PlaceName'
+import { usePaintMosaic } from 'Maposaic/usePaintMosaic'
 
 const CloudUpload = React.lazy(() => import('CloudUpload/CloudUpload'))
 
 mapboxgl.accessToken = MAPBOX_TOKEN
 
 const INITIAL_SIZE_FACTOR = 1
-const DISPLAY_PIXEL_RATIO = 1
 
-let mapboxResolutionRatio: number | null = null
-let paintWorker = new PaintWorker()
-let isFirstRender = true
 let lastFetchedPlaceNameCenter: mapboxgl.LngLat | null = null
-
-const getMapboxPixelCount = (map: mapboxgl.Map) => {
-  const mapboxCanvas = map.getCanvas()
-  const gl = mapboxCanvas.getContext('webgl')
-  return (gl?.drawingBufferWidth ?? 0) * (gl?.drawingBufferHeight ?? 0)
-}
-
-const computeTime: { pixelCount: number | null; milliseconds: number | null } = {
-  pixelCount: null,
-  milliseconds: null,
-}
-
-let lastStartDate = new Date()
 
 const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): JSX.Element => {
   const history = useHistory()
@@ -192,127 +163,27 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
     }
   }, [changePlacePeriodically])
 
-  useEffect(() => {
-    const paintMosaic = (newMap: mapboxgl.Map): void => {
-      setIsLoading(true)
-      toggleCanvasOpacity(true)
-      const mapboxCanvas = newMap.getCanvas()
-      const gl = mapboxCanvas.getContext('webgl')
-      const mapboxWrapper = document.getElementById('mapbox-wrapper')
-      const maposaicCanvas = document.getElementById('maposaic-canvas') as HTMLCanvasElement
-
-      if (!gl || !gl.drawingBufferWidth || !maposaicCanvas) {
-        return
-      }
-      const mapboxCanvasSize = { w: gl.drawingBufferWidth, h: gl.drawingBufferHeight }
-      const maposaicCanvasSize = getTargetSizeFromSourceSize(mapboxCanvasSize, DISPLAY_PIXEL_RATIO)
-
-      if (null === mapboxResolutionRatio) {
-        // mapbox render with *2 resolution on some screens (like retina ones)
-        mapboxResolutionRatio = gl.drawingBufferWidth / (mapboxWrapper?.offsetWidth ?? 1)
-      }
-
-      maposaicCanvas.setAttribute('width', maposaicCanvasSize.w.toString())
-      maposaicCanvas.setAttribute('height', maposaicCanvasSize.h.toString())
-
-      const maposaicContext = maposaicCanvas.getContext('2d')
-      if (!maposaicContext) {
-        return
-      }
-      const imageData = maposaicContext.getImageData(0, 0, maposaicCanvasSize.w, maposaicCanvasSize.h)
-      const maposaicData = imageData.data
-
-      const mapboxPixels = new Uint8Array(gl.drawingBufferWidth * gl.drawingBufferHeight * 4)
-      gl.readPixels(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight, gl.RGBA, gl.UNSIGNED_BYTE, mapboxPixels)
-
-      paintWorker.postMessage({
-        sourcePixelArray: mapboxPixels,
-        targetPixelArray: maposaicData,
-        sourceSize: mapboxCanvasSize,
-        targetSize: maposaicCanvasSize,
-        canvassRatio: DISPLAY_PIXEL_RATIO,
-        maposaicColors: createMaposaicColors(colorConfig, specificColorTransforms),
-        specificColorTransforms,
-        isWasmAvailable,
-      })
-
-      paintWorker.onmessage = function (e: { data: { pixels: number[]; paintedBoundsMin: number } }): void {
-        imageData.data.set(e.data.pixels, e.data.paintedBoundsMin)
-        maposaicContext.putImageData(imageData, 0, 0)
-        toggleCanvasOpacity(false)
-        setIsLoading(false)
-        setRemainingTime(0)
-
-        const pixelCount = Math.floor(e.data.pixels.length / 4)
-        const duration = new Date().getTime() - lastStartDate.getTime()
-        if (pixelCount >= (computeTime.pixelCount ?? 0)) {
-          computeTime.pixelCount = Math.floor(e.data.pixels.length / 4)
-          computeTime.milliseconds = duration
-        }
-        setEstimatedTime(duration)
-      }
-    }
-    if (null === isWasmAvailable) {
-      return // avoid flash at initalization
-    }
-    if (!initialCenter) {
-      return
-    }
-
-    const center = map?.getCenter() ?? initialCenter
-    const zoom = map?.getZoom() ?? initialZoom
-
-    setMapboxArtificialSize(sizeFactor)
-
-    const newMap = new mapboxgl.Map({
-      container: mapboxContainer.current ? mapboxContainer.current : '',
-      style: MAPBOX_STYLES[mapboxStyle].url,
-      zoom,
-      center,
-      maxTileCacheSize: 0,
-    })
-
-    newMap.on('load', () => {
-      if (isFirstRender) {
-        isFirstRender = false
-        const urlParams = new URLSearchParams(window.location.search)
-        if (
-          !isMobile &&
-          urlParams.get(MAPOSAIC_HIDE_DRAWER_PARAM_KEY) !== TRUE_URL_PARAM_VALUE &&
-          urlParams.get(MAPOSAIC_SCREENSAVER_PARAM_KEY) !== TRUE_URL_PARAM_VALUE
-        ) {
-          setDrawerVisible(true)
-        }
-      }
-      setMap(newMap)
-    })
-    newMap.on('resize', () => setSizeRender((s) => s + 1))
-    newMap.on('dragstart', toggleCanvasOpacity)
-    newMap.on('zoomstart', toggleCanvasOpacity)
-
-    newMap.on('render', () => {
-      setMapboxDisplaySize()
-      paintWorker.terminate()
-
-      if (!newMap.loaded() || newMap.isMoving() || newMap.isZooming()) {
-        return
-      }
-
-      const pixelCount = getMapboxPixelCount(newMap)
-      setRemainingTime(Math.round(((computeTime.milliseconds ?? 0) * pixelCount) / (computeTime.pixelCount ?? 1)))
-
-      lastStartDate = new Date()
-      paintWorker = new PaintWorker()
-      paintMosaic(newMap)
-      if (newMap.getCenter().lat !== currentCenter?.lat && newMap.getCenter().lng !== currentCenter?.lng) {
-        setCurrentCenter(newMap.getCenter())
-      }
-    })
-    return () => {
-      newMap.remove()
-    }
-    // eslint-disable-next-line
-  }, [mapboxStyle, colorConfig, sizeRender, sizeFactor, specificColorTransforms, initialCenter, isWasmAvailable])
+  const { mapboxResolutionRatio } = usePaintMosaic({
+    setIsLoading,
+    colorConfig,
+    specificColorTransforms,
+    isWasmAvailable,
+    setRemainingTime,
+    setEstimatedTime,
+    initialCenter,
+    map,
+    initialZoom,
+    sizeFactor,
+    mapboxContainer,
+    mapboxStyle,
+    isMobile,
+    setDrawerVisible,
+    setSizeRender,
+    setMap,
+    currentCenter,
+    setCurrentCenter,
+    sizeRender,
+  })
 
   const changeMapStyle = (newStyle: MapboxStyle) => {
     toggleCanvasOpacity(true)

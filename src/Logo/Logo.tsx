@@ -15,7 +15,7 @@ const SPECIFIC_COLOR_TRANSFORMS = {
 const Logo = ({ colorConfig }: { colorConfig: ColorConfig }) => {
   useConversion({
     imageUrl: URL,
-    colorConfig: colorConfig,
+    colorConfig,
     specificColorTransforms: SPECIFIC_COLOR_TRANSFORMS,
     imageWidth: 1000,
     isBrightColor: true,
