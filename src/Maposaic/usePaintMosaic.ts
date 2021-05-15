@@ -2,6 +2,7 @@ import { getTargetSizeFromSourceSize } from 'Canvas/utils'
 import { ColorConfig } from 'Colors/types'
 import { createMaposaicColors } from 'Colors/utils'
 import { TRUE_URL_PARAM_VALUE } from 'constants/navigation'
+import { OUTPUT_CANVAS_ID } from 'Logo/Logo'
 import mapboxgl from 'mapbox-gl'
 import { MAPBOX_STYLES } from 'Maposaic/constants'
 import { setMapboxArtificialSize, setMapboxDisplaySize, toggleCanvasOpacity } from 'Maposaic/elementHelpers'
@@ -126,6 +127,11 @@ export const usePaintMosaic = ({
         toggleCanvasOpacity(false)
         setIsLoading(false)
         setRemainingTime(0)
+
+        const outputCanvas = document.getElementById(OUTPUT_CANVAS_ID) as HTMLCanvasElement | null
+        if (outputCanvas) {
+          maposaicContext.drawImage(outputCanvas, 30, 30, 250, (outputCanvas.height * 250) / outputCanvas.width)
+        }
 
         const pixelCount = Math.floor(e.data.pixels.length / 4)
         const duration = new Date().getTime() - lastStartDate.getTime()

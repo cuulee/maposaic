@@ -318,15 +318,19 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
       />
       <div className="overmap">
         <div className="overmap__actions">
-          <Tooltip title="Settings" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
-            <Button
-              className="overmap__actions__button"
-              type="primary"
-              shape="circle"
-              onClick={() => setDrawerVisible(true)}
-              icon={<SettingOutlined />}
-            />
-          </Tooltip>
+          {isMobile ? (
+            <Tooltip title="Settings" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
+              <Button
+                className="overmap__actions__button"
+                type="primary"
+                shape="circle"
+                onClick={() => setDrawerVisible(true)}
+                icon={<SettingOutlined />}
+              />
+            </Tooltip>
+          ) : (
+            <div onClick={() => setDrawerVisible(true)} className="overmap__actions__settings--invisible"></div>
+          )}
         </div>
         <div className="overmap__actions">
           <Tooltip title="Download" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>

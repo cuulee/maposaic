@@ -12,12 +12,17 @@ export const useConversion = ({
   specificColorTransforms,
   imageWidth,
   isBrightColor,
+  canvasElementsIds,
 }: {
   imageUrl: string | null
   colorConfig: ColorConfig
   specificColorTransforms: SpecificColorTransforms
   imageWidth?: number
   isBrightColor?: boolean
+  canvasElementsIds?: {
+    input?: string
+    output?: string
+  }
 }) => {
   useEffect(() => {
     if (!imageUrl) {
@@ -32,8 +37,8 @@ export const useConversion = ({
         image.width = imageWidth
         image.height = (imageWidth * image.height) / old_width
       }
-      const inputCanvas = document.getElementById('input-canvas') as HTMLCanvasElement
-      const outputCanvas = document.getElementById('output-canvas') as HTMLCanvasElement
+      const inputCanvas = document.getElementById(canvasElementsIds?.input ?? 'input-canvas') as HTMLCanvasElement
+      const outputCanvas = document.getElementById(canvasElementsIds?.output ?? 'output-canvas') as HTMLCanvasElement
       const size = { w: image.width, h: image.height }
 
       inputCanvas.width = size.w
@@ -74,5 +79,5 @@ export const useConversion = ({
       }
     }
     return () => paintWorker.terminate()
-  }, [colorConfig, specificColorTransforms, imageUrl, imageWidth, isBrightColor])
+  }, [colorConfig, specificColorTransforms, imageUrl, imageWidth, isBrightColor, canvasElementsIds])
 }
