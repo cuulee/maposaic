@@ -75,10 +75,11 @@ export const DEFAULT_SHADING_CONFIG: ShadingColorConfig = {
   shadingType: ShadingType.Preset,
   seedColor: ShadingPresetName.Blue,
 }
+export const INITIAL_COOLORS_INDEX = Math.floor(Math.random() * coolors.length)
 
 export const DEFAULT_PALETTE_CONFIG: PaletteColorConfig = {
   type: ColorConfigType.Palette,
   paletteType: PaletteType.Preset,
   origin: PaletteOrigin.Coolors,
-  paletteIndex: 0,
+  paletteIndex: INITIAL_COOLORS_INDEX,
 }
