@@ -344,7 +344,7 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
         <div className="overmap__actions">
           <Tooltip title="Full screen" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
             <Button
-              onClick={() => onFullScreenClick(isFullScreen)}
+              onClick={() => onFullScreenClick(isFullScreen, setDrawerVisible)}
               shape="circle"
               icon={isFullScreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
             />

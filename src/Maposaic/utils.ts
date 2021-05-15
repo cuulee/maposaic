@@ -161,12 +161,13 @@ export const useIsFullScreen = () => {
   return { isFullScreen }
 }
 
-export const onFullScreenClick = (isFullScreen: boolean) => {
+export const onFullScreenClick = (isFullScreen: boolean, setDrawerVisible: (visible: boolean) => void) => {
   if (screenfull.isEnabled) {
     if (isFullScreen) {
       void screenfull.exit()
     } else {
       void screenfull.request()
+      setDrawerVisible(false)
     }
   }
 }
