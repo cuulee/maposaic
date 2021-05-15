@@ -8,6 +8,7 @@ import {
 import { ColorConfig, ColorConfigType, PaletteOrigin, PaletteType, ShadingPresetName, ShadingType } from 'Colors/types'
 import { MaposaicColorURLParamKey, MaposaicGeoURLParamKey } from 'Maposaic/types'
 import { useEffect, useState } from 'react'
+import screenfull from 'screenfull'
 
 const COLORS_SEPARATOR = ','
 
@@ -148,14 +149,24 @@ export const useIsFullScreen = () => {
   const [isFullScreen, setIsFullScreen] = useState(!!document.fullscreenElement)
 
   useEffect(() => {
-    document.addEventListener('fullscreenchange', (e) => {
-      if (document.fullscreenElement) {
-        setIsFullScreen(true)
-      } else {
-        setIsFullScreen(false)
-      }
-    })
+    if (screenfull.isEnabled) {
+      screenfull.on('change', () => {
+        //eslint-disable-next-line
+        // @ts-ignore
+        setIsFullScreen(screenfull.isFullscreen)
+      })
+    }
   }, [])
 
   return { isFullScreen }
+}
+
+export const onFullScreenClick = (isFullScreen: boolean) => {
+  if (screenfull.isEnabled) {
+    if (isFullScreen) {
+      void screenfull.exit()
+    } else {
+      void screenfull.request()
+    }
+  }
 }

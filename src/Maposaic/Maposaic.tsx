@@ -40,6 +40,7 @@ import {
   getColorConfigFromURLParams,
   getURLParamsFromColorConfig,
   getURLParamsFromCoords,
+  onFullScreenClick,
   useCheckMobileScreen,
   useIsFullScreen,
 } from 'Maposaic/utils'
@@ -298,14 +299,6 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
     }
   }
   const { isFullScreen } = useIsFullScreen()
-  const onFullScreenClick = () => {
-    if (isFullScreen) {
-      void document.exitFullscreen()
-    } else {
-      void document.documentElement.requestFullscreen()
-      setDrawerVisible(false)
-    }
-  }
 
   return (
     <div className="root-wrapper" id="root-wrapper">
@@ -351,7 +344,7 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
         <div className="overmap__actions">
           <Tooltip title="Full screen" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
             <Button
-              onClick={onFullScreenClick}
+              onClick={() => onFullScreenClick(isFullScreen)}
               shape="circle"
               icon={isFullScreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
             />

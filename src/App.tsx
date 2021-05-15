@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useEffect, useState } from 'react'
+import React, { lazy, Suspense, useEffect } from 'react'
 import { Route, BrowserRouter as Router, Switch } from 'react-router-dom'
 import { Spin } from 'antd'
 import spinner from 'assets/spinner.png'
