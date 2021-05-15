@@ -130,7 +130,7 @@ export const usePaintMosaic = ({
 
         const outputCanvas = document.getElementById(OUTPUT_CANVAS_ID) as HTMLCanvasElement | null
         if (outputCanvas) {
-          maposaicContext.drawImage(outputCanvas, 30, 30, 250, (outputCanvas.height * 250) / outputCanvas.width)
+          maposaicContext.drawImage(outputCanvas, 30, 30, 300, (outputCanvas.height * 300) / outputCanvas.width)
         }
 
         const pixelCount = Math.floor(e.data.pixels.length / 4)
