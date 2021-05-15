@@ -10,7 +10,7 @@ import {
 } from 'Colors/types'
 import { SpecificColorTransforms } from 'Maposaic/types'
 import { generate } from '@ant-design/colors'
-import { AntColors, INITIAL_COOLORS_INDEX, PRESET_PALETTES } from 'Colors/constants'
+import { AntColors, INITIAL_PALETTE_INDEX, PRESET_PALETTES } from 'Colors/constants'
 
 export const createRGB = (r: number, g: number, b: number, a: number): RGBColor => {
   // beware of cheeseNaN
@@ -139,9 +139,7 @@ export const getInitialPresetPaletteIndex = (colorConfig: ColorConfig, origin: P
     colorConfig.paletteType === PaletteType.Preset &&
     colorConfig.origin === origin
     ? colorConfig.paletteIndex
-    : origin === PaletteOrigin.Coolors
-    ? INITIAL_COOLORS_INDEX
-    : 0
+    : INITIAL_PALETTE_INDEX[origin] ?? 0
 }
 
 export const createColorSettings = (
