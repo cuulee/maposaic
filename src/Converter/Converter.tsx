@@ -1,9 +1,11 @@
 import { RANDOM_CONFIG, ROAD_WHITE } from 'Colors/constants'
 import { ROAD_SIMPLE_WHITE, WATER_CYAN } from 'Colors/mapbox'
-import { ColorConfig } from 'Colors/types'
+import { ColorConfig as ColorConfigType } from 'Colors/types'
 import { SpecificColorTransforms } from 'Maposaic/types'
 import React, { useState } from 'react'
 import spinner from 'assets/spinner.png'
+import ColorConfig from 'Colors/ColorConfigChoice'
+import { Card } from 'antd'
 
 import './converter.less'
 
@@ -35,11 +37,11 @@ const Uploader = ({ setImageUrl }: { setImageUrl: (url: string) => void }) => {
 }
 
 const Converter = () => {
-  const [colorConfig] = useState<ColorConfig>(RANDOM_CONFIG)
+  const [colorConfig, setColorConfig] = useState<ColorConfigType>(RANDOM_CONFIG)
   const [imageUrl, setImageUrl] = useState<null | string>(null)
   const [similarColorTolerance, setSimilarColorTolerance] = useState(10)
 
-  const [specificColorTransforms] = useState<SpecificColorTransforms>({
+  const [specificColorTransforms, setNewSpecificColorTransforms] = useState<SpecificColorTransforms>({
     [ROAD_SIMPLE_WHITE]: { color: ROAD_WHITE, isEditable: true, name: 'roads' },
     [WATER_CYAN]: { color: null, isEditable: true, name: 'water' },
   })
@@ -49,7 +51,16 @@ const Converter = () => {
   return (
     <div className="converter">
       <div className="converter__settings">
-        <Uploader setImageUrl={setImageUrl} />
+        <div className="converter__settings__upload">
+          <Uploader setImageUrl={setImageUrl} />
+          {isLoading && (
+            <Spin
+              className="converter__settings__loader"
+              spinning={true}
+              indicator={<img className="spinner" src={spinner} alt="spin" />}
+            />
+          )}
+        </div>
         <div className="converter__settings__tolerance">
           <div>Tolerance</div>
           <InputNumber
@@ -59,13 +70,16 @@ const Converter = () => {
             onChange={(value) => setSimilarColorTolerance(value as number)}
           />
         </div>
-        {isLoading && (
-          <Spin
-            className="converter__settings__loader"
-            spinning={true}
-            indicator={<img className="spinner" src={spinner} alt="spin" />}
-          />
-        )}
+        <div className="converter__color-config">
+          <Card title="Color">
+            <ColorConfig
+              colorConfig={colorConfig}
+              setColorConfig={setColorConfig}
+              specificColorTransforms={specificColorTransforms}
+              setNewSpecificColorTransforms={setNewSpecificColorTransforms}
+            />
+          </Card>
+        </div>
       </div>
       <div className="converter__item">
         <canvas className="converter__item__image" id="input-canvas" />
