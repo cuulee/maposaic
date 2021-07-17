@@ -293,6 +293,7 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
       navigator.geolocation.getCurrentPosition(
         (position) => {
           map.setCenter(new mapboxgl.LngLat(position.coords.longitude, position.coords.latitude))
+          map.setZoom(14)
         },
         () => setIsLoading(false),
       )
