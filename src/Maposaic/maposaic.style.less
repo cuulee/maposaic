@@ -1,3 +1,5 @@
+@import 'App.style.less';
+
 .root-wrapper {
   width: 100%;
   height: 100%;
@@ -36,7 +38,6 @@
 }
 .overmap {
   padding: 8px;
-  height: 56px;
   align-items: center;
   top: 0;
   left: 0;
@@ -44,22 +45,43 @@
   display: flex;
   justify-content: space-between;
   width: 100%;
+  pointer-events: none; // so the map in background is still clickable on mobile
+
+  @media @mobile {
+    align-items: flex-start;
+  }
+  @media @desktop {
+    height: 56px;
+  }
 
   &__actions {
     display: flex;
+
     &__settings {
+      pointer-events: auto;
+
       &--invisible {
         cursor: pointer;
         width: 150px;
         height: 30px;
       }
     }
-    &:not(:first-child) {
-      margin-left: 8px;
+    @media @mobile {
+      flex-direction: column;
+      align-items: flex-end;
     }
+
     &__button {
-      &:not(:first-child) {
-        margin-left: 8px;
+      pointer-events: auto;
+      @media @mobile {
+        &:not(:first-child) {
+          margin-top: 8px;
+        }
+      }
+      @media @desktop {
+        &:not(:first-child) {
+          margin-left: 8px;
+        }
       }
       .button-icon {
         width: 16px;

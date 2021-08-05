@@ -16,6 +16,7 @@ import { MAPBOX_STYLES } from 'Maposaic/constants'
 import githubMark from 'assets/GitHub-Mark.png'
 import { TOOLTIP_ENTER_DELAY } from 'constants/ux'
 import Logo from 'Logo/Logo'
+import Checkbox from 'antd/lib/checkbox/Checkbox'
 
 const millisecondsToText = (millis: number | null) => {
   const min = Math.floor((millis ?? 0) / 60000)
@@ -40,6 +41,8 @@ const Drawer = ({
   estimatedTime,
   onPosterSizeChange,
   isMobile,
+  displayLogo,
+  setDisplayLogo,
 }: DrawerPropsType) => {
   const [isLandscape, setIsLandscape] = useState<boolean | null>(null)
   const [format, setFormat] = useState<Format>(Format.A4)
@@ -173,6 +176,11 @@ const Drawer = ({
                     </span>
                   </Badge>
                 )}
+              </div>
+              <div className="display-logo">
+                <Checkbox checked={displayLogo} onChange={() => setDisplayLogo(!displayLogo)}>
+                  Display logo
+                </Checkbox>
               </div>
             </div>
           </div>

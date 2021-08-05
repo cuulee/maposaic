@@ -48,6 +48,7 @@ import { UploadButton } from 'CloudUpload/UploadButton'
 import { TRUE_URL_PARAM_VALUE } from 'constants/navigation'
 import PlaceName from 'PlaceName/PlaceName'
 import { usePaintMosaic } from 'Maposaic/usePaintMosaic'
+import { LOGO_OUTPUT_CANVAS_ID } from 'Logo/Logo'
 
 const CloudUpload = React.lazy(() => import('CloudUpload/CloudUpload'))
 
@@ -64,6 +65,7 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
   const [map, setMap] = useState<mapboxgl.Map | null>(null)
   const mapboxContainer = useRef<HTMLDivElement | null>(null)
   const [drawerVisible, setDrawerVisible] = useState(false)
+  const [displayLogo, setDisplayLogo] = useState(true)
   const [estimatedTime, setEstimatedTime] = useState<number | null>(null)
   const [remainingTime, setRemainingTime] = useState<number | null>(null)
   const [mapboxStyle, setMapboxStyle] = useState(MapboxStyle.Road)
@@ -191,6 +193,7 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
     currentCenter,
     setCurrentCenter,
     sizeRender,
+    displayLogo,
   })
 
   const changeMapStyle = (newStyle: MapboxStyle) => {
@@ -300,6 +303,7 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
     }
   }
   const { isFullScreen } = useIsFullScreen()
+  const isLogoDisplayed = displayLogo && document.getElementById(LOGO_OUTPUT_CANVAS_ID)
 
   return (
     <div className="root-wrapper" id="root-wrapper">
@@ -325,10 +329,12 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
         estimatedTime={estimatedTime}
         onPosterSizeChange={onPosterSizeChange}
         isMobile={isMobile}
+        displayLogo={displayLogo}
+        setDisplayLogo={setDisplayLogo}
       />
       <div className="overmap">
         <div className="overmap__actions">
-          {isMobile ? (
+          {!isLogoDisplayed ? (
             <Tooltip title="Settings" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
               <Button
                 className="overmap__actions__button"
@@ -339,12 +345,22 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
               />
             </Tooltip>
           ) : (
-            <div onClick={() => setDrawerVisible(true)} className="overmap__actions__settings--invisible"></div>
+            <div
+              onClick={() => setDrawerVisible(true)}
+              className="overmap__actions__settings--invisible overmap__actions__button"
+            />
           )}
         </div>
         <div className="overmap__actions">
+          <GeoSearch
+            className="overmap__actions__button"
+            flyTo={flyTo}
+            currentCenter={currentCenter}
+            setDrawerVisible={setDrawerVisible}
+          />
           <Tooltip title="Full screen" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
             <Button
+              className="overmap__actions__button"
               onClick={() => onFullScreenClick(isFullScreen, setDrawerVisible)}
               shape="circle"
               icon={isFullScreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
@@ -381,12 +397,6 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
               icon={<PictureOutlined />}
             />
           </Tooltip>
-          <GeoSearch
-            className="overmap__actions__button"
-            flyTo={flyTo}
-            currentCenter={currentCenter}
-            setDrawerVisible={setDrawerVisible}
-          />
           <Tooltip title="Random place" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
             <Button
               className="overmap__actions__button"

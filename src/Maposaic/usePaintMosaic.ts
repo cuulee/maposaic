@@ -55,6 +55,7 @@ export const usePaintMosaic = ({
   currentCenter,
   setCurrentCenter,
   sizeRender,
+  displayLogo,
 }: {
   setIsLoading: (loading: boolean) => void
   colorConfig: ColorConfig
@@ -75,6 +76,7 @@ export const usePaintMosaic = ({
   currentCenter: null | mapboxgl.LngLat
   setCurrentCenter: React.Dispatch<React.SetStateAction<null | mapboxgl.LngLat>>
   sizeRender: number
+  displayLogo?: boolean
 }) => {
   const [mapboxResolutionRatio, setmapboxResolutionRatio] = useState<number | null>(null)
 
@@ -130,11 +132,11 @@ export const usePaintMosaic = ({
         setRemainingTime(0)
 
         const outputCanvas = document.getElementById(LOGO_OUTPUT_CANVAS_ID) as HTMLCanvasElement | null
-        if (outputCanvas && !isMobile) {
+        if (outputCanvas && displayLogo) {
           maposaicContext.drawImage(
             outputCanvas,
-            40,
-            40,
+            30,
+            30,
             LOGO_PIXEL_WIDTH,
             (outputCanvas.height * LOGO_PIXEL_WIDTH) / outputCanvas.width,
           )
@@ -209,7 +211,16 @@ export const usePaintMosaic = ({
       newMap.remove()
     }
     // eslint-disable-next-line
-  }, [mapboxStyle, colorConfig, sizeRender, sizeFactor, specificColorTransforms, initialCenter, isWasmAvailable])
+  }, [
+    mapboxStyle,
+    colorConfig,
+    sizeRender,
+    sizeFactor,
+    specificColorTransforms,
+    initialCenter,
+    isWasmAvailable,
+    displayLogo,
+  ])
 
   return { mapboxResolutionRatio }
 }

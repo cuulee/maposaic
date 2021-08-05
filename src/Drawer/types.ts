@@ -14,4 +14,6 @@ export type DrawerPropsType = {
   colorConfig: ColorConfig
   setColorConfig: (colorConfig: ColorConfig) => void
   isMobile: boolean
+  displayLogo: boolean
+  setDisplayLogo: (displayLogo: boolean) => void
 }

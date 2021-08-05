@@ -1,6 +1,9 @@
 @import '~antd/dist/antd.less';
 
-@media screen and (max-width: 767px) {
+@desktop: ~'only screen and (min-width: 721px)';
+@mobile: ~'only screen and (max-width: 720px)';
+
+@media @mobile {
   input,
   select,
   textarea {
