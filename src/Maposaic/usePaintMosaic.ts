@@ -131,14 +131,14 @@ export const usePaintMosaic = ({
         setIsLoading(false)
         setRemainingTime(0)
 
-        const outputCanvas = document.getElementById(LOGO_OUTPUT_CANVAS_ID) as HTMLCanvasElement | null
-        if (outputCanvas && displayLogo) {
+        const logoCanvas = document.getElementById(LOGO_OUTPUT_CANVAS_ID) as HTMLCanvasElement | null
+        if (logoCanvas && displayLogo) {
           maposaicContext.drawImage(
-            outputCanvas,
+            logoCanvas,
             30,
-            30,
+            maposaicCanvasSize.h - 30 - logoCanvas.height,
             LOGO_PIXEL_WIDTH,
-            (outputCanvas.height * LOGO_PIXEL_WIDTH) / outputCanvas.width,
+            (logoCanvas.height * LOGO_PIXEL_WIDTH) / logoCanvas.width,
           )
         }
 

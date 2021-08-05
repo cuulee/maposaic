@@ -48,7 +48,6 @@ import { UploadButton } from 'CloudUpload/UploadButton'
 import { TRUE_URL_PARAM_VALUE } from 'constants/navigation'
 import PlaceName from 'PlaceName/PlaceName'
 import { usePaintMosaic } from 'Maposaic/usePaintMosaic'
-import { LOGO_OUTPUT_CANVAS_ID } from 'Logo/Logo'
 
 const CloudUpload = React.lazy(() => import('CloudUpload/CloudUpload'))
 
@@ -303,7 +302,6 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
     }
   }
   const { isFullScreen } = useIsFullScreen()
-  const isLogoDisplayed = displayLogo && document.getElementById(LOGO_OUTPUT_CANVAS_ID)
 
   return (
     <div className="root-wrapper" id="root-wrapper">
@@ -334,22 +332,15 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
       />
       <div className="overmap">
         <div className="overmap__actions">
-          {!isLogoDisplayed ? (
-            <Tooltip title="Settings" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
-              <Button
-                className="overmap__actions__button"
-                type="primary"
-                shape="circle"
-                onClick={() => setDrawerVisible(true)}
-                icon={<SettingOutlined />}
-              />
-            </Tooltip>
-          ) : (
-            <div
+          <Tooltip title="Settings" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
+            <Button
+              className="overmap__actions__button"
+              type="primary"
+              shape="circle"
               onClick={() => setDrawerVisible(true)}
-              className="overmap__actions__settings--invisible overmap__actions__button"
+              icon={<SettingOutlined />}
             />
-          )}
+          </Tooltip>
         </div>
         <div className="overmap__actions">
           <GeoSearch

@@ -78,6 +78,7 @@ const Drawer = ({
       width="min(100%,333px)"
       bodyStyle={{ padding: 0 }}
       mask={isMobile}
+      forceRender={true}
       closeIcon={<CloseOutlined style={{ color: PRIMARY_COLOR }} />}
     >
       <div className="drawer">
