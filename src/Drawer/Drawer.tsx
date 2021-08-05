@@ -142,11 +142,10 @@ const Drawer = ({
                     })}
                   </Select>
                   <Radio.Group
-                    style={{ display: 'flex', alignItems: 'center' }}
+                    style={{ display: 'flex', alignItems: 'center', marginLeft: '16px' }}
                     name="preset"
                     value={isLandscape}
                     size="small"
-                    className="poster__settings__landscape"
                   >
                     <Radio.Button
                       style={{ width: '29px', height: '21px', ...radioStyle }}
