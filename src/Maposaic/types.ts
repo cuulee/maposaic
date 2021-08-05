@@ -23,6 +23,7 @@ export enum MapboxStyle {
   Road = 'road',
   Relief = 'relief',
   Water = 'water',
+  Administrative = 'administrative',
 }
 
 export const MAPOSAIC_STYLE_URL_PARAM_KEY = 'style'

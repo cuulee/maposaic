@@ -91,7 +91,8 @@
   &__backgroungs {
     display: flex;
     width: 100%;
-    justify-content: space-around;
+    justify-content: flex-start;
+    flex-wrap: wrap;
 
     &__background {
       cursor: pointer;
@@ -99,8 +100,8 @@
       &--selected {
         opacity: 1;
       }
-      &:not(:first-child) {
-        margin-left: 16px;
+      &:not(:last-child) {
+        margin-right: 16px;
       }
       .background-image {
         padding: 2px;
