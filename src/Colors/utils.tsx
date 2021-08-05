@@ -71,9 +71,8 @@ export const transformInitialColor = (
 
 export const isColorSimilar = (color1: RGBColor, color2: RGBColor, similarColorTolerance: number): boolean => {
   return (
-    Math.abs(color1.r - color2.r) < similarColorTolerance &&
-    Math.abs(color1.g - color2.g) < similarColorTolerance &&
-    Math.abs(color1.b - color2.b) < similarColorTolerance
+    Math.pow(color1.r - color2.r, 2) + Math.pow(color1.g - color2.g, 2) + Math.pow(color1.b - color2.b, 2) <
+    similarColorTolerance ** 2
   )
 }
 
