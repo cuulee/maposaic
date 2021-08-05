@@ -1,5 +1,6 @@
 import { ColorConfig } from 'Colors/types'
 import { createMaposaicColors } from 'Colors/utils'
+import { INPUT_CANVAS_ID, OUTPUT_CANVAS_ID } from 'Converter/Converter'
 import { SpecificColorTransforms } from 'Maposaic/types'
 import { useEffect, useState } from 'react'
 
@@ -43,8 +44,8 @@ export const useConversion = ({
         image.width = imageWidth
         image.height = (imageWidth * image.height) / old_width
       }
-      const inputCanvas = document.getElementById(canvasElementsIds?.input ?? 'input-canvas') as HTMLCanvasElement
-      const outputCanvas = document.getElementById(canvasElementsIds?.output ?? 'output-canvas') as HTMLCanvasElement
+      const inputCanvas = document.getElementById(canvasElementsIds?.input ?? INPUT_CANVAS_ID) as HTMLCanvasElement
+      const outputCanvas = document.getElementById(canvasElementsIds?.output ?? OUTPUT_CANVAS_ID) as HTMLCanvasElement
       const size = { w: image.width, h: image.height }
 
       inputCanvas.width = size.w

@@ -13,6 +13,9 @@ import { useConversion } from 'Converter/useConversion'
 import { InputNumber, Spin } from 'antd'
 import Checkbox from 'antd/lib/checkbox/Checkbox'
 
+export const OUTPUT_CANVAS_ID = 'output-canvas-id'
+export const INPUT_CANVAS_ID = 'input-canvas-id'
+
 const Uploader = ({ setImageUrl }: { setImageUrl: (url: string) => void }) => {
   const handleChange = (fileList: FileList | null) => {
     if (!fileList) {
@@ -98,10 +101,10 @@ const Converter = () => {
         </div>
       </div>
       <div className="converter__item">
-        <canvas className="converter__item__image" id="input-canvas" />
+        <canvas className="converter__item__image" id={INPUT_CANVAS_ID} />
       </div>
       <div className="converter__image">
-        <canvas className="converter__item__image" id="output-canvas" />
+        <canvas className="converter__item__image" id={OUTPUT_CANVAS_ID} />
       </div>
     </div>
   )

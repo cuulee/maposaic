@@ -2,7 +2,7 @@ import { getTargetSizeFromSourceSize } from 'Canvas/utils'
 import { ColorConfig } from 'Colors/types'
 import { createMaposaicColors } from 'Colors/utils'
 import { TRUE_URL_PARAM_VALUE } from 'constants/navigation'
-import { OUTPUT_CANVAS_ID } from 'Logo/Logo'
+import { LOGO_OUTPUT_CANVAS_ID } from 'Logo/Logo'
 import mapboxgl from 'mapbox-gl'
 import { MAPBOX_STYLES } from 'Maposaic/constants'
 import { setMapboxArtificialSize, setMapboxDisplaySize, toggleCanvasOpacity } from 'Maposaic/elementHelpers'
@@ -19,6 +19,7 @@ import PaintWorker from 'worker-loader!../Converter/paint.worker'
 let paintWorker = new PaintWorker()
 
 const DISPLAY_PIXEL_RATIO = 1
+export const LOGO_PIXEL_WIDTH = 222
 
 let lastStartDate = new Date()
 let isFirstRender = true
@@ -128,9 +129,15 @@ export const usePaintMosaic = ({
         setIsLoading(false)
         setRemainingTime(0)
 
-        const outputCanvas = document.getElementById(OUTPUT_CANVAS_ID) as HTMLCanvasElement | null
+        const outputCanvas = document.getElementById(LOGO_OUTPUT_CANVAS_ID) as HTMLCanvasElement | null
         if (outputCanvas && !isMobile) {
-          maposaicContext.drawImage(outputCanvas, 30, 30, 300, (outputCanvas.height * 300) / outputCanvas.width)
+          maposaicContext.drawImage(
+            outputCanvas,
+            40,
+            40,
+            LOGO_PIXEL_WIDTH,
+            (outputCanvas.height * LOGO_PIXEL_WIDTH) / outputCanvas.width,
+          )
         }
 
         const pixelCount = Math.floor(e.data.pixels.length / 4)
