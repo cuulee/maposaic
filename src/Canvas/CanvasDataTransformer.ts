@@ -18,6 +18,7 @@ export class CanvasDataTransformer {
   hasAxialTransfo: boolean
   isBrightColor: boolean
   similarColorTolerance: number
+  compareWithCIELAB: boolean
 
   visited: boolean[]
 
@@ -39,6 +40,7 @@ export class CanvasDataTransformer {
     hasAxialTransfo,
     isBrightColor,
     similarColorTolerance,
+    compareWithCIELAB,
   }: {
     sourcePixelArray: Uint8Array | Uint8ClampedArray
     targetPixelArray: Uint8ClampedArray
@@ -50,6 +52,7 @@ export class CanvasDataTransformer {
     hasAxialTransfo?: boolean
     isBrightColor?: boolean
     similarColorTolerance?: number
+    compareWithCIELAB?: boolean
   }) {
     this.sourcePixelArray = sourcePixelArray
     this.targetPixelArray = targetPixelArray
@@ -61,6 +64,7 @@ export class CanvasDataTransformer {
     this.hasAxialTransfo = hasAxialTransfo ?? true
     this.isBrightColor = !!isBrightColor
     this.similarColorTolerance = similarColorTolerance ?? SIMILAR_COLOR_TOLERANCE
+    this.compareWithCIELAB = !!compareWithCIELAB
 
     const visitedSize = targetSize.h * targetSize.w
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -135,7 +139,12 @@ export class CanvasDataTransformer {
       const adjacentTargetPoints = getAdjacentPoints({ point: targetPoint, canvasSize: this.targetSize })
 
       // anti-aliasing
-      if (!isColorSimilar(sourcePointColor, initialColor, this.similarColorTolerance)) {
+      if (
+        !isColorSimilar(sourcePointColor, initialColor, {
+          similarColorTolerance: this.similarColorTolerance,
+          compareWithCIELAB: this.compareWithCIELAB,
+        })
+      ) {
         const similarPointCount = Object.values(adjacentTargetPoints).filter((adjacentTargetPoint) => {
           if (!adjacentTargetPoint) {
             return false
@@ -160,7 +169,10 @@ export class CanvasDataTransformer {
               this.sourcePixelArray[adjSourceIndex * 4 + 3],
             ),
             sourcePointColor,
-            this.similarColorTolerance,
+            {
+              similarColorTolerance: this.similarColorTolerance,
+              compareWithCIELAB: this.compareWithCIELAB,
+            },
           )
         }).length
 

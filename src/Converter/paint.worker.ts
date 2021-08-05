@@ -17,6 +17,7 @@ onmessage = async ({
     hasAxialTransfo,
     isBrightColor,
     similarColorTolerance,
+    compareWithCIELAB,
   },
 }: {
   data: {
@@ -31,9 +32,11 @@ onmessage = async ({
     hasAxialTransfo?: boolean
     isBrightColor?: boolean
     similarColorTolerance?: number
+    compareWithCIELAB?: boolean
   }
 }) => {
   let computedPixels: Uint8Array | Uint8ClampedArray = new Uint8Array()
+  const tStart = performance.now()
 
   if (isWasmAvailable) {
     const wasm = await import('map-converter')
@@ -55,10 +58,14 @@ onmessage = async ({
       hasAxialTransfo,
       isBrightColor,
       similarColorTolerance,
+      compareWithCIELAB,
     })
     canvasDataTransformer.paintTargetData()
     computedPixels = canvasDataTransformer.targetPixelArray
   }
+  const tEnd = performance.now()
+  // eslint-disable-next-line
+  console.log('compute time: ' + (tEnd - tStart).toString() + 'ms')
 
   // eslint-disable-next-line
   // @ts-ignore

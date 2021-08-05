@@ -14,6 +14,7 @@ export const useConversion = ({
   isBrightColor,
   canvasElementsIds,
   similarColorTolerance,
+  compareWithCIELAB,
 }: {
   imageUrl: string | null
   colorConfig: ColorConfig
@@ -25,6 +26,7 @@ export const useConversion = ({
     output?: string
   }
   similarColorTolerance?: number
+  compareWithCIELAB?: boolean
 }) => {
   const [isLoading, setIsLoading] = useState(false)
   useEffect(() => {
@@ -77,6 +79,7 @@ export const useConversion = ({
         hasAxialTransfo: false,
         isBrightColor,
         similarColorTolerance,
+        compareWithCIELAB,
       })
 
       paintWorker.onmessage = function (e: { data: { pixels: number[]; paintedBoundsMin: number } }): void {
@@ -97,6 +100,7 @@ export const useConversion = ({
     isBrightColor,
     canvasElementsIds,
     similarColorTolerance,
+    compareWithCIELAB,
   ])
 
   return { isLoading }

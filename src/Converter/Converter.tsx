@@ -11,6 +11,7 @@ import './converter.less'
 
 import { useConversion } from 'Converter/useConversion'
 import { InputNumber, Spin } from 'antd'
+import Checkbox from 'antd/lib/checkbox/Checkbox'
 
 const Uploader = ({ setImageUrl }: { setImageUrl: (url: string) => void }) => {
   const handleChange = (fileList: FileList | null) => {
@@ -38,6 +39,7 @@ const Uploader = ({ setImageUrl }: { setImageUrl: (url: string) => void }) => {
 
 const Converter = () => {
   const [colorConfig, setColorConfig] = useState<ColorConfigType>(RANDOM_CONFIG)
+  const [compareWithCIELAB, setcompareWithCIELAB] = useState(true)
   const [imageUrl, setImageUrl] = useState<null | string>(null)
   const [similarColorTolerance, setSimilarColorTolerance] = useState(10)
 
@@ -46,7 +48,13 @@ const Converter = () => {
     [WATER_CYAN]: { color: null, isEditable: true, name: 'water' },
   })
 
-  const { isLoading } = useConversion({ imageUrl, colorConfig, specificColorTransforms, similarColorTolerance })
+  const { isLoading } = useConversion({
+    imageUrl,
+    colorConfig,
+    specificColorTransforms,
+    similarColorTolerance,
+    compareWithCIELAB,
+  })
 
   return (
     <div className="converter">
@@ -60,6 +68,15 @@ const Converter = () => {
               indicator={<img className="spinner" src={spinner} alt="spin" />}
             />
           )}
+        </div>
+        <div>
+          <Checkbox checked={compareWithCIELAB} onChange={() => setcompareWithCIELAB(!compareWithCIELAB)}>
+            CIELAB color comparison
+            <span> </span>
+            <a href="https://en.wikipedia.org/wiki/CIELAB_color_space" target="blank">
+              (closer to human vision but longer to compute)
+            </a>
+          </Checkbox>
         </div>
         <div className="converter__settings__tolerance">
           <div>Tolerance</div>

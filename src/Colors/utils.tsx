@@ -12,6 +12,8 @@ import { SpecificColorTransforms } from 'Maposaic/types'
 import { generate } from '@ant-design/colors'
 import { AntColors, INITIAL_PALETTE_INDEX, PRESET_PALETTES } from 'Colors/constants'
 
+import diff from 'color-diff'
+
 export const createRGB = (r: number, g: number, b: number, a: number): RGBColor => {
   // beware of cheeseNaN
   return { r: r || 0, g: g || 0, b: b || 0, a: a || 0 }
@@ -69,11 +71,22 @@ export const transformInitialColor = (
   return createColor(mainColor, isBrightColor)
 }
 
-export const isColorSimilar = (color1: RGBColor, color2: RGBColor, similarColorTolerance: number): boolean => {
-  return (
-    Math.pow(color1.r - color2.r, 2) + Math.pow(color1.g - color2.g, 2) + Math.pow(color1.b - color2.b, 2) <
-    similarColorTolerance ** 2
-  )
+export const isColorSimilar = (
+  color1: RGBColor,
+  color2: RGBColor,
+  options: { compareWithCIELAB?: boolean; similarColorTolerance: number },
+): boolean => {
+  if (options.compareWithCIELAB) {
+    const lab1 = diff.rgb_to_lab(rgbToRGB(color1))
+    const lab2 = diff.rgb_to_lab(rgbToRGB(color2))
+
+    return diff.diff(lab1, lab2) < options.similarColorTolerance
+  } else {
+    return (
+      Math.pow(color1.r - color2.r, 2) + Math.pow(color1.g - color2.g, 2) + Math.pow(color1.b - color2.b, 2) <
+      options.similarColorTolerance ** 2
+    )
+  }
 }
 
 export const getMaposaicColorsWithoutSpecific = (
@@ -201,3 +214,10 @@ const hslToRGB = (h: number, s0: number, l0: number) => {
 
   return createRGB(r, g, b, 255)
 }
+
+const rgbToRGB = (c: RGBColor) => ({
+  R: c.r,
+  G: c.g,
+  B: c.b,
+  A: c.a,
+})
