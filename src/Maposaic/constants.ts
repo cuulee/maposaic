@@ -19,7 +19,12 @@ export const MAPBOX_STYLES = {
     imgPath:
       'https://firebasestorage.googleapis.com/v0/b/maposaic-99785.appspot.com/o/app_assets%2Fwater-loire.png?alt=media&token=1b986519-854e-433e-bbc0-81b974a77a39',
   },
-  administrative: { url: 'mapbox://styles/cartapuce/ck8vkvxjt27z71ila3b3jecka', name: '' },
+  administrative: {
+    url: 'mapbox://styles/cartapuce/ck8vkvxjt27z71ila3b3jecka',
+    name: 'Borders',
+    imgPath:
+      'https://firebasestorage.googleapis.com/v0/b/maposaic-99785.appspot.com/o/app_assets%2Fwater-loire.png?alt=media&token=1b986519-854e-433e-bbc0-81b974a77a39',
+  },
   satellite: { url: 'mapbox://styles/mapbox/satellite-v9', name: '' },
   regular: { url: 'mapbox://styles/mapbox/streets-v11', name: '' },
 }

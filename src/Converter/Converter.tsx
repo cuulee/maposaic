@@ -71,11 +71,10 @@ const Converter = () => {
         </div>
         <div>
           <Checkbox checked={compareWithCIELAB} onChange={() => setcompareWithCIELAB(!compareWithCIELAB)}>
-            CIELAB color comparison
-            <span> </span>
             <a href="https://en.wikipedia.org/wiki/CIELAB_color_space" target="blank">
-              (closer to human vision but longer to compute)
+              CIELAB
             </a>
+            <span> color comparison (closer to human vision but longer to compute)</span>
           </Checkbox>
         </div>
         <div className="converter__settings__tolerance">
