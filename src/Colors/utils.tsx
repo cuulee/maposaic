@@ -80,10 +80,10 @@ export const isColorSimilar = (
     const lab1 = diff.rgb_to_lab(rgbToRGB(color1))
     const lab2 = diff.rgb_to_lab(rgbToRGB(color2))
 
-    return diff.diff(lab1, lab2) < options.similarColorTolerance
+    return diff.diff(lab1, lab2) <= options.similarColorTolerance
   } else {
     return (
-      Math.pow(color1.r - color2.r, 2) + Math.pow(color1.g - color2.g, 2) + Math.pow(color1.b - color2.b, 2) <
+      Math.pow(color1.r - color2.r, 2) + Math.pow(color1.g - color2.g, 2) + Math.pow(color1.b - color2.b, 2) <=
       options.similarColorTolerance ** 2
     )
   }
@@ -157,6 +157,7 @@ export const getInitialPresetPaletteIndex = (colorConfig: ColorConfig, origin: P
 export const createColorSettings = (
   mainColors: MaposaicColors,
   specificColorTransforms: SpecificColorTransforms,
+  squared_tolerance?: number,
 ): ColorSettings => {
   const specific_transforms: Record<number, number> = {}
   for (const [colorHex, transform] of Object.entries(specificColorTransforms)) {
@@ -168,6 +169,7 @@ export const createColorSettings = (
     is_random: mainColors === ColorConfigType.Random,
     specific_transforms,
     available_colors: mainColors === ColorConfigType.Random ? [] : mainColors.map(hexToU32),
+    squared_tolerance: squared_tolerance ?? 0,
   }
 }
 

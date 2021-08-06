@@ -52,6 +52,7 @@ pub fn convert_pixels(source: &[u8], size: Size, color_settings: &JsValue) -> Ve
             target_index,
             &area_color,
             &initial_color,
+            color_settings.squared_tolerance,
         )
     }
 
@@ -75,6 +76,7 @@ fn paint_current_area(
     initial_target_index: usize,
     area_color: &Color,
     initial_color: &Color,
+    squared_tolerance: f32,
 ) {
     let mut stack = Vec::new();
     stack.push(initial_target_index);
@@ -87,7 +89,7 @@ fn paint_current_area(
         let adjacent_points = utils::get_adjacent_points(&target_point, &size);
 
         // anti-aliasing
-        if !utils::are_colors_similar(&initial_color, &source_color) {
+        if !utils::are_colors_similar(&initial_color, &source_color, squared_tolerance) {
             let mut similar_point_count = 0;
             for adjacent_candidate in adjacent_points.iter() {
                 match adjacent_candidate {
@@ -99,7 +101,11 @@ fn paint_current_area(
                         let adj_source_index =
                             utils::get_source_index_from_target_index(adj_index, &size, &size, 1);
                         let adj_source_color = create_color_from_index(source, adj_source_index);
-                        if utils::are_colors_similar(&adj_source_color, &source_color) {
+                        if utils::are_colors_similar(
+                            &adj_source_color,
+                            &source_color,
+                            squared_tolerance,
+                        ) {
                             similar_point_count += 1;
                         }
                     }
@@ -210,6 +216,7 @@ pub struct ColorSettings {
     specific_transforms: HashMap<u32, u32>,
     is_random: bool,
     available_colors: Vec<u32>,
+    squared_tolerance: f32,
 }
 
 macro_rules! console_log {

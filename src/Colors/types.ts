@@ -72,4 +72,5 @@ export type ColorSettings = {
   specific_transforms: Record<number, number>
   is_random: boolean
   available_colors: number[]
+  squared_tolerance: number
 }
