@@ -1,6 +1,7 @@
 import { ColorConfig } from 'Colors/types'
 import { createMaposaicColors } from 'Colors/utils'
 import { INPUT_CANVAS_ID, OUTPUT_CANVAS_ID } from 'Converter/Converter'
+import { PaintWorkerPayload } from 'Converter/paint.worker'
 import { SpecificColorTransforms } from 'Maposaic/types'
 import { useEffect, useState } from 'react'
 
@@ -68,7 +69,7 @@ export const useConversion = ({
       const inputImageData = inputCanvasContext.getImageData(0, 0, size.w, size.h)
       const outputImageData = outputCanvasContext.getImageData(0, 0, size.w, size.h)
 
-      paintWorker.postMessage({
+      const workerPayload: PaintWorkerPayload = {
         sourcePixelArray: inputImageData.data,
         targetPixelArray: outputImageData.data,
         sourceSize: size,
@@ -81,7 +82,9 @@ export const useConversion = ({
         isBrightColor,
         similarColorTolerance,
         compareWithCIELAB,
-      })
+      }
+
+      paintWorker.postMessage(workerPayload)
 
       paintWorker.onmessage = function (e: { data: { pixels: number[]; paintedBoundsMin: number } }): void {
         setIsLoading(false)

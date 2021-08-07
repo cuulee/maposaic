@@ -4,6 +4,21 @@ import { CanvasDataTransformer } from 'Canvas/CanvasDataTransformer'
 import { SpecificColorTransforms } from 'Maposaic/types'
 import { createColorSettings } from 'Colors/utils'
 
+export type PaintWorkerPayload = {
+  sourcePixelArray: Uint8Array | Uint8ClampedArray
+  targetPixelArray: Uint8ClampedArray
+  sourceSize: Size
+  targetSize: Size
+  canvassRatio: number
+  maposaicColors: MaposaicColors
+  specificColorTransforms: SpecificColorTransforms
+  isWasmAvailable: boolean
+  hasAxialTransfo?: boolean
+  isBrightColor?: boolean
+  similarColorTolerance?: number
+  compareWithCIELAB?: boolean
+}
+
 onmessage = async ({
   data: {
     sourcePixelArray,
@@ -20,20 +35,7 @@ onmessage = async ({
     compareWithCIELAB,
   },
 }: {
-  data: {
-    sourcePixelArray: Uint8Array
-    targetPixelArray: Uint8ClampedArray
-    sourceSize: Size
-    targetSize: Size
-    canvassRatio: number
-    maposaicColors: MaposaicColors
-    specificColorTransforms: SpecificColorTransforms
-    isWasmAvailable: boolean
-    hasAxialTransfo?: boolean
-    isBrightColor?: boolean
-    similarColorTolerance?: number
-    compareWithCIELAB?: boolean
-  }
+  data: PaintWorkerPayload
 }) => {
   let computedPixels: Uint8Array | Uint8ClampedArray = new Uint8Array()
   const tStart = performance.now()

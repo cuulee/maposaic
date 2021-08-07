@@ -2,6 +2,7 @@ import { getTargetSizeFromSourceSize } from 'Canvas/utils'
 import { ColorConfig } from 'Colors/types'
 import { createMaposaicColors } from 'Colors/utils'
 import { TRUE_URL_PARAM_VALUE } from 'constants/navigation'
+import { PaintWorkerPayload } from 'Converter/paint.worker'
 import { LOGO_OUTPUT_CANVAS_ID } from 'Logo/Logo'
 import mapboxgl from 'mapbox-gl'
 import { MAPBOX_STYLES } from 'Maposaic/constants'
@@ -113,7 +114,7 @@ export const usePaintMosaic = ({
       const mapboxPixels = new Uint8Array(gl.drawingBufferWidth * gl.drawingBufferHeight * 4)
       gl.readPixels(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight, gl.RGBA, gl.UNSIGNED_BYTE, mapboxPixels)
 
-      paintWorker.postMessage({
+      const workerPayload: PaintWorkerPayload = {
         sourcePixelArray: mapboxPixels,
         targetPixelArray: maposaicData,
         sourceSize: mapboxCanvasSize,
@@ -121,9 +122,11 @@ export const usePaintMosaic = ({
         canvassRatio: DISPLAY_PIXEL_RATIO,
         maposaicColors: createMaposaicColors(colorConfig, specificColorTransforms),
         specificColorTransforms,
-        isWasmAvailable,
+        isWasmAvailable: !!isWasmAvailable,
         similarColorTolerance: 0,
-      })
+      }
+
+      paintWorker.postMessage(workerPayload)
 
       paintWorker.onmessage = function (e: { data: { pixels: number[]; paintedBoundsMin: number } }): void {
         imageData.data.set(e.data.pixels, e.data.paintedBoundsMin)
