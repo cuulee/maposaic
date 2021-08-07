@@ -157,7 +157,7 @@ export const getInitialPresetPaletteIndex = (colorConfig: ColorConfig, origin: P
 export const createColorSettings = (
   mainColors: MaposaicColors,
   specificColorTransforms: SpecificColorTransforms,
-  squared_tolerance?: number,
+  similarColorTolerance?: number,
 ): ColorSettings => {
   const specific_transforms: Record<number, number> = {}
   for (const [colorHex, transform] of Object.entries(specificColorTransforms)) {
@@ -169,7 +169,7 @@ export const createColorSettings = (
     is_random: mainColors === ColorConfigType.Random,
     specific_transforms,
     available_colors: mainColors === ColorConfigType.Random ? [] : mainColors.map(hexToU32),
-    squared_tolerance: squared_tolerance ?? 0,
+    squared_tolerance: (similarColorTolerance ?? 0) ** 2,
   }
 }
 

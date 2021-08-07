@@ -122,6 +122,7 @@ export const usePaintMosaic = ({
         maposaicColors: createMaposaicColors(colorConfig, specificColorTransforms),
         specificColorTransforms,
         isWasmAvailable,
+        similarColorTolerance: 0,
       })
 
       paintWorker.onmessage = function (e: { data: { pixels: number[]; paintedBoundsMin: number } }): void {

@@ -44,7 +44,7 @@ onmessage = async ({
     computedPixels = wasm.convert_pixels(
       sourcePixelArray,
       wasm.Size.new(sourceSize.w, sourceSize.h),
-      createColorSettings(maposaicColors, specificColorTransforms),
+      createColorSettings(maposaicColors, specificColorTransforms, similarColorTolerance),
     )
   } else {
     const canvasDataTransformer = new CanvasDataTransformer({
@@ -65,7 +65,7 @@ onmessage = async ({
   }
   const tEnd = performance.now()
   // eslint-disable-next-line
-  console.log('compute time: ' + (tEnd - tStart).toString() + 'ms')
+  console.log('compute time: ' + Math.round(tEnd - tStart).toString() + ' ms')
 
   // eslint-disable-next-line
   // @ts-ignore
