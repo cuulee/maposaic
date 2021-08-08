@@ -40,7 +40,7 @@ const Uploader = ({ setImageUrl }: { setImageUrl: (url: string) => void }) => {
   )
 }
 
-const Converter = () => {
+const Converter = ({ isWasmAvailable }: { isWasmAvailable: boolean }) => {
   const [colorConfig, setColorConfig] = useState<ColorConfigType>(RANDOM_CONFIG)
   const [compareWithCIELAB, setcompareWithCIELAB] = useState(true)
   const [imageUrl, setImageUrl] = useState<null | string>(null)
@@ -57,6 +57,7 @@ const Converter = () => {
     specificColorTransforms,
     similarColorTolerance,
     compareWithCIELAB,
+    isWasmAvailable,
   })
 
   return (

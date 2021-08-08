@@ -130,7 +130,7 @@ export const useCheckWasmAvailability = () => {
     // eslint-disable-next-line
   }, [])
 
-  return { isWasmAvailable }
+  return { isWasmAvailable: !!isWasmAvailable }
 }
 
 export const useCheckMobileScreen = ({ setIsMobile }: { setIsMobile: (isMobile: boolean) => void }) => {

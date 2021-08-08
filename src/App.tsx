@@ -34,7 +34,7 @@ function App() {
             <Gallery />
           </Route>
           <Route path="/convert">
-            <Converter />
+            <Converter isWasmAvailable={isWasmAvailable} />
           </Route>
           <Route path="/game-of-life">
             <GameOfLife />

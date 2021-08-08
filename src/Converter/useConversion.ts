@@ -17,6 +17,7 @@ export const useConversion = ({
   canvasElementsIds,
   similarColorTolerance,
   compareWithCIELAB,
+  isWasmAvailable,
 }: {
   imageUrl: string | null
   colorConfig: ColorConfig
@@ -29,6 +30,7 @@ export const useConversion = ({
   }
   similarColorTolerance?: number
   compareWithCIELAB?: boolean
+  isWasmAvailable: boolean
 }) => {
   const [isLoading, setIsLoading] = useState(false)
   useEffect(() => {
@@ -77,7 +79,7 @@ export const useConversion = ({
         canvassRatio: 1,
         maposaicColors: createMaposaicColors(colorConfig, specificColorTransforms, isBrightColor),
         specificColorTransforms,
-        isWasmAvailable: false,
+        isWasmAvailable,
         hasAxialTransfo: false,
         isBrightColor,
         similarColorTolerance,
@@ -105,6 +107,7 @@ export const useConversion = ({
     canvasElementsIds,
     similarColorTolerance,
     compareWithCIELAB,
+    isWasmAvailable,
   ])
 
   return { isLoading }
