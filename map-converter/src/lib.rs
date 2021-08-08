@@ -76,7 +76,7 @@ fn paint_current_area(
     initial_target_index: usize,
     area_color: &Color,
     initial_color: &Color,
-    squared_tolerance: u16,
+    squared_tolerance: u32,
 ) {
     let mut stack = Vec::new();
     stack.push(initial_target_index);
@@ -216,7 +216,7 @@ pub struct ColorSettings {
     specific_transforms: HashMap<u32, u32>,
     is_random: bool,
     available_colors: Vec<u32>,
-    squared_tolerance: u16,
+    squared_tolerance: u32,
 }
 
 macro_rules! console_log {

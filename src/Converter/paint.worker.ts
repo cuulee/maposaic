@@ -44,7 +44,7 @@ onmessage = async ({
     const wasm = await import('map-converter')
 
     computedPixels = wasm.convert_pixels(
-      sourcePixelArray,
+      sourcePixelArray as Uint8Array,
       wasm.Size.new(sourceSize.w, sourceSize.h),
       createColorSettings(maposaicColors, specificColorTransforms, similarColorTolerance),
     )

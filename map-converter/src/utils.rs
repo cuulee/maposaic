@@ -42,11 +42,11 @@ pub fn get_source_index_from_target_index(
     get_pixel_index_from_point(&source, source_size.width)
 }
 
-pub fn are_colors_similar(color1: &Color, color2: &Color, squared_tolerance: u16) -> bool {
-    ((color1.r as i32) - (color2.r as i32)).pow(2)
+pub fn are_colors_similar(color1: &Color, color2: &Color, squared_tolerance: u32) -> bool {
+    ((((color1.r as i32) - (color2.r as i32)).pow(2)
         + ((color1.g as i32) - (color2.g as i32)).pow(2)
-        + ((color1.b as i32) - (color2.b as i32)).pow(2)
-        <= (squared_tolerance as i32)
+        + ((color1.b as i32) - (color2.b as i32)).pow(2)) as u32)
+        <= squared_tolerance
 }
 
 pub fn get_adjacent_points(point: &Point, size: &Size) -> [Option<Point>; 4] {
