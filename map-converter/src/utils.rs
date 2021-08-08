@@ -2,6 +2,9 @@ use crate::Color;
 use crate::Point;
 use crate::Size;
 
+extern crate lab;
+use lab::Lab;
+
 pub fn set_panic_hook() {
     // When the `console_error_panic_hook` feature is enabled, we can call the
     // `set_panic_hook` function at least once during initialization, and then
@@ -23,10 +26,22 @@ pub fn get_pixel_index_from_point(point: &Point, width: u32) -> usize {
     (point.y * width + point.x) as usize
 }
 
-fn get_source_point_from_target_point(point: &Point, size: &Size, ratio: u32) -> Point {
-    Point {
-        x: ratio * point.x,
-        y: ratio * (size.height - 1 - point.y),
+fn get_source_point_from_target_point(
+    point: &Point,
+    size: &Size,
+    ratio: u32,
+    reverse_y_axis: bool,
+) -> Point {
+    if reverse_y_axis {
+        Point {
+            x: ratio * point.x,
+            y: ratio * (size.height - 1 - point.y),
+        }
+    } else {
+        Point {
+            x: ratio * point.x,
+            y: ratio * point.y,
+        }
     }
 }
 

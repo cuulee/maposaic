@@ -17,6 +17,7 @@ export type PaintWorkerPayload = {
   isBrightColor?: boolean
   similarColorTolerance?: number
   compareWithCIELAB?: boolean
+  reverseYAxis?: boolean
 }
 
 onmessage = async ({
@@ -33,6 +34,7 @@ onmessage = async ({
     isBrightColor,
     similarColorTolerance,
     compareWithCIELAB,
+    reverseYAxis,
   },
 }: {
   data: PaintWorkerPayload
@@ -46,7 +48,7 @@ onmessage = async ({
     computedPixels = wasm.convert_pixels(
       sourcePixelArray as Uint8Array,
       wasm.Size.new(sourceSize.w, sourceSize.h),
-      createColorSettings(maposaicColors, specificColorTransforms, similarColorTolerance),
+      createColorSettings(maposaicColors, specificColorTransforms, similarColorTolerance, reverseYAxis),
     )
   } else {
     const canvasDataTransformer = new CanvasDataTransformer({

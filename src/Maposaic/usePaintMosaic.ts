@@ -124,6 +124,7 @@ export const usePaintMosaic = ({
         specificColorTransforms,
         isWasmAvailable: !!isWasmAvailable,
         similarColorTolerance: 0,
+        reverseYAxis: true,
       }
 
       paintWorker.postMessage(workerPayload)

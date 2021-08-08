@@ -158,6 +158,7 @@ export const createColorSettings = (
   mainColors: MaposaicColors,
   specificColorTransforms: SpecificColorTransforms,
   similarColorTolerance?: number,
+  reverse_y_axis?: boolean,
 ): ColorSettings => {
   const specific_transforms: Record<number, number> = {}
   for (const [colorHex, transform] of Object.entries(specificColorTransforms)) {
@@ -170,6 +171,7 @@ export const createColorSettings = (
     specific_transforms,
     available_colors: mainColors === ColorConfigType.Random ? [] : mainColors.map(hexToU32),
     squared_tolerance: (similarColorTolerance ?? 0) ** 2,
+    reverse_y_axis: reverse_y_axis ?? false,
   }
 }
 

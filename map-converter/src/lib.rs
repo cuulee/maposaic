@@ -27,6 +27,10 @@ pub fn convert_pixels(source: &[u8], size: Size, color_settings: &JsValue) -> Ve
     let mut target = vec![0; pixel_count * 4];
     let mut visited_index: usize = 0;
     let color_settings: ColorSettings = color_settings.into_serde().unwrap();
+    let paint_options = PaintOptions {
+        squared_tolerance: color_settings.squared_tolerance,
+        reverse_y_axis: color_settings.reverse_y_axis,
+    };
 
     loop {
         let bit_index = visited[visited_index].leading_ones();
@@ -40,7 +44,13 @@ pub fn convert_pixels(source: &[u8], size: Size, color_settings: &JsValue) -> Ve
             continue;
         }
 
-        let source_index = utils::get_source_index_from_target_index(target_index, &size, &size, 1);
+        let source_index = utils::get_source_index_from_target_index(
+            target_index,
+            &size,
+            &size,
+            1,
+            paint_options.reverse_y_axis,
+        );
         let initial_color = create_color_from_index(&source, source_index as usize);
         let area_color = create_transformed_color(&initial_color, &color_settings);
 
@@ -52,7 +62,7 @@ pub fn convert_pixels(source: &[u8], size: Size, color_settings: &JsValue) -> Ve
             target_index,
             &area_color,
             &initial_color,
-            color_settings.squared_tolerance,
+            &paint_options,
         )
     }
 
@@ -76,20 +86,30 @@ fn paint_current_area(
     initial_target_index: usize,
     area_color: &Color,
     initial_color: &Color,
-    squared_tolerance: u32,
+    paint_options: &PaintOptions,
 ) {
     let mut stack = Vec::new();
     stack.push(initial_target_index);
 
     while let Some(target_index) = stack.pop() {
-        let source_index = utils::get_source_index_from_target_index(target_index, &size, &size, 1);
+        let source_index = utils::get_source_index_from_target_index(
+            target_index,
+            &size,
+            &size,
+            1,
+            paint_options.reverse_y_axis,
+        );
         let source_color = create_color_from_index(source, source_index);
         let target_point = utils::get_point_from_pixel_index(target_index, size.width);
 
         let adjacent_points = utils::get_adjacent_points(&target_point, &size);
 
         // anti-aliasing
-        if !utils::are_colors_similar(&initial_color, &source_color, squared_tolerance) {
+        if !utils::are_colors_similar(
+            &initial_color,
+            &source_color,
+            paint_options.squared_tolerance,
+        ) {
             let mut similar_point_count = 0;
             for adjacent_candidate in adjacent_points.iter() {
                 match adjacent_candidate {
@@ -98,13 +118,18 @@ fn paint_current_area(
                         if is_index_visited(visited, adj_index) {
                             continue;
                         }
-                        let adj_source_index =
-                            utils::get_source_index_from_target_index(adj_index, &size, &size, 1);
+                        let adj_source_index = utils::get_source_index_from_target_index(
+                            adj_index,
+                            &size,
+                            &size,
+                            1,
+                            paint_options.reverse_y_axis,
+                        );
                         let adj_source_color = create_color_from_index(source, adj_source_index);
                         if utils::are_colors_similar(
                             &adj_source_color,
                             &source_color,
-                            squared_tolerance,
+                            paint_options.squared_tolerance,
                         ) {
                             similar_point_count += 1;
                         }
@@ -216,7 +241,13 @@ pub struct ColorSettings {
     specific_transforms: HashMap<u32, u32>,
     is_random: bool,
     available_colors: Vec<u32>,
-    squared_tolerance: u32,
+    squared_tolerance: f32,
+    reverse_y_axis: bool,
+}
+
+pub struct PaintOptions {
+    squared_tolerance: f32,
+    reverse_y_axis: bool,
 }
 
 macro_rules! console_log {

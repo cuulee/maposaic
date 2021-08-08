@@ -73,4 +73,5 @@ export type ColorSettings = {
   is_random: boolean
   available_colors: number[]
   squared_tolerance: number
+  reverse_y_axis: boolean
 }
