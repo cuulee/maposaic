@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Drawer as AntDrawer, Radio, Select, Tooltip } from 'antd'
+import { Drawer as AntDrawer, Button, Radio, Select, Tooltip } from 'antd'
 import Title from 'antd/lib/typography/Title'
 
 import { CloseOutlined, InfoCircleOutlined } from '@ant-design/icons'
@@ -17,6 +17,7 @@ import githubMark from 'assets/GitHub-Mark.png'
 import { TOOLTIP_ENTER_DELAY } from 'constants/ux'
 import Logo from 'Logo/Logo'
 import Checkbox from 'antd/lib/checkbox/Checkbox'
+import { useHistory } from 'react-router-dom'
 
 const millisecondsToText = (millis: number | null) => {
   const min = Math.floor((millis ?? 0) / 60000)
@@ -44,6 +45,7 @@ const Drawer = ({
   displayLogo,
   setDisplayLogo,
 }: DrawerPropsType) => {
+  const history = useHistory()
   const [isLandscape, setIsLandscape] = useState<boolean | null>(null)
   const [format, setFormat] = useState<Format>(Format.A4)
 
@@ -184,13 +186,20 @@ const Drawer = ({
               </div>
             </div>
           </div>
-          <div
-            onClick={() => window.open('https://github.com/viconnex/maposaic', '_blank')}
-            className="drawer__content__footer"
-          >
+          <div className="drawer__content__footer">
             <Tooltip title="Source code" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
-              <img className="footer__source__image" src={githubMark} alt="github-link" />
+              <img
+                onClick={() => window.open('https://github.com/viconnex/maposaic', '_blank')}
+                className="footer__source__image"
+                src={githubMark}
+                alt="github-link"
+              />
             </Tooltip>
+            <div>
+              <Button onClick={() => history.push('/convert')} type="link">
+                Image Converter
+              </Button>
+            </div>
           </div>
         </div>
       </div>
