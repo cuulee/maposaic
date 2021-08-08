@@ -50,18 +50,31 @@ pub fn get_source_index_from_target_index(
     target_size: &Size,
     source_size: &Size,
     ratio: u32,
+    reverse_y_axis: bool,
 ) -> usize {
     let target = get_point_from_pixel_index(target_pixel_index, target_size.width);
-    let source = get_source_point_from_target_point(&target, &target_size, ratio);
+    let source = get_source_point_from_target_point(&target, &target_size, ratio, reverse_y_axis);
 
     get_pixel_index_from_point(&source, source_size.width)
 }
 
-pub fn are_colors_similar(color1: &Color, color2: &Color, squared_tolerance: u32) -> bool {
-    ((((color1.r as i32) - (color2.r as i32)).pow(2)
-        + ((color1.g as i32) - (color2.g as i32)).pow(2)
-        + ((color1.b as i32) - (color2.b as i32)).pow(2)) as u32)
-        <= squared_tolerance
+pub fn are_colors_similar(
+    color1: &Color,
+    color2: &Color,
+    squared_tolerance: f32,
+    compare_with_lab: bool,
+) -> bool {
+    if compare_with_lab {
+        let color1_lab = Lab::from_rgba(&[color1.r, color1.g, color1.b, color1.a]);
+        let color2_lab = Lab::from_rgba(&[color2.r, color2.g, color2.b, color2.a]);
+
+        return color1_lab.squared_distance(&color2_lab) <= squared_tolerance;
+    } else {
+        ((((color1.r as i32) - (color2.r as i32)).pow(2)
+            + ((color1.g as i32) - (color2.g as i32)).pow(2)
+            + ((color1.b as i32) - (color2.b as i32)).pow(2)) as u32)
+            <= (squared_tolerance as u32)
+    }
 }
 
 pub fn get_adjacent_points(point: &Point, size: &Size) -> [Option<Point>; 4] {

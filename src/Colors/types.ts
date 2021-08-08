@@ -74,4 +74,5 @@ export type ColorSettings = {
   available_colors: number[]
   squared_tolerance: number
   reverse_y_axis: boolean
+  compare_with_lab: boolean
 }

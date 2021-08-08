@@ -48,7 +48,13 @@ onmessage = async ({
     computedPixels = wasm.convert_pixels(
       sourcePixelArray as Uint8Array,
       wasm.Size.new(sourceSize.w, sourceSize.h),
-      createColorSettings(maposaicColors, specificColorTransforms, similarColorTolerance, reverseYAxis),
+      createColorSettings(
+        maposaicColors,
+        specificColorTransforms,
+        similarColorTolerance,
+        reverseYAxis,
+        compareWithCIELAB,
+      ),
     )
   } else {
     const canvasDataTransformer = new CanvasDataTransformer({

@@ -30,6 +30,7 @@ pub fn convert_pixels(source: &[u8], size: Size, color_settings: &JsValue) -> Ve
     let paint_options = PaintOptions {
         squared_tolerance: color_settings.squared_tolerance,
         reverse_y_axis: color_settings.reverse_y_axis,
+        compare_with_lab: color_settings.compare_with_lab,
     };
 
     loop {
@@ -109,6 +110,7 @@ fn paint_current_area(
             &initial_color,
             &source_color,
             paint_options.squared_tolerance,
+            paint_options.compare_with_lab,
         ) {
             let mut similar_point_count = 0;
             for adjacent_candidate in adjacent_points.iter() {
@@ -130,6 +132,7 @@ fn paint_current_area(
                             &adj_source_color,
                             &source_color,
                             paint_options.squared_tolerance,
+                            paint_options.compare_with_lab,
                         ) {
                             similar_point_count += 1;
                         }
@@ -243,11 +246,13 @@ pub struct ColorSettings {
     available_colors: Vec<u32>,
     squared_tolerance: f32,
     reverse_y_axis: bool,
+    compare_with_lab: bool,
 }
 
 pub struct PaintOptions {
     squared_tolerance: f32,
     reverse_y_axis: bool,
+    compare_with_lab: bool,
 }
 
 macro_rules! console_log {
