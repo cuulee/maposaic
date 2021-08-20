@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Drawer as AntDrawer, Button, Radio, Select, Tooltip } from 'antd'
+import { Drawer as AntDrawer, Button, Radio, Select, Tooltip, InputNumber } from 'antd'
 import Title from 'antd/lib/typography/Title'
 
 import { CloseOutlined, InfoCircleOutlined } from '@ant-design/icons'
@@ -18,6 +18,8 @@ import { TOOLTIP_ENTER_DELAY } from 'constants/ux'
 import Logo from 'Logo/Logo'
 import Checkbox from 'antd/lib/checkbox/Checkbox'
 import { useHistory } from 'react-router-dom'
+import { useEffect } from 'react'
+import useDebounce from 'hooks/debounce'
 
 const millisecondsToText = (millis: number | null) => {
   const min = Math.floor((millis ?? 0) / 60000)
@@ -28,6 +30,7 @@ const millisecondsToText = (millis: number | null) => {
 }
 
 const radioStyle = { display: 'flex', justifyContent: 'center', alignItems: 'center' }
+const DEFAULT_RESOLUTION = '300'
 
 const Drawer = ({
   visible,
@@ -48,13 +51,25 @@ const Drawer = ({
   const history = useHistory()
   const [isLandscape, setIsLandscape] = useState<boolean | null>(null)
   const [format, setFormat] = useState<Format>(Format.A4)
+  const [pixelPerInchResolution, setPixelPerInchResolution] = useState(parseInt(DEFAULT_RESOLUTION))
+
+  const deboucedRes = useDebounce(pixelPerInchResolution, 600)
+
+  useEffect(() => {
+    onPosterSizeChange({
+      isLandscape: isLandscape,
+      pixelPerInchResolution,
+      longerPropertyCMLength: FORMAT_SIZE[format],
+    })
+    // eslint-disable-next-line
+  }, [deboucedRes])
 
   const handleOrientationChange = (newIsLandscape: boolean) => {
     const newValue = newIsLandscape === isLandscape ? null : newIsLandscape
     setIsLandscape(newValue)
     onPosterSizeChange({
       isLandscape: newValue,
-      pixelPerInchResolution: 300,
+      pixelPerInchResolution,
       longerPropertyCMLength: FORMAT_SIZE[format],
     })
   }
@@ -66,7 +81,7 @@ const Drawer = ({
     }
     onPosterSizeChange({
       isLandscape: isLandscape ?? true,
-      pixelPerInchResolution: 300,
+      pixelPerInchResolution,
       longerPropertyCMLength: FORMAT_SIZE[format],
     })
   }
@@ -179,6 +194,21 @@ const Drawer = ({
                   </Badge>
                 )}
               </div>
+              {isLandscape !== null && (
+                <div className="resolution">
+                  <div className="resolution__item">Resolution</div>
+                  <InputNumber
+                    value={pixelPerInchResolution}
+                    onChange={(value) =>
+                      setPixelPerInchResolution(
+                        typeof value === 'number' ? value : parseInt(value ?? DEFAULT_RESOLUTION),
+                      )
+                    }
+                    className="resolution__item"
+                  ></InputNumber>
+                  <div className="resolution__item">ppp</div>
+                </div>
+              )}
               <div className="display-logo">
                 <Checkbox checked={displayLogo} onChange={() => setDisplayLogo(!displayLogo)}>
                   Display logo
