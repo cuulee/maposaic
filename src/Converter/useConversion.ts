@@ -79,7 +79,7 @@ export const useConversion = ({
         canvassRatio: 1,
         maposaicColors: createMaposaicColors(colorConfig, specificColorTransforms, isBrightColor),
         specificColorTransforms,
-        isWasmAvailable,
+        isWasmAvailable: compareWithCIELAB ? false : isWasmAvailable,
         hasAxialTransfo: false,
         isBrightColor,
         similarColorTolerance,
