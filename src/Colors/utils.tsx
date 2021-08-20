@@ -80,7 +80,12 @@ export const isColorSimilar = (
     const lab1 = diff.rgb_to_lab(rgbToRGB(color1))
     const lab2 = diff.rgb_to_lab(rgbToRGB(color2))
 
-    return diff.diff(lab1, lab2) <= options.similarColorTolerance
+    return (
+      Math.pow(lab1.L - lab2.L, 2) + Math.pow(lab1.a - lab2.a, 2) + Math.pow(lab1.b - lab2.b, 2) <=
+      options.similarColorTolerance ** 2
+    )
+
+    // return diff.diff(lab1, lab2) <= options.similarColorTolerance
   } else {
     return (
       Math.pow(color1.r - color2.r, 2) + Math.pow(color1.g - color2.g, 2) + Math.pow(color1.b - color2.b, 2) <=
