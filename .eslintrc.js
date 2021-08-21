@@ -79,6 +79,7 @@ module.exports = {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     'no-shadow': 'off',
     // 'no-unreachable': 'off',
+    '@typescript-eslint/no-unsafe-assignment': 'warn',
   },
   root: true,
   settings: {

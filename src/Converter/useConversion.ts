@@ -47,9 +47,17 @@ export const useConversion = ({
         image.width = imageWidth
         image.height = (imageWidth * image.height) / old_width
       }
-      const inputCanvas = document.getElementById(canvasElementsIds?.input ?? INPUT_CANVAS_ID) as HTMLCanvasElement
-      const outputCanvas = document.getElementById(canvasElementsIds?.output ?? OUTPUT_CANVAS_ID) as HTMLCanvasElement
+      const inputCanvas = document.getElementById(
+        canvasElementsIds?.input ?? INPUT_CANVAS_ID,
+      ) as HTMLCanvasElement | null
+      const outputCanvas = document.getElementById(
+        canvasElementsIds?.output ?? OUTPUT_CANVAS_ID,
+      ) as HTMLCanvasElement | null
       const size = { w: image.width, h: image.height }
+
+      if (!inputCanvas || !outputCanvas) {
+        return
+      }
 
       inputCanvas.width = size.w
       inputCanvas.height = size.h

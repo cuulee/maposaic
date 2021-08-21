@@ -69,6 +69,7 @@ const GeoSearch = ({
 
   return (
     <AutoComplete
+      style={{ maxWidth: '160px' }}
       className={className}
       onSearch={handleSearch}
       onSelect={handleSelect}

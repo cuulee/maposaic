@@ -56,15 +56,6 @@
 
   &__actions {
     display: flex;
-
-    &__settings {
-      pointer-events: auto;
-    }
-    @media @mobile {
-      flex-direction: column;
-      align-items: flex-end;
-    }
-
     &__button {
       pointer-events: auto;
       @media @mobile {
@@ -92,4 +83,9 @@
 // mapbox floating info in bottom right
 .mapboxgl-ctrl-bottom-right {
   display: none;
+}
+
+.image-converter {
+  height: 100%;
+  width: 100%;
 }

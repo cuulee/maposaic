@@ -168,6 +168,10 @@ export const usePaintMosaic = ({
 
     setMapboxArtificialSize(sizeFactor)
 
+    if (!mapboxContainer.current) {
+      return
+    }
+
     const newMap = new mapboxgl.Map({
       container: mapboxContainer.current ? mapboxContainer.current : '',
       style: MAPBOX_STYLES[mapboxStyle].url,
@@ -225,6 +229,7 @@ export const usePaintMosaic = ({
     initialCenter,
     isWasmAvailable,
     displayLogo,
+    mapboxContainer,
   ])
 
   return { mapboxResolutionRatio }

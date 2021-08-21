@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { Input, Modal, Progress } from 'antd'
-import { CheckCircleTwoTone, LoadingOutlined, SendOutlined } from '@ant-design/icons'
+import { Button, Input, Modal, Progress } from 'antd'
+import { CheckCircleTwoTone, CloudUploadOutlined, LoadingOutlined, SendOutlined } from '@ant-design/icons'
 import { ProgressProps } from 'antd/lib/progress'
 import firebase from 'firebase/app'
 import { firebaseAuth } from 'firebaseService/initialize'
@@ -68,6 +68,7 @@ const CloudUpload = ({
   placeName,
   colorConfig,
   mapboxStyle,
+  isLinkButton,
 }: {
   isDisabled: boolean
   className?: string
@@ -76,6 +77,7 @@ const CloudUpload = ({
   placeName: string | null
   colorConfig: ColorConfig
   mapboxStyle: MapboxStyle
+  isLinkButton?: boolean
 }) => {
   const [modalVisible, setModalVisible] = useState(false)
   const [progress, setProgress] = useState(0)
@@ -256,7 +258,13 @@ const CloudUpload = ({
 
   return (
     <div className={className}>
-      <UploadButton isDisabled={isDisabled} onUploadClick={onUploadClick} />
+      {isLinkButton ? (
+        <Button icon={<CloudUploadOutlined />} shape="round" onClick={onUploadClick}>
+          Upload to gallery
+        </Button>
+      ) : (
+        <UploadButton isDisabled={isDisabled} onUploadClick={onUploadClick} />
+      )}
       <Modal visible={modalVisible} onCancel={onModalCancel} onOk={onModalOk}>
         <StatusMessage documentId={pictureDocumentId} taskState={taskState} />
         {taskState && (

@@ -70,16 +70,21 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 32px 16px 8px;
+    padding: 16px 16px 8px;
     height: 100%;
     width: 100%;
     background-color: @light-grey;
     &__cards {
+      &__first-card {
+        padding: 12px;
+        background-color: white;
+        margin-top: 16px;
+      }
       &__card {
-        padding: 16px;
+        padding: 12px;
         background-color: white;
         &:not(:first-child) {
-          margin-top: 32px;
+          margin-top: 26px;
         }
       }
     }
@@ -112,7 +117,7 @@
         opacity: 1;
       }
       &:not(:last-child) {
-        margin-right: 16px;
+        margin-right: 6px;
       }
       .background-image {
         padding: 2px;
@@ -121,5 +126,32 @@
         }
       }
     }
+  }
+}
+.mosaic-mode {
+  margin-top: 16px;
+}
+
+.drawer-action {
+  display: flex;
+  flex-direction: column;
+  margin-top: 16px;
+  &__download-upload {
+    display: flex;
+  }
+  &__links {
+    margin-top: 16px;
+  }
+}
+
+.action-button {
+  pointer-events: auto;
+  &:not(:first-child) {
+    margin-left: 8px;
+  }
+
+  .button-icon {
+    width: 16px;
+    height: 16px;
   }
 }

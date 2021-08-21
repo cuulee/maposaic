@@ -43,3 +43,8 @@ export enum MaposaicColorURLParamKey {
   Index = 'index',
   Colors = 'colors',
 }
+
+export enum MosaicMode {
+  'Map',
+  'Image',
+}

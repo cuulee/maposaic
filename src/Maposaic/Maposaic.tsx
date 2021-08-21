@@ -1,19 +1,10 @@
-import React, { Suspense, useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { Button, Tooltip } from 'antd'
-import {
-  CloudDownloadOutlined,
-  FullscreenExitOutlined,
-  FullscreenOutlined,
-  PictureOutlined,
-  SettingOutlined,
-} from '@ant-design/icons'
-import { useHistory } from 'react-router-dom'
+import { SettingOutlined } from '@ant-design/icons'
 import { Spin } from 'antd'
 import spinner from 'assets/spinner.png'
-import dice from 'assets/dice.svg'
-import gps from 'assets/gps.svg'
 
 import Drawer from 'Drawer/Drawer'
 
@@ -28,6 +19,7 @@ import {
   MAPOSAIC_SCREENSAVER_PARAM_KEY,
   MAPOSAIC_STYLE_URL_PARAM_KEY,
   MaposaicGeoURLParamKey,
+  MosaicMode,
   OnPosterSizeChangePayload,
   SpecificColorTransforms,
 } from 'Maposaic/types'
@@ -35,21 +27,16 @@ import { getPosterTargetSize, resizeMapsContainer, toggleCanvasOpacity } from 'M
 import { TOOLTIP_ENTER_DELAY } from 'constants/ux'
 import { MAPBOX_TOKEN } from 'constants/mapbox'
 import { fetchGeoRandom, getPlaceNameFromPosition, getRandomCityCoords, getRandomZoom } from 'Geo/utils'
-import GeoSearch from 'Geo/GeoSearchInput'
 import {
   getColorConfigFromURLParams,
   getURLParamsFromColorConfig,
   getURLParamsFromCoords,
-  onFullScreenClick,
   useCheckMobileScreen,
-  useIsFullScreen,
 } from 'Maposaic/utils'
-import { UploadButton } from 'CloudUpload/UploadButton'
 import { TRUE_URL_PARAM_VALUE } from 'constants/navigation'
 import PlaceName from 'PlaceName/PlaceName'
 import { usePaintMosaic } from 'Maposaic/usePaintMosaic'
-
-const CloudUpload = React.lazy(() => import('CloudUpload/CloudUpload'))
+import Converter from 'Converter/Converter'
 
 mapboxgl.accessToken = MAPBOX_TOKEN
 
@@ -58,8 +45,8 @@ const INITIAL_SIZE_FACTOR = 1
 let lastFetchedPlaceNameCenter: mapboxgl.LngLat | null = null
 
 const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): JSX.Element => {
-  const history = useHistory()
   const [isMobile, setIsMobile] = useState(false)
+  const [mosaicMode, setMosaicMode] = useState(MosaicMode.Image)
   const [isInitialUrlParamsParsed, setIsInitialUrlParamsParsed] = useState(false)
   const [map, setMap] = useState<mapboxgl.Map | null>(null)
   const mapboxContainer = useRef<HTMLDivElement | null>(null)
@@ -159,6 +146,14 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
     setIsInitialUrlParamsParsed(true)
     // eslint-disable-next-line
   }, [])
+
+  const onMosaicModeChange = (mode: MosaicMode) => {
+    setMosaicMode(mode)
+    setSizeRender((sizeRender) => sizeRender + 1)
+    if (mode === MosaicMode.Image) {
+      setDrawerVisible(false)
+    }
+  }
 
   const changePlacePeriodically = useCallback(() => {
     void setRandomCoords({ setZoom: true, fetchFromApi: false })
@@ -301,19 +296,28 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
       )
     }
   }
-  const { isFullScreen } = useIsFullScreen()
 
   return (
     <div className="root-wrapper" id="root-wrapper">
-      <div className="maps-container" id="maps-container">
-        <canvas className="mosaic-canvas" id="maposaic-canvas" />
-        <div id="mapbox-wrapper" className="mapbox-wrapper" ref={(el) => (mapboxContainer.current = el)} />
-        <Spin
-          className="maps-container__spin"
-          spinning={isLoading}
-          indicator={<img className="spinner" src={spinner} alt="spin" />}
-        />
-      </div>
+      {mosaicMode === MosaicMode.Map ? (
+        <div className="maps-container" id="maps-container">
+          <canvas className="mosaic-canvas" id="maposaic-canvas" />
+          <div id="mapbox-wrapper" className="mapbox-wrapper" ref={(el) => (mapboxContainer.current = el)} />
+          <Spin
+            className="maps-container__spin"
+            spinning={isLoading}
+            indicator={<img className="spinner" src={spinner} alt="spin" />}
+          />
+        </div>
+      ) : (
+        <div className="image-converter">
+          <Converter
+            isWasmAvailable={!!isWasmAvailable}
+            specificColorTransforms={specificColorTransforms}
+            colorConfig={colorConfig}
+          />
+        </div>
+      )}
       <Drawer
         visible={drawerVisible}
         setDrawerVisible={setDrawerVisible}
@@ -329,6 +333,17 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
         isMobile={isMobile}
         displayLogo={displayLogo}
         setDisplayLogo={setDisplayLogo}
+        flyTo={flyTo}
+        currentCenter={currentCenter}
+        setRandomCoords={setRandomCoords}
+        onGeolocationClick={onGeolocationClick}
+        isLoading={isLoading}
+        download={download}
+        mapZoom={map?.getZoom()}
+        mapCenter={map?.getCenter()}
+        placeName={placeName}
+        mosaicMode={mosaicMode}
+        setMosaicMode={onMosaicModeChange}
       />
       <div className="overmap">
         <div className="overmap__actions">
@@ -341,68 +356,6 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
               icon={<SettingOutlined />}
             />
           </Tooltip>
-        </div>
-        <div className="overmap__actions">
-          <GeoSearch
-            className="overmap__actions__button"
-            flyTo={flyTo}
-            currentCenter={currentCenter}
-            setDrawerVisible={setDrawerVisible}
-          />
-          <Tooltip title="Full screen" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
-            <Button
-              className="overmap__actions__button"
-              onClick={() => onFullScreenClick(isFullScreen, setDrawerVisible)}
-              shape="circle"
-              icon={isFullScreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
-            />
-          </Tooltip>
-          <Tooltip title="Download" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
-            <Button
-              className="overmap__actions__button"
-              type="default"
-              shape="circle"
-              onClick={download}
-              icon={<CloudDownloadOutlined />}
-              disabled={isLoading}
-            />
-          </Tooltip>
-          <Suspense fallback={<UploadButton isDisabled={true} />}>
-            <CloudUpload
-              mapZoom={map?.getZoom()}
-              mapCenter={map?.getCenter()}
-              mapboxStyle={mapboxStyle}
-              colorConfig={colorConfig}
-              placeName={placeName}
-              className="overmap__actions__button"
-              isDisabled={isLoading}
-            />
-          </Suspense>
-          <Tooltip title="Visit gallery">
-            <Button
-              className="overmap__actions__button"
-              onClick={() => {
-                history.push('/gallery')
-              }}
-              shape="circle"
-              icon={<PictureOutlined />}
-            />
-          </Tooltip>
-          <Tooltip title="Random place" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
-            <Button
-              className="overmap__actions__button"
-              style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
-              shape="circle"
-              onClick={() => setRandomCoords({ setZoom: true, fetchFromApi: false })}
-              icon={<img src={dice} width="16px" alt="dice" />}
-            />
-          </Tooltip>
-          <Button
-            onClick={onGeolocationClick}
-            className="overmap__actions__button"
-            shape="circle"
-            icon={<img src={gps} width="16px" alt="gps" />}
-          />
         </div>
       </div>
       <PlaceName showPlaceNameTrigger={showPlaceNameTrigger} placeName={placeName} />

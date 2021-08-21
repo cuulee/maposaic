@@ -1,11 +1,7 @@
-import { RANDOM_CONFIG, ROAD_WHITE } from 'Colors/constants'
-import { ROAD_SIMPLE_WHITE, WATER_CYAN } from 'Colors/mapbox'
 import { ColorConfig as ColorConfigType } from 'Colors/types'
 import { SpecificColorTransforms } from 'Maposaic/types'
 import React, { useState } from 'react'
 import spinner from 'assets/spinner.png'
-import ColorConfig from 'Colors/ColorConfigChoice'
-import { Card } from 'antd'
 
 import './converter.less'
 
@@ -40,16 +36,18 @@ const Uploader = ({ setImageUrl }: { setImageUrl: (url: string) => void }) => {
   )
 }
 
-const Converter = ({ isWasmAvailable }: { isWasmAvailable: boolean }) => {
-  const [colorConfig, setColorConfig] = useState<ColorConfigType>(RANDOM_CONFIG)
+const Converter = ({
+  isWasmAvailable,
+  colorConfig,
+  specificColorTransforms,
+}: {
+  isWasmAvailable: boolean
+  colorConfig: ColorConfigType
+  specificColorTransforms: SpecificColorTransforms
+}) => {
   const [compareWithCIELAB, setcompareWithCIELAB] = useState(true)
   const [imageUrl, setImageUrl] = useState<null | string>(null)
   const [similarColorTolerance, setSimilarColorTolerance] = useState(10)
-
-  const [specificColorTransforms, setNewSpecificColorTransforms] = useState<SpecificColorTransforms>({
-    [ROAD_SIMPLE_WHITE]: { color: ROAD_WHITE, isEditable: true, name: 'roads' },
-    [WATER_CYAN]: { color: null, isEditable: true, name: 'water' },
-  })
 
   const { isLoading } = useConversion({
     imageUrl,
@@ -89,16 +87,6 @@ const Converter = ({ isWasmAvailable }: { isWasmAvailable: boolean }) => {
             value={similarColorTolerance}
             onChange={(value) => setSimilarColorTolerance(value as number)}
           />
-        </div>
-        <div className="converter__color-config">
-          <Card title="Color">
-            <ColorConfig
-              colorConfig={colorConfig}
-              setColorConfig={setColorConfig}
-              specificColorTransforms={specificColorTransforms}
-              setNewSpecificColorTransforms={setNewSpecificColorTransforms}
-            />
-          </Card>
         </div>
       </div>
       <div className="converter__item">
