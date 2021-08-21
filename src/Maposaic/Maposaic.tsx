@@ -36,7 +36,7 @@ import {
 import { TRUE_URL_PARAM_VALUE } from 'constants/navigation'
 import PlaceName from 'PlaceName/PlaceName'
 import { usePaintMosaic } from 'Maposaic/usePaintMosaic'
-import Converter from 'Converter/Converter'
+import Converter, { OUTPUT_CANVAS_ID } from 'Converter/Converter'
 
 mapboxgl.accessToken = MAPBOX_TOKEN
 
@@ -46,7 +46,7 @@ let lastFetchedPlaceNameCenter: mapboxgl.LngLat | null = null
 
 const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): JSX.Element => {
   const [isMobile, setIsMobile] = useState(false)
-  const [mosaicMode, setMosaicMode] = useState(MosaicMode.Image)
+  const [mosaicMode, setMosaicMode] = useState(MosaicMode.Map)
   const [isInitialUrlParamsParsed, setIsInitialUrlParamsParsed] = useState(false)
   const [map, setMap] = useState<mapboxgl.Map | null>(null)
   const mapboxContainer = useRef<HTMLDivElement | null>(null)
@@ -59,6 +59,7 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
   const [isLoading, setIsLoading] = useState(true)
   const [currentCenter, setCurrentCenter] = useState<null | mapboxgl.LngLat>(null)
   const [placeName, setPlaceName] = useState<null | string>(null)
+  const [hidePlaceName, setHidePlaceName] = useState(false)
   const [sizeRender, setSizeRender] = useState(0)
   const [sizeFactor, setSizeFactor] = useState(INITIAL_SIZE_FACTOR)
   const [initialCenter, setInitialCenter] = useState<null | mapboxgl.LngLat>(null)
@@ -147,13 +148,15 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
     // eslint-disable-next-line
   }, [])
 
-  const onMosaicModeChange = (mode: MosaicMode) => {
-    setMosaicMode(mode)
+  useEffect(() => {
     setSizeRender((sizeRender) => sizeRender + 1)
-    if (mode === MosaicMode.Image) {
+    if (mosaicMode === MosaicMode.Image) {
       setDrawerVisible(false)
+      setHidePlaceName(true)
+    } else {
+      setHidePlaceName(false)
     }
-  }
+  }, [mosaicMode])
 
   const changePlacePeriodically = useCallback(() => {
     void setRandomCoords({ setZoom: true, fetchFromApi: false })
@@ -266,14 +269,24 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentCenter])
 
+  const getMosaicElementById = () => {
+    return mosaicMode === MosaicMode.Map
+      ? (document.getElementById('maposaic-canvas') as HTMLCanvasElement | null)
+      : (document.getElementById(OUTPUT_CANVAS_ID) as HTMLCanvasElement | null)
+  }
+
   const download = () => {
-    const mosaicElement = document.getElementById('maposaic-canvas') as HTMLCanvasElement | null
+    const mosaicElement = getMosaicElementById()
     if (!mosaicElement) {
       return
     }
     mosaicElement.toBlob((blob) => {
       const link = document.createElement('a')
-      link.download = placeName ? `maposaic - ${placeName}` : 'maposaic'
+      let fileName = placeName ? `maposaic - ${placeName}` : 'maposaic'
+      if (mosaicMode === MosaicMode.Image) {
+        fileName = 'painted image'
+      }
+      link.download = fileName
       link.href = URL.createObjectURL(blob)
       link.click()
     })
@@ -315,6 +328,7 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
             isWasmAvailable={!!isWasmAvailable}
             specificColorTransforms={specificColorTransforms}
             colorConfig={colorConfig}
+            setIsParentLoading={setIsLoading}
           />
         </div>
       )}
@@ -343,7 +357,8 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
         mapCenter={map?.getCenter()}
         placeName={placeName}
         mosaicMode={mosaicMode}
-        setMosaicMode={onMosaicModeChange}
+        setMosaicMode={setMosaicMode}
+        getMosaicElementById={getMosaicElementById}
       />
       <div className="overmap">
         <div className="overmap__actions">
@@ -358,7 +373,7 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
           </Tooltip>
         </div>
       </div>
-      <PlaceName showPlaceNameTrigger={showPlaceNameTrigger} placeName={placeName} />
+      <PlaceName hidePlaceName={hidePlaceName} showPlaceNameTrigger={showPlaceNameTrigger} placeName={placeName} />
     </div>
   )
 }

@@ -4,7 +4,15 @@ import React, { useEffect, useState } from 'react'
 
 import 'PlaceName/placeName.style.less'
 
-const PlaceName = ({ placeName, showPlaceNameTrigger }: { placeName: string | null; showPlaceNameTrigger: number }) => {
+const PlaceName = ({
+  placeName,
+  showPlaceNameTrigger,
+  hidePlaceName,
+}: {
+  placeName: string | null
+  showPlaceNameTrigger: number
+  hidePlaceName: boolean
+}) => {
   const [isTextDisplayed, setIsTextDisplayed] = useState(false)
   useEffect(() => {
     if (!showPlaceNameTrigger || isTextDisplayed) {
@@ -20,10 +28,10 @@ const PlaceName = ({ placeName, showPlaceNameTrigger }: { placeName: string | nu
   }
 
   const getAdditionalPlaceNameClass = () => {
-    if (isTextDisplayed) {
+    if (!hidePlaceName && isTextDisplayed) {
       return 'place-name--displayed'
     }
-    if (!showPlaceNameTrigger) {
+    if (hidePlaceName || !showPlaceNameTrigger) {
       return 'place-name--hidden'
     }
     return 'place-name--hidden place-name--hidden--animation'

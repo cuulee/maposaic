@@ -8,6 +8,7 @@ import './converter.less'
 import { useConversion } from 'Converter/useConversion'
 import { InputNumber, Spin } from 'antd'
 import Checkbox from 'antd/lib/checkbox/Checkbox'
+import { useEffect } from 'react'
 
 export const OUTPUT_CANVAS_ID = 'output-canvas-id'
 export const INPUT_CANVAS_ID = 'input-canvas-id'
@@ -40,10 +41,12 @@ const Converter = ({
   isWasmAvailable,
   colorConfig,
   specificColorTransforms,
+  setIsParentLoading,
 }: {
   isWasmAvailable: boolean
   colorConfig: ColorConfigType
   specificColorTransforms: SpecificColorTransforms
+  setIsParentLoading: (isLoading: boolean) => void
 }) => {
   const [compareWithCIELAB, setcompareWithCIELAB] = useState(true)
   const [imageUrl, setImageUrl] = useState<null | string>(null)
@@ -57,6 +60,11 @@ const Converter = ({
     compareWithCIELAB,
     isWasmAvailable,
   })
+
+  useEffect(() => {
+    setIsParentLoading(isLoading)
+    return () => setIsParentLoading(false)
+  }, [isLoading, setIsParentLoading])
 
   return (
     <div className="converter">

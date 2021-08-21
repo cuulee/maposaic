@@ -72,6 +72,7 @@ const Drawer = ({
   placeName,
   mosaicMode,
   setMosaicMode,
+  getMosaicElementById,
 }: DrawerPropsType) => {
   const history = useHistory()
   const [isLandscape, setIsLandscape] = useState<boolean | null>(null)
@@ -135,31 +136,33 @@ const Drawer = ({
         </div>
         <div className="drawer__content">
           <div className="drawer__content__cards">
-            <div className="drawer_localization">
-              <GeoSearch flyTo={flyTo} currentCenter={currentCenter} setDrawerVisible={setDrawerVisible} />
-              <Tooltip title="Full screen" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
+            {mosaicMode === MosaicMode.Map && (
+              <div className="drawer_localization">
+                <GeoSearch flyTo={flyTo} currentCenter={currentCenter} setDrawerVisible={setDrawerVisible} />
+                <Tooltip title="Full screen" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
+                  <Button
+                    className="action-button"
+                    onClick={() => onFullScreenClick(isFullScreen, setDrawerVisible)}
+                    shape="circle"
+                    icon={isFullScreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
+                  />
+                </Tooltip>
+                <Tooltip title="Random place" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
+                  <Button
+                    className="action-button"
+                    shape="circle"
+                    onClick={() => setRandomCoords({ setZoom: true, fetchFromApi: false })}
+                    icon={<img src={dice} width="16px" alt="dice" />}
+                  />
+                </Tooltip>
                 <Button
-                  className="action-button"
-                  onClick={() => onFullScreenClick(isFullScreen, setDrawerVisible)}
-                  shape="circle"
-                  icon={isFullScreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
-                />
-              </Tooltip>
-              <Tooltip title="Random place" mouseEnterDelay={TOOLTIP_ENTER_DELAY}>
-                <Button
+                  onClick={onGeolocationClick}
                   className="action-button"
                   shape="circle"
-                  onClick={() => setRandomCoords({ setZoom: true, fetchFromApi: false })}
-                  icon={<img src={dice} width="16px" alt="dice" />}
+                  icon={<img src={gps} width="16px" alt="gps" />}
                 />
-              </Tooltip>
-              <Button
-                onClick={onGeolocationClick}
-                className="action-button"
-                shape="circle"
-                icon={<img src={gps} width="16px" alt="gps" />}
-              />
-            </div>
+              </div>
+            )}
             <div className="drawer__content__cards__first-card">
               <Title level={5}>Colors</Title>
               <ColorConfig
@@ -195,7 +198,6 @@ const Drawer = ({
                 </div>
               )}
               <div className="mosaic-mode">
-                {/* eslint-disable-next-line */}
                 <Radio.Group onChange={(e) => setMosaicMode(e.target.value)} value={mosaicMode}>
                   <Radio value={MosaicMode.Map}>Map</Radio>
                   <Radio value={MosaicMode.Image}>Image</Radio>
@@ -267,7 +269,7 @@ const Drawer = ({
                         )
                       }
                       className="resolution__item"
-                    ></InputNumber>
+                    />
                     <div className="resolution__item">ppp</div>
                   </div>
                 )}
@@ -293,6 +295,7 @@ const Drawer = ({
                     className="overmap__actions__button"
                     isDisabled={isLoading}
                     isLinkButton={true}
+                    getMosaicElementById={getMosaicElementById}
                   />
                 </Suspense>
               </div>

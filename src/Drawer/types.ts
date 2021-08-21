@@ -28,4 +28,5 @@ export type DrawerPropsType = {
   placeName: string | null
   mosaicMode: MosaicMode
   setMosaicMode: (mode: MosaicMode) => void
+  getMosaicElementById: () => HTMLCanvasElement | null
 }

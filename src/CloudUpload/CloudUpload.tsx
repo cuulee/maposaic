@@ -69,6 +69,7 @@ const CloudUpload = ({
   colorConfig,
   mapboxStyle,
   isLinkButton,
+  getMosaicElementById,
 }: {
   isDisabled: boolean
   className?: string
@@ -78,6 +79,7 @@ const CloudUpload = ({
   colorConfig: ColorConfig
   mapboxStyle: MapboxStyle
   isLinkButton?: boolean
+  getMosaicElementById: () => HTMLCanvasElement | null
 }) => {
   const [modalVisible, setModalVisible] = useState(false)
   const [progress, setProgress] = useState(0)
@@ -101,7 +103,7 @@ const CloudUpload = ({
     })
   }, [])
 
-  const onUploadClick = () => {
+  const onUploadClick = (getMosaicElementById: () => HTMLCanvasElement | null) => {
     setModalVisible(true)
     if (taskState === UploadStatus.Running) {
       return
@@ -111,7 +113,7 @@ const CloudUpload = ({
     setPictureDocumentId(null)
     setPictureName('')
 
-    const mosaicElement = document.getElementById('maposaic-canvas') as HTMLCanvasElement | null
+    const mosaicElement = getMosaicElementById()
     if (!mosaicElement) {
       return
     }
@@ -259,7 +261,7 @@ const CloudUpload = ({
   return (
     <div className={className}>
       {isLinkButton ? (
-        <Button icon={<CloudUploadOutlined />} shape="round" onClick={onUploadClick}>
+        <Button icon={<CloudUploadOutlined />} shape="round" onClick={() => onUploadClick(getMosaicElementById)}>
           Upload to gallery
         </Button>
       ) : (
