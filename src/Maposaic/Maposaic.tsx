@@ -330,6 +330,11 @@ const MapboxGLMap = ({ isWasmAvailable }: { isWasmAvailable: boolean | null }): 
             colorConfig={colorConfig}
             setIsParentLoading={setIsLoading}
           />
+          <Spin
+            className="image-converter__spin"
+            spinning={isLoading}
+            indicator={<img className="spinner" src={spinner} alt="spin" />}
+          />
         </div>
       )}
       <Drawer

@@ -6,18 +6,17 @@ import spinner from 'assets/spinner.png'
 import './converter.less'
 
 import { useConversion } from 'Converter/useConversion'
-import { InputNumber, Spin } from 'antd'
+import { Button, InputNumber, Spin, Upload } from 'antd'
 import Checkbox from 'antd/lib/checkbox/Checkbox'
 import { useEffect } from 'react'
+import { UploadOutlined } from '@ant-design/icons'
+import { RcFile } from 'antd/lib/upload/interface'
 
 export const OUTPUT_CANVAS_ID = 'output-canvas-id'
 export const INPUT_CANVAS_ID = 'input-canvas-id'
 
 const Uploader = ({ setImageUrl }: { setImageUrl: (url: string) => void }) => {
-  const handleChange = (fileList: FileList | null) => {
-    if (!fileList) {
-      return
-    }
+  const onChange = (file: RcFile): boolean => {
     const reader = new FileReader()
 
     reader.onload = (e) => {
@@ -25,15 +24,16 @@ const Uploader = ({ setImageUrl }: { setImageUrl: (url: string) => void }) => {
         setImageUrl(e.target.result as string)
       }
     }
-    if (fileList[0]) {
-      reader.readAsDataURL(fileList[0])
+    if (file) {
+      reader.readAsDataURL(file)
     }
+    return false // prevent upload
   }
 
   return (
-    <div className="uploader">
-      <input accept="image/png, image/jpeg, image/svg+xml" type="file" onChange={(e) => handleChange(e.target.files)} />
-    </div>
+    <Upload accept="image/*" multiple={false} beforeUpload={onChange}>
+      <Button icon={<UploadOutlined />}>Chose an image</Button>
+    </Upload>
   )
 }
 
@@ -46,7 +46,7 @@ const Converter = ({
   isWasmAvailable: boolean
   colorConfig: ColorConfigType
   specificColorTransforms: SpecificColorTransforms
-  setIsParentLoading: (isLoading: boolean) => void
+  setIsParentLoading?: (isLoading: boolean) => void
 }) => {
   const [compareWithCIELAB, setcompareWithCIELAB] = useState(true)
   const [imageUrl, setImageUrl] = useState<null | string>(null)
@@ -62,8 +62,10 @@ const Converter = ({
   })
 
   useEffect(() => {
-    setIsParentLoading(isLoading)
-    return () => setIsParentLoading(false)
+    if (setIsParentLoading) {
+      setIsParentLoading(isLoading)
+      return () => setIsParentLoading(false)
+    }
   }, [isLoading, setIsParentLoading])
 
   return (
@@ -71,7 +73,7 @@ const Converter = ({
       <div className="converter__settings">
         <div className="converter__settings__upload">
           <Uploader setImageUrl={setImageUrl} />
-          {isLoading && (
+          {isLoading && !setIsParentLoading && (
             <Spin
               className="converter__settings__loader"
               spinning={true}
