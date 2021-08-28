@@ -1,3 +1,5 @@
+@import 'App.style.less';
+
 .poster-tooltip {
   margin-left: 8px;
 }
@@ -137,8 +139,14 @@
   display: flex;
   flex-direction: column;
   margin-top: 16px;
+  @media @desktop {
+    margin-top: 32px;
+  }
   &__download-upload {
     display: flex;
+    @media @mobile {
+      flex-direction: column;
+    }
   }
   &__links {
     margin-top: 16px;

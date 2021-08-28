@@ -282,9 +282,11 @@ const Drawer = ({
             )}
             <div className="drawer-action">
               <div className="drawer-action__download-upload">
-                <Button shape="round" onClick={download} icon={<CloudDownloadOutlined />} disabled={isLoading}>
-                  Dowload
-                </Button>
+                <div>
+                  <Button shape="round" onClick={download} icon={<CloudDownloadOutlined />} disabled={isLoading}>
+                    Dowload
+                  </Button>
+                </div>
                 <Suspense fallback={<UploadButton isDisabled={true} />}>
                   <CloudUpload
                     mapZoom={mapZoom}
